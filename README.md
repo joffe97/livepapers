@@ -1,4 +1,5 @@
-<div><div style="font-weight: bold; font-size: 3em">Livepapers</div><div style="font-size: 1.8em; color: #666666">Web programming exam project</div></div>
+# Livepapers
+### Web programming exam project
 
 <hr>
 
@@ -61,6 +62,8 @@ Stores information about animated wallpapers. The table contains the following c
   * Date added
   * Date, not null
 * views
+  * Counted views
+  * Int, not null
 
 <table>
     <thead>
@@ -82,10 +85,10 @@ Stores information about likes on animated wallpapers. The table contains the fo
   * Int, primary key
 * aid
   * Id of the animated wallpaper
-  * Int, foreign key (*aid* wallpaper)
-* user
+  * Int, foreign key (*aid* wallpaper), not null
+* username
   * Username of the user that added the wallpaper.
-  * Text
+  * Text, foreign key (*username* user), not null
 
 <table>
     <thead>
