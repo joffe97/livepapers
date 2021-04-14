@@ -1,8 +1,4 @@
-# Livepapers
-### Web programming exam project
-
-<hr>
-
+# Livepapers - Web programming exam project
 **Livepapers** is a webpage developed by Joachim Andreassen as a exam project in the web programming course. The purpose of this webpage is to provide animated wallpapers to users. Animated wallpapers can be put to use using <a href="https://rocksdanister.github.io/lively/#three">Lively Wallpaper</a>, or other similar software.
 
 
