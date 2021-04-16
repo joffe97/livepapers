@@ -3,9 +3,21 @@
 
 
 
+## Technical
+
+**How to run:**  run `python3 app.py` from the `./flaskr` directory.
+
+**Python version:** 3.9
+
+**Third party python packages:**
+
+* werkzeug
+
+
+
 ## Databases
 
-#### User database:
+#### Users database:
 
 Stores information about users. The table contains the following columns:
 
@@ -38,7 +50,7 @@ Stores information about users. The table contains the following columns:
 
 
 
-#### Wallpaper database:
+#### Wallpapers database:
 
 Stores information about animated wallpapers. The table contains the following columns:
 
@@ -47,7 +59,7 @@ Stores information about animated wallpapers. The table contains the following c
   * Int, primary key
 * username
   * Username of the user that added the wallpaper.
-  * Text, foreign key (*username* user)
+  * Text, foreign key (*username* users)
 * width
   * Wallpaper width
   * Int, not null
@@ -72,7 +84,7 @@ Stores information about animated wallpapers. The table contains the following c
 
 
 
-#### Like database:
+#### Likes database:
 
 Stores information about likes on animated wallpapers. The table contains the following columns:
 
@@ -81,10 +93,12 @@ Stores information about likes on animated wallpapers. The table contains the fo
   * Int, primary key
 * aid
   * Id of the animated wallpaper
-  * Int, foreign key (*aid* wallpaper), not null
+  * Int, foreign key (*aid* wallpapers), not null
 * username
   * Username of the user that added the wallpaper.
-  * Text, foreign key (*username* user), not null
+  * Text, foreign key (*username* users), not null
+
+**aid** and **username** is a multi column *unique constraint*.
 
 <table>
     <thead>
@@ -92,7 +106,7 @@ Stores information about likes on animated wallpapers. The table contains the fo
     </thead>
 	<tbody>
         <tr><td>1</td><td>2</td><td>joachim</td></tr>
-        <tr><td>2</td><td>2</td><td>joachim</td></tr>
+        <tr><td>2</td><td>1</td><td>joachim</td></tr>
     </tbody>
 </table>
 

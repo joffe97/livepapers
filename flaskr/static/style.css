@@ -1,0 +1,42 @@
+#logo {
+    max-width: 10em;
+    max-height: 100%;
+}
+
+.browse-img-square {
+    overflow: hidden;
+    width: 300px;
+    height: 200px;
+}
+
+.browse-img-square figure {
+    height: 100%;
+    width: 100%;
+}
+
+.browse-img-square figure img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.wallpaper-video {
+    width: 70%;
+}
+
+.wallpaper-video * {
+    width: 100%;
+}
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.unclickable {
+    pointer-events: none;
+}

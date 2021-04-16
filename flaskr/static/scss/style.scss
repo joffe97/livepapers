@@ -1,0 +1,15 @@
+@import "../bootstrap/scss/functions";
+@import "../bootstrap/scss/variables";
+
+$theme-colors: (
+        primary:    $gray-900,
+        secondary:  $gray-800,
+        success:    $success,
+        info:       $gray-700,
+        warning:    $warning,
+        danger:     $danger,
+        light:      $light,
+        dark:       $dark
+);
+
+@import "../bootstrap/scss/bootstrap";

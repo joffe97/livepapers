@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://unpkg.com/vue@3.0.5/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4"></script>
+
+    <script src={{url_for("static", filename="datastore.js")}}></script>
+    <script src={{url_for("static", filename="header.js")}}></script>
+    <script src={{url_for("static", filename="browse.js")}}></script>
+    <script src={{url_for("static", filename="wallpaper.js")}}></script>
+    <script src={{url_for("static", filename="router.js")}}></script>
+
+    <link rel="stylesheet" href={{url_for("static", filename="bsstyle.css")}}>
+    <link rel="stylesheet" href={{url_for("static", filename="style.css")}}>
+
+    <title>Livepapers</title>
+</head>
+
+<body class="bg-secondary text-light">
+    <div id="app">
+        <router-view></router-view>
+    </div>
+</body>
+
+<script>
+    let app = Vue.createApp({});
+    app.component("my-head", headerC);
+    app.component("wallpaper", wallpaperC);
+    app.use(router);
+    app.mount("#app");
+</script>
