@@ -9,7 +9,7 @@ $theme-colors: (
         warning:    $warning,
         danger:     $danger,
         light:      $light,
-        dark:       $dark
+        dark:       $gray-300
 );
 
 @import "../bootstrap/scss/bootstrap";

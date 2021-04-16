@@ -11,22 +11,29 @@ let headerC = {
           <div class="d-flex justify-content-between flex-column-reverse flex-lg-row w-100 pb-2 pb-lg-0">
               <ul class="navbar-nav">
                 <li class="nav-item">
-                  <div class="nav-link btn" :class="{active: this.pageId == 1}" href="#">Latest</div>
+                  <div class="nav-link btn" :class="{active: this.pageId == 1}" @click="goLatest()">Latest</div>
                 </li>
                 <li class="nav-item px-lg-2">
-                  <div class="nav-link btn" :class="{active: this.pageId == 2}" href="#">Most liked</div>
+                  <div class="nav-link btn" :class="{active: this.pageId == 2}" @click="goMostliked()">Most liked</div>
                 </li>
                 <li class="nav-item">
-                  <div class="nav-link btn" :class="{active: this.pageId == 3}" href="#">Random</div>
+                  <div class="nav-link btn" :class="{active: this.pageId == 3}" @click="goRandom()">Random</div>
                 </li>
                 <hr class="dropdown-divider d-block d-lg-none">
                 <div class="vl d-lg-block d-none"></div>
-                <li v-if="store.state.isLoggedIn == 1" class="nav-item">
-                  <div 
-                  class="nav-link btn" 
-                  :class="{active: this.pageId == 4}" 
-                  v-on:click="goLogin()"
-                  >Log in</div>
+                <li v-if="!store.state.isLoggedIn" class="nav-item">
+                    <div class="btn-group w-100">
+                      <div 
+                      class="nav-link btn w-50" 
+                      :class="{active: this.pageId == 5}" 
+                      v-on:click="goLogin()"
+                      >Login</div>
+                      <div 
+                      class="nav-link btn w-50" 
+                      :class="{active: this.pageId == 6}" 
+                      v-on:click="goRegister()"
+                      >Register</div>
+                    </div>
                 </li>
                 <li v-else class="nav-item"
                 @mouseover="userButtonHover = true"
@@ -37,7 +44,8 @@ let headerC = {
                         Profile
                       </div>
                       <div class="dropdown-menu p-0 border-0" :class="{show: userButtonHover}" aria-labelledby="dropdownMenuButton1">
-                        <button class="dropdown-item p-2" @click="goProfile()">Overview</button>
+                        <button class="btn btn-dark p-2 w-100 rounded-0 rounded-top" @click="goProfile()">Overview</button>
+                        <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfile()">Settings</button>
                         <button class="btn btn-danger p-2 w-100 rounded-0 rounded-bottom" href="#">Log out</button>
                       </div>
                     </div>
@@ -63,11 +71,23 @@ let headerC = {
         goHome: function () {
             return this.$router.push("/#/");
         },
+        goLatest: function () {
+            return this.$router.push("/latest/");
+        },
+        goMostliked: function () {
+            return this.$router.push("/mostliked/");
+        },
+        goRandom: function () {
+            return this.$router.push("/random/");
+        },
         goProfile: function () {
             return this.$router.push("/profile/");
         },
         goLogin: function () {
-            return this.$router.push("/#/");
+            return this.$router.push("/login/");
+        },
+        goRegister: function () {
+            return this.$router.push("/register/");
         }
     }
 }
