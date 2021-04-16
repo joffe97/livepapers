@@ -1,6 +1,6 @@
 let browseC = {
     template: `
-    <my-head></my-head>
+    <my-head pageId=1></my-head>
     <div class="bg-secondary">
         <div class="container">
             <div class="d-flex justify-content-center flex-wrap">
@@ -11,7 +11,7 @@ let browseC = {
                     <figure
                     class="figure m-0">
                         <img class="rounded-3 m-0 figure-img img-fluid" 
-                        v-bind:src="'static/wallpapers/images/' + wpId + '.jpg'">
+                        v-bind:src="getImageUrl(wpId)">
                     </figure>
                 </div>
             </div>
@@ -24,8 +24,11 @@ let browseC = {
         }
     },
     methods: {
-        goWallpaper: function(wp_id) {
-            this.$router.push("/wallpaper/" + wp_id);
+        goWallpaper: function(wpId) {
+            this.$router.push("/wallpaper/" + wpId);
+        },
+        getImageUrl: function (wpId) {
+            return cmnGetImageUrl(wpId);
         }
     }
 }

@@ -5,9 +5,12 @@
 
     <script src="https://unpkg.com/vue@3.0.5/dist/vue.global.js"></script>
     <script src="https://unpkg.com/vue-router@4"></script>
+    <script src={{url_for("static", filename="bootstrap/dist/js/bootstrap.min.js")}}></script>
 
+    <script src={{url_for("static", filename="common.js")}}></script>
     <script src={{url_for("static", filename="datastore.js")}}></script>
     <script src={{url_for("static", filename="header.js")}}></script>
+    <script src={{url_for("static", filename="profile.js")}}></script>
     <script src={{url_for("static", filename="browse.js")}}></script>
     <script src={{url_for("static", filename="wallpaper.js")}}></script>
     <script src={{url_for("static", filename="router.js")}}></script>
@@ -28,6 +31,7 @@
     let app = Vue.createApp({});
     app.component("my-head", headerC);
     app.component("wallpaper", wallpaperC);
+    app.component("wallpaper", profileC);
     app.use(router);
     app.mount("#app");
 </script>

@@ -1,7 +1,7 @@
 class DataStore {
     constructor() {
         this.state = Vue.reactive({
-            wallpaperIds: [1, 2, 3]
+            isLoggedIn: 0
         });
     }
 }

@@ -31,7 +31,7 @@ let wallpaperC = {
     },
     methods: {
         getVideoUrl: function () {
-            return 'static/wallpapers/videos/' + this.wpId + '.mp4'
+            return cmnGetVideoUrl(this.wpId)
         },
         getResolution: function () {
             return this.width + " x " + this.height

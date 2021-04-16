@@ -40,3 +40,9 @@
 .unclickable {
     pointer-events: none;
 }
+
+.vl {
+    border-left: 1px solid #555555;
+    margin: 0 10px;
+    height: 100%
+}

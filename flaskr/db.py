@@ -46,6 +46,13 @@ CREATE_LIKES_TABLE = """CREATE TABLE IF NOT EXISTS likes (
                           CONSTRAINT uc_like UNIQUE (aid,username)
                         );"""
 
+CREATE_TAGS_TABLE = """CREATE TABLE IF NOT EXISTS tags (
+                          tag TEXT NOT NULL,
+                          aid INTEGER NOT NULL,
+                          PRIMARY KEY (tag,aid),
+                          FOREIGN KEY (aid) REFERENCES wallpapers (aid)
+                        );"""
+
 
 # --------------- Common ---------------
 
@@ -116,6 +123,19 @@ def add_like(conn, aid: int, username: str):
         print(e)
 
 
+# --------------- Likes ---------------
+
+# Adds a like to a wallpaper to the database
+def add_tag(conn, tag: str, aid: int):
+    try:
+        cur: Cursor = conn.cursor()
+        query = "INSERT INTO tags (tag, aid) VALUES (?,?)"
+        cur.execute(query, (tag, aid))
+        conn.commit()
+    except Error as e:
+        print(e)
+
+
 # --------------- Setup ---------------
 
 # Initialize users
@@ -131,6 +151,7 @@ def init_users(conn):
             add_user(conn, user[0], user[1])
 
 
+# Initialize wallpapers
 def init_wallpapers(conn):
     wps = (
         ("joachim", 1920, 1080, 68),
@@ -140,6 +161,7 @@ def init_wallpapers(conn):
         add_wallpaper(conn, wp[0], wp[1], wp[2], views=wp[3])
 
 
+# Initialize likes
 def init_likes(conn):
     likes = (
         (1, "joachim"),
@@ -147,6 +169,17 @@ def init_likes(conn):
     )
     for like in likes:
         add_like(conn, like[0], like[1])
+
+
+# Initialize tags
+def init_tags(conn):
+    tags = (
+        ("popcorn", 2),
+        ("candy", 2),
+        ("popcorn", 1),
+    )
+    for tag in tags:
+        add_tag(conn, tag[0], tag[1])
 
 
 # Setup for database.db
@@ -157,9 +190,11 @@ def setup():
     create_table(conn, CREATE_USERS_TABLE)
     create_table(conn, CREATE_WALLPAPERS_TABLE)
     create_table(conn, CREATE_LIKES_TABLE)
+    create_table(conn, CREATE_TAGS_TABLE)
     init_users(conn)
     init_wallpapers(conn)
     init_likes(conn)
+    init_tags(conn)
     conn.close()
 
 

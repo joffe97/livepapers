@@ -9,9 +9,9 @@
 
 **Python version:** 3.9
 
-**Third party python packages:**
+**Python packages:** See requrements.txt
 
-* werkzeug
+**Style:** Bootstrap (bsstyle.css) and custom css (style.css)
 
 
 
@@ -107,6 +107,31 @@ Stores information about likes on animated wallpapers. The table contains the fo
 	<tbody>
         <tr><td>1</td><td>2</td><td>joachim</td></tr>
         <tr><td>2</td><td>1</td><td>joachim</td></tr>
+    </tbody>
+</table>
+
+
+#### **Tags database:**
+
+Stores information about the tags for animated wallpapers. The table contains the following columns:
+
+* tag
+  * The tag
+  * Text, primary key, not null
+* aid
+  * Id of the animated wallpaper
+  * Int, foreign key (*aid* wallpapers), not null
+
+**tag** and **aid** is a multi column *unique constraint*.
+
+<table>
+    <thead>
+        <tr><th>tag</th><th>aid</th></tr>
+    </thead>
+	<tbody>
+        <tr><td>popcorn</td><td>2</td></tr>
+        <tr><td>candy</td><td>2</td></tr>
+        <tr><td>whale</td><td>1</td></tr>
     </tbody>
 </table>
 
