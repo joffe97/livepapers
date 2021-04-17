@@ -2,6 +2,7 @@ import sqlite3
 import datetime
 from sqlite3 import Error, Cursor, Connection
 from werkzeug.security import generate_password_hash, check_password_hash
+from typing import Dict, Union
 
 
 DATABASE = "./database.db"
@@ -91,6 +92,24 @@ def add_user(conn, username: str, password: str, usertype: int = 3):
         conn.commit()
     except Error as e:
         print(e)
+
+
+# Get user from the database
+def get_user(conn, username: str) -> Dict[str, Union[str, int]]:
+    cur: Cursor = conn.cursor()
+    query = "SELECT * FROM users WHERE username=?"
+    cur.execute(query, (username,))
+    row = cur.fetchone()
+    return {"username": row[0], "pwhash": row[1], "type": row[2]} if row else None
+
+
+# Verify user
+def verify_user(conn, username: str, password: str) -> bool:
+    user = get_user(conn, username)
+    if user is None:
+        return False
+    pwhash = user.get("pwhash", None)
+    return pwhash is not None and check_password_hash(pwhash, password)
 
 
 # --------------- Wallpapers ---------------

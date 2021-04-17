@@ -1,7 +1,7 @@
 let headerC = {
     props: ["pageId"],
     template: `   
-    <nav class="position-fixed w-100 navbar navbar-expand-lg navbar-dark bg-primary mb-3 p-0">
+    <nav class="position-fixed w-100 navbar navbar-expand-lg navbar-dark bg-primary mb-3 p-0 flex-nowrap">
       <div class="container-fluid">
         <a class="navbar-brand" href="#"><img id="logo" class="img-fluid w-50" src="static/assets/logo_l.png"></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

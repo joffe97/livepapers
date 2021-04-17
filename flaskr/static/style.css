@@ -1,3 +1,7 @@
+nav {
+    z-index: 10000;
+}
+
 #logo {
     max-width: 10em;
     max-height: 100%;
@@ -45,4 +49,9 @@
     border-left: 1px solid #555555;
     margin: 0 10px;
     height: 100%
+}
+
+.okform {
+    max-width: 40em;
+    margin: auto;
 }
