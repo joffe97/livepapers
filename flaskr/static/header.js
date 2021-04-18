@@ -1,7 +1,7 @@
 let headerC = {
     props: ["pageId"],
     template: `   
-    <nav class="position-fixed w-100 navbar navbar-expand-lg navbar-dark bg-primary mb-3 p-0 flex-nowrap">
+    <nav class="position-fixed w-100 navbar navbar-expand-lg navbar-dark bg-primary mb-3 p-0">
       <div class="container-fluid">
         <a class="navbar-brand" href="#"><img id="logo" class="img-fluid w-50" src="static/assets/logo_l.png"></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,7 +46,7 @@ let headerC = {
                       <div class="dropdown-menu p-0 border-0" :class="{show: userButtonHover}" aria-labelledby="dropdownMenuButton1">
                         <button class="btn btn-dark p-2 w-100 rounded-0 rounded-top" @click="goProfile()">Overview</button>
                         <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfile()">Settings</button>
-                        <button class="btn btn-danger p-2 w-100 rounded-0 rounded-bottom" href="#">Log out</button>
+                        <button class="btn btn-danger p-2 w-100 rounded-0 rounded-bottom" @click="logout()">Log out</button>
                       </div>
                     </div>
                 </li>
@@ -88,6 +88,20 @@ let headerC = {
         },
         goRegister: function () {
             return this.$router.push("/register/");
+        },
+        logout: async function () {
+            let reply = await fetch("/dologout");
+            if (reply.status !== 200) return 0;
+            let isLoggedOut = parseInt(await reply.text());
+            if (isLoggedOut !== 1) return 0;
+            this.store.state.isLoggedIn = false;
+            return 1;
         }
+    },
+    async created() {
+        if (this.store.state.isInited) return;
+        this.store.state.isInited = true;
+        this.store.state.isLoggedIn = await cmnIsLoggedIn();
+        console.log(this.store.state.isLoggedIn)
     }
 }

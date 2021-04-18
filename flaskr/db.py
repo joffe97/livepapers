@@ -103,13 +103,20 @@ def get_user(conn, username: str) -> Dict[str, Union[str, int]]:
     return {"username": row[0], "pwhash": row[1], "type": row[2]} if row else None
 
 
-# Verify user
-def verify_user(conn, username: str, password: str) -> bool:
+# Verify user and returns user
+def verify_and_get_user(conn, username: str, password: str) -> Union[Dict[str, Union[str, int]], None]:
     user = get_user(conn, username)
     if user is None:
-        return False
+        return None
     pwhash = user.get("pwhash", None)
-    return pwhash is not None and check_password_hash(pwhash, password)
+    if pwhash is None or check_password_hash(pwhash, password) is False:
+        return None
+    return user
+
+
+# Verify user
+def verify_user(conn, username: str, password: str) -> bool:
+    return bool(verify_and_get_user(conn, username, password))
 
 
 # --------------- Wallpapers ---------------

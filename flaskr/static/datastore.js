@@ -1,7 +1,8 @@
 class DataStore {
     constructor() {
         this.state = Vue.reactive({
-            isLoggedIn: 0
+            isInited: false,
+            isLoggedIn: false
         });
     }
 }

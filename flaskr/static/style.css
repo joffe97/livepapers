@@ -1,5 +1,6 @@
 nav {
     z-index: 10000;
+    min-width: 300px;
 }
 
 #logo {

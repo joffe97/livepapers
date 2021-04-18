@@ -1,7 +1,7 @@
 async function cmnIsLoggedIn() {
-    let reply = await fetch("/userdata");
-	if (reply.status !== 200) return;
-	return await reply.text();
+	let reply = await fetch("/validate");
+	if (reply.status !== 200) return false;
+	return parseInt(await reply.text()) === 1
 }
 
 function cmnGetVideoUrl (wpId) {

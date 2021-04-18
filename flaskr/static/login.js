@@ -22,7 +22,8 @@ let loginC = {
         return {
             username: "",
             password: "",
-            failedLoginMessage: ""
+            failedLoginMessage: "",
+            store: store
         }
     },
     methods: {
@@ -39,11 +40,16 @@ let loginC = {
             });
             if (reply.status !== 200) {
                 this.failedLoginMessage = "An unknown error occured.";
-                return;
+                return 0;
             }
-            let isLoggedIn = await reply.text();
-            console.log(isLoggedIn);
-            return isLoggedIn;
+            console.log(reply);
+            let isLoggedIn = parseInt(await reply.text());
+            if (isLoggedIn !== 1) {
+                this.failedLoginMessage = "Wrong username or password. Try again.";
+                return 0;
+            }
+            store.state.isLoggedIn = true
+            return this.$router.push("/#/");
         }
     }
 }
