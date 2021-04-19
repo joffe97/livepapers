@@ -1,5 +1,4 @@
 let headerC = {
-    props: ["pageId"],
     template: `   
     <nav class="position-fixed w-100 navbar navbar-expand-lg navbar-dark bg-primary mb-3 p-0">
       <div class="container-fluid">
@@ -11,13 +10,13 @@ let headerC = {
           <div class="d-flex justify-content-between flex-column-reverse flex-lg-row w-100 pb-2 pb-lg-0">
               <ul class="navbar-nav">
                 <li class="nav-item">
-                  <div class="nav-link btn" :class="{active: this.pageId == 1}" @click="goLatest()">Latest</div>
+                  <div class="nav-link btn" :class="{active: store.state.pageId == 1}" @click="goLatest()">Latest</div>
                 </li>
                 <li class="nav-item px-lg-2">
-                  <div class="nav-link btn" :class="{active: this.pageId == 2}" @click="goMostliked()">Most liked</div>
+                  <div class="nav-link btn" :class="{active: store.state.pageId == 2}" @click="goMostliked()">Most liked</div>
                 </li>
                 <li class="nav-item">
-                  <div class="nav-link btn" :class="{active: this.pageId == 3}" @click="goRandom()">Random</div>
+                  <div class="nav-link btn" :class="{active: store.state.pageId == 3}" @click="goRandom()">Random</div>
                 </li>
                 <hr class="dropdown-divider d-block d-lg-none">
                 <div class="vl d-lg-block d-none"></div>
@@ -25,12 +24,12 @@ let headerC = {
                     <div class="btn-group w-100">
                       <div 
                       class="nav-link btn w-50" 
-                      :class="{active: this.pageId == 5}" 
+                      :class="{active: store.state.pageId == 5}" 
                       v-on:click="goLogin()"
                       >Login</div>
                       <div 
                       class="nav-link btn w-50" 
-                      :class="{active: this.pageId == 6}" 
+                      :class="{active: store.state.pageId == 6}" 
                       v-on:click="goRegister()"
                       >Register</div>
                     </div>
@@ -40,7 +39,7 @@ let headerC = {
                 @mouseleave="userButtonHover = false"
                 >
                     <div class="dropend">
-                      <div class="btn nav-link dropdown-toggle" :class="{show: userButtonHover, active: this.pageId == 4}" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" v-bind:aria-expanded="userButtonHover">
+                      <div class="btn nav-link dropdown-toggle" :class="{show: userButtonHover, active: store.state.pageId == 4}" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" v-bind:aria-expanded="userButtonHover">
                         Profile
                       </div>
                       <div class="dropdown-menu p-0 border-0" :class="{show: userButtonHover}" aria-labelledby="dropdownMenuButton1">

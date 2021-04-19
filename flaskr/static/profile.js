@@ -1,7 +1,19 @@
 let profileC = {
     template: `
-    <my-head pageId="4"></my-head>
+    <my-head></my-head>
     <div class="container">
     Profile
-    </div>`
+    </div>
+    `,
+    data() {
+        return {
+            store: store,
+        }
+    },
+    created() {
+        store.state.pageId = 4;
+    },
+    beforeUnmount() {
+        store.state.pageId = 0;
+    }
 }

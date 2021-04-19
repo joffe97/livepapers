@@ -1,12 +1,9 @@
 let loginC = {
     template: `
-    <my-head pageId=5></my-head>
+    <my-head></my-head>
     <div class="container">
         <form class="okform" @submit.prevent @submit="onLogin()">
-            <div class="alert alert-danger alert-dismissible fade" :class="[ failedLoginMessage !== '' ? 'show' : 'p-0 m-0 unclickable' ]">
-                {{ failedLoginMessage }}
-                 <button type="button" class="btn-close" @click="failedLoginMessage = ''"></button>
-            </div>
+            <alert-cross></alert-cross>
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input v-model="username" type="username" class="form-control" id="username">
@@ -22,9 +19,17 @@ let loginC = {
         return {
             username: "",
             password: "",
-            failedLoginMessage: "",
             store: store
         }
+    },
+    created() {
+        store.state.pageId = 5;
+    },
+    beforeUnmount() {
+        store.state.pageId = 0;
+    },
+    unmounted() {
+        if (store.state.isLoggedIn) setAlert("Successfully logged in!", "success");
     },
     methods: {
         onLogin: async function () {
@@ -34,21 +39,22 @@ let loginC = {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                "username": this.username,
-                "password": this.password
+                    "username": this.username,
+                    "password": this.password
                 })
             });
             if (reply.status !== 200) {
-                this.failedLoginMessage = "An unknown error occured.";
+                setAlert("An unknown error occured.", "danger");
                 return 0;
             }
             console.log(reply);
             let isLoggedIn = parseInt(await reply.text());
             if (isLoggedIn !== 1) {
-                this.failedLoginMessage = "Wrong username or password. Try again.";
+                setAlert("Wrong username or password. Try again.", "danger");
                 return 0;
             }
             store.state.isLoggedIn = true
+            console.log(this.$unmounted)
             return this.$router.push("/#/");
         }
     }

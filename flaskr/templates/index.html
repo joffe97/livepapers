@@ -9,6 +9,7 @@
 
     <script src={{url_for("static", filename="common.js")}}></script>
     <script src={{url_for("static", filename="datastore.js")}}></script>
+    <script src={{url_for("static", filename="alertsC.js")}}></script>
     <script src={{url_for("static", filename="header.js")}}></script>
     <script src={{url_for("static", filename="login.js")}}></script>
     <script src={{url_for("static", filename="register.js")}}></script>
@@ -32,6 +33,8 @@
 <script>
     let app = Vue.createApp({});
     app.component("my-head", headerC);
+    app.component("alert-cross", alertCrossC);
+    app.component("alert-tmp", alertTmpC);
     app.use(router);
     app.mount("#app");
 </script>

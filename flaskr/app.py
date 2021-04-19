@@ -78,8 +78,7 @@ def login():
     user = load_user(username, password)
     if not user:
         return json.dumps(0)
-    print(login_user(user))
-    return json.dumps(1)
+    return json.dumps(int(login_user(user)))
 
 
 # Log out the user

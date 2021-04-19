@@ -1,8 +1,8 @@
 let browseC = {
     template: `
-    <my-head pageId=1></my-head>
-    <div class="bg-secondary">
+    <my-head></my-head>
         <div class="container">
+            <alert-tmp></alert-tmp>
             <div class="d-flex justify-content-center flex-wrap">
                 <div
                 v-for="wpId in wallpaperIds"
@@ -16,12 +16,18 @@ let browseC = {
                 </div>
             </div>
         </div>
-    </div>
     `,
     data() {
         return {
+            store: store,
             wallpaperIds: [1, 2, 3, 4]
         }
+    },
+    created() {
+        store.state.pageId = 1;
+    },
+    beforeUnmount() {
+        store.state.pageId = 0;
     },
     methods: {
         goWallpaper: function(wpId) {
