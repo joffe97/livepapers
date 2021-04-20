@@ -1,30 +1,35 @@
 <!DOCTYPE html>
-<head lang="en">
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href={{url_for("static", filename="assets/favicon.ico")}}/>
 
     <script src="https://unpkg.com/vue@3.0.5/dist/vue.global.js"></script>
     <script src="https://unpkg.com/vue-router@4"></script>
     <script src={{url_for("static", filename="bootstrap/dist/js/bootstrap.min.js")}}></script>
 
-    <script src={{url_for("static", filename="common.js")}}></script>
-    <script src={{url_for("static", filename="datastore.js")}}></script>
-    <script src={{url_for("static", filename="alertsC.js")}}></script>
-    <script src={{url_for("static", filename="header.js")}}></script>
-    <script src={{url_for("static", filename="login.js")}}></script>
-    <script src={{url_for("static", filename="register.js")}}></script>
-    <script src={{url_for("static", filename="profile.js")}}></script>
-    <script src={{url_for("static", filename="browse.js")}}></script>
-    <script src={{url_for("static", filename="wallpaper.js")}}></script>
-    <script src={{url_for("static", filename="router.js")}}></script>
+    <script src={{url_for("static", filename="scripts/other/common.js")}}></script>
+    <script src={{url_for("static", filename="scripts/other/datastore.js")}}></script>
+    <script src={{url_for("static", filename="scripts/other/alertsC.js")}}></script>
+    <script src={{url_for("static", filename="scripts/other/header.js")}}></script>
+    <script src={{url_for("static", filename="scripts/userManagement/login.js")}}></script>
+    <script src={{url_for("static", filename="scripts/userManagement/register.js")}}></script>
+    <script src={{url_for("static", filename="scripts/profile/profile.js")}}></script>
+    <script src={{url_for("static", filename="scripts/profile/profileOverview.js")}}></script>
+    <script src={{url_for("static", filename="scripts/profile/profileWallpapers.js")}}></script>
+    <script src={{url_for("static", filename="scripts/profile/profileSettings.js")}}></script>
+    <script src={{url_for("static", filename="scripts/browse/browse.js")}}></script>
+    <script src={{url_for("static", filename="scripts/wallpaper/wallpaper.js")}}></script>
+    <script src={{url_for("static", filename="scripts/other/router.js")}}></script>
 
-    <link rel="stylesheet" href={{url_for("static", filename="bsstyle.css")}}>
-    <link rel="stylesheet" href={{url_for("static", filename="style.css")}}>
+    <link rel="stylesheet" href={{url_for("static", filename="style/bsstyle.css")}}>
+    <link rel="stylesheet" href={{url_for("static", filename="style/style.css")}}>
 
     <title>Livepapers</title>
 </head>
 
-<body class="bg-secondary text-light">
+<body class="bg-secondary text-light bgcolor">
     <div id="app">
         <router-view></router-view>
     </div>
@@ -35,6 +40,10 @@
     app.component("my-head", headerC);
     app.component("alert-cross", alertCrossC);
     app.component("alert-tmp", alertTmpC);
+    app.component("profile-overview", profileOverviewC);
+    app.component("profile-wallpapers", profileWallpapersC);
+    app.component("profile-settings", profileSettingsC);
     app.use(router);
     app.mount("#app");
 </script>
+</html>

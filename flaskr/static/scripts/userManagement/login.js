@@ -1,8 +1,9 @@
-let registerC = {
+let loginC = {
     template: `
     <my-head></my-head>
     <div class="container">
-        <form class="okform">
+        <form class="okform" @submit.prevent @submit="onLogin()">
+            <alert-cross></alert-cross>
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input v-model="username" type="username" class="form-control" id="username">
@@ -11,32 +12,28 @@ let registerC = {
                 <label for="password" class="form-label">Password</label>
                 <input v-model="password" type="password" class="form-control" id="password">
             </div>
-            <div class="mb-3">
-                <label for="pw_verified" class="form-label">Verify password</label>
-                <input v-model="pw_verified" type="password" class="form-control" id="pw_verified">
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="submit" class="btn btn-primary">Log in</button>
         </form>    
-    </div>
-    `,
+    </div>`,
     data() {
         return {
-            store: store,
             username: "",
             password: "",
-            pw_verified: "",
-            failedLoginMessage: ""
+            succLogin: false
         }
     },
     created() {
-        store.state.pageId = 6;
+        store.state.pageId = 5;
     },
     beforeUnmount() {
         store.state.pageId = 0;
     },
+    unmounted() {
+        if (this.succLogin) setAlert("Successfully logged in!", "success");
+    },
     methods: {
-        onRegister: async function () {
-            let reply = await fetch("/doregister", {
+        onLogin: async function () {
+            let reply = await fetch("/dologin", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -47,9 +44,17 @@ let registerC = {
                 })
             });
             if (reply.status !== 200) {
-                this.failedLoginMessage = "An unknown error occured.";
+                setAlert("An unknown error occured.", "danger");
                 return 0;
             }
+            console.log(reply);
+            let json = await reply.json();
+            if (!json.loggedIn) {
+                setAlert("Wrong username or password. Try again.", "danger");
+                return 0;
+            }
+            store.state.isLoggedIn = this.succLogin = true
+            return this.$router.push("/#/");
         }
     }
 }

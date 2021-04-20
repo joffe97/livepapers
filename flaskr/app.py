@@ -7,6 +7,7 @@ from flask import g, render_template, url_for, request, session
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 from db import get_user, verify_user, verify_and_get_user
+from user import User, register_if_valid
 
 
 DATABASE = os.path.dirname(os.path.realpath(__file__)) + r"\database.db"
@@ -17,25 +18,6 @@ app.config["MAX_CONTENT_LENGTH"] = 128 * (1024 ** 2)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-
-class User:
-    def __init__(self, db_user):
-        self.username = db_user["username"]
-        self.type = db_user["type"]
-        self.is_authenticated = True
-
-    def is_active(self):
-        return True
-
-    def get_id(self):
-        return self.username
-
-    def is_authenticated(self):
-        return self.is_authenticated
-
-    def is_anonymous(self):
-        return False
 
 
 # Log in user
@@ -69,6 +51,26 @@ def home():
     return render_template("index.html")
 
 
+# Registers the user if ok
+@app.route("/doregister", methods=["POST"])
+def register():
+    credentials = json.loads(request.data)
+    username: str = credentials.get("username", None)
+    password: str = credentials.get("password", None)
+    pw_verify: str = credentials.get("pw_verify", None)
+
+    reply_dict = register_if_valid(get_db(), username, password, pw_verify)
+    user = load_user(username, password) if reply_dict.get("status") == "success" else None
+    if user:
+        login_user(user)
+        reply_dict["loggedIn"] = True
+    else:
+        reply_dict["loggedIn"] = False
+
+    reply_json = json.dumps(reply_dict)
+    return reply_json
+
+
 # Log in the user if right credentials
 @app.route("/dologin", methods=["POST"])
 def login():
@@ -76,9 +78,14 @@ def login():
     username: str = credentials.get("username", None)
     password: str = credentials.get("password", None)
     user = load_user(username, password)
-    if not user:
-        return json.dumps(0)
-    return json.dumps(int(login_user(user)))
+    reply_dict = {}
+    if user:
+        login_user(user)
+        reply_dict["loggedIn"] = True
+    else:
+        reply_dict["loggedIn"] = False
+
+    return json.dumps(reply_dict)
 
 
 # Log out the user
@@ -86,14 +93,16 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return json.dumps(1)
+    return json.dumps({"loggedIn": False})
 
 
+# Check if the user is logged in
 @app.route("/validate", methods=["GET"])
 def validate_user():
+    # return json.dumps({"loggedIn": current_user.is_authenticated})
     is_authenticated = current_user.is_authenticated
     return json.dumps(int(is_authenticated))
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")

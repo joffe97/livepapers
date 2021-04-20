@@ -25,8 +25,12 @@ nav {
     object-fit: cover;
 }
 
+.browse-img-square:hover {
+    opacity: 80%;
+}
+
 .wallpaper-video {
-    width: 70%;
+    width: 100%;
 }
 
 .wallpaper-video * {
@@ -55,4 +59,18 @@ nav {
 .okform {
     max-width: 40em;
     margin: auto;
+}
+
+#alerttmp {
+    opacity: 0.96;
+    margin: auto;
+    min-width: 90vw;
+    z-index: 20000;
+    z-index: 20000;
+}
+
+@media (min-width: 992px) {
+    #alerttmp {
+        min-width: 30vw;
+    }
 }

@@ -64,6 +64,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="CSS File" />
+        <option value="Python Script" />
         <option value="JavaScript File" />
       </list>
     </option>
@@ -93,13 +94,20 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/static/scripts/profile" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Joach\OneDrive\Documents\Skole\Data4\dat310\exam\flaskr\static\scripts\profile" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Joach\OneDrive\Documents\Skole\Data4\dat310\exam\flaskr\static\scripts\wallpaper" />
+      <recent name="C:\Users\Joach\OneDrive\Documents\Skole\Data4\dat310\exam\flaskr\static\style" />
       <recent name="C:\Users\Joach\OneDrive\Documents\Skole\Data4\dat310\exam\flaskr\static" />
+      <recent name="C:\Users\Joach\OneDrive\Documents\Skole\Data4\dat310\exam\flaskr\static\scripts\browse" />
+      <recent name="C:\Users\Joach\OneDrive\Documents\Skole\Data4\dat310\exam\flaskr\static\scripts" />
     </key>
   </component>
   <component name="RunManager" selected="Python.app">
@@ -172,6 +180,7 @@
       <workItem from="1618665390473" duration="9410000" />
       <workItem from="1618758748114" duration="10375000" />
       <workItem from="1618849667816" duration="8919000" />
+      <workItem from="1618903141086" duration="35660000" />
     </task>
     <servers />
   </component>
@@ -180,6 +189,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/flaskr$db.coverage" NAME="db Coverage Results" MODIFIED="1618568265824" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/flaskr$app.coverage" NAME="app Coverage Results" MODIFIED="1618849763808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/flaskr$app.coverage" NAME="app Coverage Results" MODIFIED="1618943063787" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

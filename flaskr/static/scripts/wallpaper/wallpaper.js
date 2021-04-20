@@ -5,14 +5,20 @@ let wallpaperC = {
     <div class="container">
         <div class="col">
             <div class="wallpaper-video row-12 m-auto">
-                <video class="unclickable p-0 my-4" autoplay loop muted>
-                    <source v-bind:src="getVideoUrl()">
-                </video>
+                <div class="my-4">
+                    <video class="unclickable p-0" autoplay loop muted>
+                        <source :src="getVideoUrl()">
+                    </video>
+                </div>
                 <div class="row-auto p-0">
-                    <ul class="col-2 list-group p-0">
-                        <li v-for="info in [getResolution(), getUploadDateStr(), getViewsStr()]"
-                        class="list-group-item bg-info">
-                            {{info}}
+                    <div class="btn-group m-0" role="group">
+                        <div class="btn btn-warning rounded-0 rounded-top">Add to favorites</div>
+                        <div class="btn btn-success rounded-0 rounded-top">Download</div>
+                    </div>
+                    <ul class="col-2 list-group p-0 rounded-0 rounded-bottom">
+                        <li v-for="info in [getViewsStr(), getUploadDateStr(), getResolution()]"
+                        class="list-group-item bg-light">
+                            <strong>{{info}}</strong>
                         </li>
                     </ul>
                 </div>
@@ -22,7 +28,6 @@ let wallpaperC = {
     `,
     data() {
         return {
-            store: store,
             username: null,
             width: 1920,
             height: 1024,
@@ -38,7 +43,7 @@ let wallpaperC = {
             return this.width + " x " + this.height
         },
         getUploadDateStr: function () {
-            return "15.04.2021";
+            return "Added 2 weeks ago";
         },
         getViewsStr: function () {
             return 512 + " views";

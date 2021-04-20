@@ -1,8 +1,8 @@
-let loginC = {
+let registerC = {
     template: `
     <my-head></my-head>
     <div class="container">
-        <form class="okform" @submit.prevent @submit="onLogin()">
+        <form class="okform" @submit.prevent @submit="onRegister()">
             <alert-cross></alert-cross>
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
@@ -12,49 +12,55 @@ let loginC = {
                 <label for="password" class="form-label">Password</label>
                 <input v-model="password" type="password" class="form-control" id="password">
             </div>
-            <button type="submit" class="btn btn-primary">Log in</button>
+            <div class="mb-3">
+                <label for="pw_verify" class="form-label">Verify password</label>
+                <input v-model="pwVerify" type="password" class="form-control" id="pw_verify">
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
         </form>    
-    </div>`,
+    </div>
+    `,
     data() {
         return {
             username: "",
             password: "",
-            store: store
+            pwVerify: "",
+            succRegister: false
         }
     },
     created() {
-        store.state.pageId = 5;
+        store.state.pageId = 6;
     },
     beforeUnmount() {
         store.state.pageId = 0;
     },
     unmounted() {
-        if (store.state.isLoggedIn) setAlert("Successfully logged in!", "success");
+        if (this.succRegister) setAlert("Successfully registered!", "success");
     },
     methods: {
-        onLogin: async function () {
-            let reply = await fetch("/dologin", {
+        onRegister: async function () {
+            let reply = await fetch("/doregister", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     "username": this.username,
-                    "password": this.password
+                    "password": this.password,
+                    "pw_verify": this.pwVerify
                 })
             });
             if (reply.status !== 200) {
-                setAlert("An unknown error occured.", "danger");
+                setAlert("An unknown error occured.");
                 return 0;
             }
-            console.log(reply);
-            let isLoggedIn = parseInt(await reply.text());
-            if (isLoggedIn !== 1) {
-                setAlert("Wrong username or password. Try again.", "danger");
+            let message = await reply.json();
+            if (message.status === "error") {
+                setAlert(message.msg);
                 return 0;
             }
-            store.state.isLoggedIn = true
-            console.log(this.$unmounted)
+            store.state.isLoggedIn = message.loggedIn;
+            this.succRegister = true;
             return this.$router.push("/#/");
         }
     }

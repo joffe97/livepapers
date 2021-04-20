@@ -90,8 +90,10 @@ def add_user(conn, username: str, password: str, usertype: int = 3):
         pw_hash = generate_password_hash(password)
         cur.execute(query, (username, pw_hash, usertype))
         conn.commit()
+        return None
     except Error as e:
         print(e)
+        return e
 
 
 # Get user from the database
@@ -101,6 +103,11 @@ def get_user(conn, username: str) -> Dict[str, Union[str, int]]:
     cur.execute(query, (username,))
     row = cur.fetchone()
     return {"username": row[0], "pwhash": row[1], "type": row[2]} if row else None
+
+
+# Checks if user exists
+def user_exist(conn, username: str):
+    return get_user(conn, username) is not None
 
 
 # Verify user and returns user

@@ -3,6 +3,30 @@
 
 
 
+## Features
+
+* Browse page where the user can browse animated wallpapers.
+  * Shows static images first, which changes to video of the wallpaper on hover.
+  * Sort by *latest*, *most liked* and *random*.
+  * Searchable by tags, colors and uploader.
+  * Filter by date, views, ratio, width and height.
+* Wallpaper page where the user can view the animated wallpaper and info about it.
+  * Button to download the wallpaper.
+  * Button to favorite the wallpaper, if logged in.
+* Settings page for users not logged in.
+  * Settings is stored in cookie.
+* Profile page where the user can view user information.
+  * Ability to upload animated wallpaper.
+  * Ability to remove wallpapers uploaded by current user.
+  * Change user settings.
+    * Settings stored in database as json.
+  * View uploaded wallpapers and favorited wallpapers.
+  * Admin and manager settings.
+    * Admins and managers can delete wallpapers and block users.
+    * Managers can delete wallpapers for all users (including admins and managers), and block all kinds of users.
+
+
+
 ## Technical
 
 **How to run:**  run `python3 app.py` from the `./flaskr` directory.
@@ -30,6 +54,9 @@ Stores information about users. The table contains the following columns:
 * type
   * Account type
   * Int, not null
+* settings
+  * Json formatted user settings
+  * Text
 
 **Type** contains an binary value that describes the account state and what the user can do on the page:
 
@@ -41,12 +68,13 @@ Stores information about users. The table contains the following columns:
 
 <table>
     <thead>
-        <tr><th>username</th><th>pwhash</th><th>type</th></tr>
+        <tr><th>username</th><th>pwhash</th><th>type</th><th>settings</th></tr>
     </thead>
 	<tbody>
-        <tr><td>joachim</td><td>fa8g97dya9hukasdf</td><td>15</td></tr>
+        <tr><td>joachim</td><td>fa8g97dya9hukasdf</td><td>15</td><td>{"color": "dark"}</td></tr>
     </tbody>
 </table>
+
 
 
 
@@ -111,7 +139,7 @@ Stores information about likes on animated wallpapers. The table contains the fo
 </table>
 
 
-#### **Tags database:**
+#### Tags database:
 
 Stores information about the tags for animated wallpapers. The table contains the following columns:
 
@@ -134,4 +162,17 @@ Stores information about the tags for animated wallpapers. The table contains th
         <tr><td>whale</td><td>1</td></tr>
     </tbody>
 </table>
+
+
+## Screenshots
+
+##### Browse page:
+
+![screenshot_browse](\assets\screenshot_browse.JPG)
+
+
+
+##### Wallpaper page:
+
+![screenshot_wallpaper](\assets\screenshot_wallpaper.png)
 
