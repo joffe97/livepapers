@@ -115,13 +115,14 @@ let headerC = {
             let json = await reply.json();
             if (json.loggedIn) return 0;
             store.state.isLoggedIn = false;
+            store.state.user = null;
             return 1;
         }
     },
     async created() {
         if (this.isInited) return;
         store.state.isInited = true;
-        store.state.isLoggedIn = await cmnIsLoggedIn();
+        store.state.isLoggedIn = await store.getUser() !== null;
         console.log(this.isLoggedIn)
     }
-}
+};

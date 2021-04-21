@@ -6,7 +6,8 @@ import json
 from flask import g, render_template, url_for, request, session
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
-from db import get_user, verify_user, verify_and_get_user
+from db import get_user, verify_user, verify_and_get_user, get_favorite_ids, get_uploaded_ids, get_wallpaper, \
+    get_likes_count_for_wallpaper, get_tags_for_wallpaper
 from user import User, register_if_valid
 
 
@@ -22,7 +23,7 @@ login_manager.init_app(app)
 
 # Log in user
 @login_manager.user_loader
-def load_user(username: str, password: str = None):
+def load_user(username: str, password: str = None) -> User:
     if password:
         db_user = verify_and_get_user(get_db(), username, password)
     else:
@@ -99,10 +100,40 @@ def logout():
 # Check if the user is logged in
 @app.route("/validate", methods=["GET"])
 def validate_user():
-    # return json.dumps({"loggedIn": current_user.is_authenticated})
-    is_authenticated = current_user.is_authenticated
-    return json.dumps(int(is_authenticated))
+    return json.dumps({"loggedIn": current_user.is_authenticated})
+
+
+# Get userdata for current user
+#   data:
+#       user: Gets username, type and settings
+#       uploaded: Gets ids of uploaded wallpapers
+#       favorite: Gets ids of favorite wallpapers
+@app.route("/userdata", methods=["GET"])
+@login_required
+def get_userdata():
+    datatype = request.args.get("data")
+    if datatype == "user":
+        return json.dumps(current_user.get_dict())
+    elif datatype == "uploaded":
+        return json.dumps({"uploaded": get_uploaded_ids(get_db(), current_user.username)})
+    elif datatype == "favorite":
+        return json.dumps({"favorite": get_favorite_ids(get_db(), current_user.username)})
+    else:
+        return json.dumps({})
+
+
+@app.route("/wallpaperdata/<int:aid>", methods=["GET"])
+def get_wallpaperdata(aid: int):
+    datatype = request.args.get("data")
+    if datatype is None:
+        return json.dumps(get_wallpaper(get_db(), aid))
+    elif datatype == "tags":
+        return json.dumps({"tags": get_tags_for_wallpaper(get_db(), aid)})
+    elif datatype == "likes":
+        return json.dumps({"likes": get_likes_count_for_wallpaper(get_db(), aid)})
+    else:
+        return json.dumps({})
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host="127.0.0.1")

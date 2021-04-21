@@ -9,6 +9,7 @@ class User:
     def __init__(self, db_user):
         self.username = db_user["username"]
         self.type = db_user["type"]
+        self.settings = db_user["settings"]
         self.is_authenticated = True
 
     def is_active(self):
@@ -22,6 +23,9 @@ class User:
 
     def is_anonymous(self):
         return False
+
+    def get_dict(self):
+        return {"username": self.username, "type": self.type, "settings": self.settings}
 
 
 def only_chars_and_nums(text: str):

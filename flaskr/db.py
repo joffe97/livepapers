@@ -23,6 +23,7 @@ CREATE_USERS_TABLE = f"""CREATE TABLE IF NOT EXISTS users (
                           username TEXT,
                           pwhash TEXT NOT NULL,
                           type INTEGER NOT NULL DEFAULT {UserType.WP_ADD | UserType.WP_REM},
+                          settings TEXT DEFAULT NULL,
                           PRIMARY KEY (username)
                         );"""
 
@@ -86,9 +87,9 @@ def create_table(conn: Connection, query: str) -> int:
 def add_user(conn, username: str, password: str, usertype: int = 3):
     try:
         cur: Cursor = conn.cursor()
-        query = "INSERT INTO users VALUES (?,?,?)"
+        query = "INSERT INTO users VALUES (?,?,?,?)"
         pw_hash = generate_password_hash(password)
-        cur.execute(query, (username, pw_hash, usertype))
+        cur.execute(query, (username, pw_hash, usertype, None))
         conn.commit()
         return None
     except Error as e:
@@ -102,12 +103,16 @@ def get_user(conn, username: str) -> Dict[str, Union[str, int]]:
     query = "SELECT * FROM users WHERE username=?"
     cur.execute(query, (username,))
     row = cur.fetchone()
-    return {"username": row[0], "pwhash": row[1], "type": row[2]} if row else None
+    return {"username": row[0], "pwhash": row[1], "type": row[2], "settings": row[3]} if row else None
 
 
 # Checks if user exists
 def user_exist(conn, username: str):
-    return get_user(conn, username) is not None
+    cur: Cursor = conn.cursor()
+    query = "SELECT username FROM users WHERE LOWER(username)=LOWER(?)"
+    cur.execute(query, (username,))
+    row = cur.fetchone()
+    return row is not None
 
 
 # Verify user and returns user
@@ -143,6 +148,29 @@ def add_wallpaper(conn, username: str,
         print(e)
 
 
+# Gets wallpaper from database
+def get_wallpaper(conn, aid):
+    cur = conn.cursor()
+    query = "SELECT * FROM wallpapers WHERE aid=?"
+    cur.execute(query, (aid,))
+    row = cur.fetchone()
+    if row:
+        return {"aid": row[0], "username": row[1], "width": row[2], "height": row[3], "date": row[4], "views": row[5]}
+    else:
+        return None
+
+
+# Returns list of ids of uploaded wallpapers by user
+def get_uploaded_ids(conn, username: str):
+    cur = conn.cursor()
+    query = "SELECT aid FROM wallpapers WHERE username=?"
+    cur.execute(query, (username,))
+    id_list = []
+    for row in cur:
+        id_list.append(row[0])
+    return id_list
+
+
 # --------------- Likes ---------------
 
 # Adds a like to a wallpaper to the database
@@ -156,7 +184,27 @@ def add_like(conn, aid: int, username: str):
         print(e)
 
 
-# --------------- Likes ---------------
+# Get like from database
+def get_likes_count_for_wallpaper(conn, aid: int):
+    cur = conn.cursor()
+    query = "SELECT COUNT(lid) FROM likes WHERE aid=?"
+    cur.execute(query, (aid,))
+    count = cur.fetchone()
+    return count[0] if count else None
+
+
+# Returns list of ids of favorite wallpapers by user
+def get_favorite_ids(conn, username: str):
+    cur = conn.cursor()
+    query = "SELECT aid FROM likes WHERE username=?"
+    cur.execute(query, (username,))
+    id_list = []
+    for row in cur:
+        id_list.append(row[0])
+    return id_list
+
+
+# --------------- Tags ---------------
 
 # Adds a like to a wallpaper to the database
 def add_tag(conn, tag: str, aid: int):
@@ -167,6 +215,17 @@ def add_tag(conn, tag: str, aid: int):
         conn.commit()
     except Error as e:
         print(e)
+
+
+# Returns list of tags for wallpaper
+def get_tags_for_wallpaper(conn, aid: int):
+    cur = conn.cursor()
+    query = "SELECT * FROM tags WHERE aid=?"
+    cur.execute(query, (aid,))
+    tags = []
+    for row in cur:
+        tags.append(row[0])
+    return tags
 
 
 # --------------- Setup ---------------

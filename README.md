@@ -24,6 +24,7 @@
   * Admin and manager settings.
     * Admins and managers can delete wallpapers and block users.
     * Managers can delete wallpapers for all users (including admins and managers), and block all kinds of users.
+* Implemented flask login.
 
 
 
@@ -137,6 +138,7 @@ Stores information about likes on animated wallpapers. The table contains the fo
         <tr><td>2</td><td>1</td><td>joachim</td></tr>
     </tbody>
 </table>
+
 
 
 #### Tags database:

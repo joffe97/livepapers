@@ -3,8 +3,7 @@ let profileC = {
     template: `
     <my-head></my-head>
     <div class="container">
-        <div class="display-2">Profile</div>
-        <div class="btn-group col-12 my-4 bg-dark rounded">
+        <div class="btn-group col-12 mb-4 bg-dark rounded">
           <div class="btn btn-outline-primary" :class="{ active: profilePageId == 1 }" @click="goProfileOverview">Overview</div>
           <div class="btn btn-outline-primary" :class="{ active: profilePageId == 2 }" @click="goProfileWallpapers">Wallpapers</div>
           <div class="btn btn-outline-primary" :class="{ active: profilePageId == 3 }" @click="goProfileSettings">Settings</div>

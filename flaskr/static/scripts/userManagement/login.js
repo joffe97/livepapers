@@ -53,8 +53,8 @@ let loginC = {
                 setAlert("Wrong username or password. Try again.", "danger");
                 return 0;
             }
-            store.state.isLoggedIn = this.succLogin = true
+            store.state.isLoggedIn = this.succLogin = true;
             return this.$router.push("/#/");
         }
     }
-}
+};
