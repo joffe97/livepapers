@@ -7,7 +7,7 @@ from flask import g, render_template, url_for, request, session
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 from db import get_user, verify_user, verify_and_get_user, get_favorite_ids, get_uploaded_ids, get_wallpaper, \
-    get_likes_count_for_wallpaper, get_tags_for_wallpaper
+    get_likes_count_for_wallpaper, get_tags_for_wallpaper, get_users_total_received_stars
 from user import User, register_if_valid
 
 
@@ -108,6 +108,7 @@ def validate_user():
 #       user: Gets username, type and settings
 #       uploaded: Gets ids of uploaded wallpapers
 #       favorite: Gets ids of favorite wallpapers
+#       receivedstars: Gets number of received stars
 @app.route("/userdata", methods=["GET"])
 @login_required
 def get_userdata():
@@ -118,10 +119,17 @@ def get_userdata():
         return json.dumps({"uploaded": get_uploaded_ids(get_db(), current_user.username)})
     elif datatype == "favorite":
         return json.dumps({"favorite": get_favorite_ids(get_db(), current_user.username)})
+    elif datatype == "receivedstars":
+        return json.dumps({"receivedStars": get_users_total_received_stars(get_db(), current_user.username)})
     else:
         return json.dumps({})
 
 
+# Get wallpaperdata for wallpaper
+#   data:
+#       None: Gets id, username of uploader, width, height, upload date and views
+#       tags: Gets list of tags
+#       likes: Gets number of likes on wallpaper
 @app.route("/wallpaperdata/<int:aid>", methods=["GET"])
 def get_wallpaperdata(aid: int):
     datatype = request.args.get("data")

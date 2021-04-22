@@ -61,11 +61,14 @@ nav {
     margin: auto;
 }
 
+.light-img {
+    filter: invert(100%);
+}
+
 #alerttmp {
     opacity: 0.96;
     margin: auto;
     min-width: 90vw;
-    z-index: 20000;
     z-index: 20000;
 }
 

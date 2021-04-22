@@ -17,8 +17,10 @@
     <script src={{url_for("static", filename="scripts/userManagement/register.js")}}></script>
     <script src={{url_for("static", filename="scripts/profile/profile.js")}}></script>
     <script src={{url_for("static", filename="scripts/profile/profileOverview.js")}}></script>
-    <script src={{url_for("static", filename="scripts/profile/profileWallpapers.js")}}></script>
+    <script src={{url_for("static", filename="scripts/profile/profileCollection.js")}}></script>
+    <script src={{url_for("static", filename="scripts/profile/profileUpload.js")}}></script>
     <script src={{url_for("static", filename="scripts/profile/profileSettings.js")}}></script>
+    <script src={{url_for("static", filename="scripts/profile/profileAdmin.js")}}></script>
     <script src={{url_for("static", filename="scripts/browse/browse.js")}}></script>
     <script src={{url_for("static", filename="scripts/wallpaper/wallpaper.js")}}></script>
     <script src={{url_for("static", filename="scripts/other/router.js")}}></script>
@@ -41,8 +43,10 @@
     app.component("alert-cross", alertCrossC);
     app.component("alert-tmp", alertTmpC);
     app.component("profile-overview", profileOverviewC);
-    app.component("profile-wallpapers", profileWallpapersC);
+    app.component("profile-collection", profileCollectionC);
+    app.component("profile-upload", profileUploadC);
     app.component("profile-settings", profileSettingsC);
+    app.component("profile-admin", profileAdminC);
     app.use(router);
     app.mount("#app");
 </script>

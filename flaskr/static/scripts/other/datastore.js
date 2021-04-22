@@ -1,4 +1,28 @@
-let ALERT_TYPES = ["danger", "success", "warning"]
+const DEFAULT_UPLOAD_IMAGE = "/static/assets/upload_default_img.png"
+const ALERT_TYPES = ["danger", "success", "warning"];
+
+const USER_TYPES = {
+    WP_ADD: 1,
+    WP_REM: 1 << 1,
+    ADMIN: 1 << 2,
+    MANAGER: 1 << 3,
+    BLOCKED: 1 << 4
+}
+
+function getUserTypeDesc(type) {
+    switch (type) {
+        case USER_TYPES.WP_ADD:
+            return "Add wallpapers";
+        case USER_TYPES.WP_REM:
+            return "Remove wallpapers";
+        case USER_TYPES.ADMIN:
+            return "Admin";
+        case USER_TYPES.MANAGER:
+            return "Manager";
+        case USER_TYPES.BLOCKED:
+            return "Blocked";
+    }
+}
 
 class Wallpaper {
     constructor(id, username, width, height, views, date) {
@@ -11,7 +35,7 @@ class Wallpaper {
         this.tags = [];         // [str]:   List of tags
         this.likes = null;      // Int:     Number of likes
     }
-    async get_tags() {
+    async getTags() {
         if (!this.tags) {
             let reply = await fetch("/wallpaperdata/" + this.id + "?data=tags");
             if (reply.status !== 200) return [];
@@ -20,7 +44,7 @@ class Wallpaper {
         }
         return this.tags;
     }
-    async get_likes() {
+    async getLikes() {
         if (!this.likes) {
             let reply = await fetch("/wallpaperdata/" + this.id + "?data=likes");
             if (reply.status !== 200) return null;
@@ -33,16 +57,16 @@ class Wallpaper {
 
 class Wallpapers {
     constructor() {
-        this.wallpapers = {};  // wpId[wp]: Object containing loaded wallpapers
+        this.dict = {};  // wpId[wp]: Object containing loaded wallpapers
     }
     async getWallpaper(id) {
-        if (!this.wallpapers[id]) {
+        if (!this.dict[id]) {
             let reply = await fetch("/wallpaperdata/" + id);
             if (reply.status !== 200) return null;
             let json = await reply.json();
-            this.wallpapers[id] = new Wallpaper(json.aid, json.username, json.width, json.height, json.date, json.views)
+            this.dict[id] = new Wallpaper(json.aid, json.username, json.width, json.height, json.date, json.views)
         }
-        return this.wallpapers[id];
+        return this.dict[id];
     }
 }
 
@@ -51,25 +75,42 @@ class User {
         this.username = username;   // Str:     Username
         this.type = type;           // Int:     Account type
         this.settings = settings;   // Obj:     Settings
+        this.wpUploaded = [];       // [int]:   List containing ids of uploaded wallpapers
         this.wpStarred = [];        // [int]:   List containing ids of starred wallpapers
-        this.wpUploaded = [];        // [int]:   List containing ids of uploaded wallpapers
+        this.receivedStars = null   // Int:     Number of stars received on uploaded wallpapers
     }
-    async getImgUrl() {
+    getImgUrl() {
         return "static/assets/user_default_img.jpg";  // TODO: Get image from server or database. Needs research on how to.
     }
+    async getUploaded() {
+        if (!this.wpUploaded || this.wpUploaded.length === 0) {
+            let reply = await fetch("/userdata?data=uploaded");
+            if (reply.status !== 200) return [];
+            let json = await reply.json();
+            this.wpUploaded = json.uploaded;
+        }
+        return this.wpUploaded;
+    }
     async getStarred() {
-        let reply = await fetch("/userdata?data=favorite");
-        if (reply.status !== 200) return [];
-        let json = await reply.json();
-        this.wpStarred = json.favorite;
+        if (!this.wpStarred || this.wpStarred.length === 0) {
+            let reply = await fetch("/userdata?data=favorite");
+            if (reply.status !== 200) return [];
+            let json = await reply.json();
+            this.wpStarred = json.favorite;
+        }
         return this.wpStarred;
     }
-    async getUploaded() {
-        let reply = await fetch("/userdata?data=uploaded");
-        if (reply.status !== 200) return [];
-        let json = await reply.json();
-        this.wpUploaded = json.uploaded;
-        return this.wpUploaded;
+    async getReceivedStars() {
+        if (!this.receivedStars) {
+            let reply = await fetch("/userdata?data=receivedstars");
+            if (reply.status !== 200) return [];
+            let json = await reply.json();
+            this.receivedStars = json.receivedStars;
+        }
+        return this.receivedStars;
+    }
+    isAnyAdmin() {
+        return (this.type & (USER_TYPES.ADMIN | USER_TYPES.MANAGER)) !== 0;
     }
 }
 

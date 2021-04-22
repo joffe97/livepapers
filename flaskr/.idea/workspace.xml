@@ -160,7 +160,7 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -180,43 +180,16 @@
       <workItem from="1618849667816" duration="8919000" />
       <workItem from="1618903141086" duration="35660000" />
       <workItem from="1618987849929" duration="29506000" />
+      <workItem from="1619077362929" duration="32949000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state width="1493" height="119" key="GridCell.Tab.0.bottom" timestamp="1619017988367">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1493" height="119" key="GridCell.Tab.0.bottom/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1619017988367" />
-    <state width="1493" height="119" key="GridCell.Tab.0.center" timestamp="1619017988366">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1493" height="119" key="GridCell.Tab.0.center/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1619017988366" />
-    <state width="1493" height="119" key="GridCell.Tab.0.left" timestamp="1619017988366">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1493" height="119" key="GridCell.Tab.0.left/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1619017988366" />
-    <state width="1493" height="119" key="GridCell.Tab.0.right" timestamp="1619017988366">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1493" height="119" key="GridCell.Tab.0.right/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1619017988366" />
-    <state x="277" y="55" key="SettingsEditor" timestamp="1618987896914">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="277" y="55" key="SettingsEditor/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1618987896914" />
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1618987851987">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1618987851987" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1618991780452">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1618991780452" />
+    <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/app_py$db.coverage" NAME="db Coverage Results" MODIFIED="1619078008634" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/app_py$app.coverage" NAME="app Coverage Results" MODIFIED="1619078014544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/flaskr$app.coverage" NAME="app Coverage Results" MODIFIED="1619014528287" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/flaskr$db.coverage" NAME="db Coverage Results" MODIFIED="1619014516397" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

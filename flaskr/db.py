@@ -189,8 +189,8 @@ def get_likes_count_for_wallpaper(conn, aid: int):
     cur = conn.cursor()
     query = "SELECT COUNT(lid) FROM likes WHERE aid=?"
     cur.execute(query, (aid,))
-    count = cur.fetchone()
-    return count[0] if count else None
+    result = cur.fetchone()
+    return result[0] if result else None
 
 
 # Returns list of ids of favorite wallpapers by user
@@ -226,6 +226,19 @@ def get_tags_for_wallpaper(conn, aid: int):
     for row in cur:
         tags.append(row[0])
     return tags
+
+
+# --------------- Multiple tables ---------------
+
+# Get number of likes gotten on all wallpapers
+def get_users_total_received_stars(conn, username: str):
+    cur = conn.cursor()
+    query = """SELECT COUNT(l.lid) 
+               FROM likes AS l, (SELECT aid FROM wallpapers WHERE username=?) AS w
+               WHERE l.aid = w.aid"""
+    cur.execute(query, (username,))
+    result = cur.fetchone()
+    return result[0] if result else None
 
 
 # --------------- Setup ---------------

@@ -48,7 +48,8 @@ let headerC = {
                       </div>
                       <div class="dropdown-menu p-0 border-0" :class="{show: userButtonHover}">
                         <button class="btn btn-dark p-2 w-100 rounded-0 rounded-top" @click="goProfileOverview()">Overview</button>
-                        <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileWallpapers()">Wallpapers</button>
+                        <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileCollection()">Collection</button>
+                        <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileUpload()">Upload</button>
                         <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileSettings()">Settings</button>
                         <button class="btn btn-danger p-2 w-100 rounded-0 rounded-bottom" @click="logout()">Log out</button>
                       </div>
@@ -97,8 +98,11 @@ let headerC = {
         goProfileOverview: function () {
             return this.$router.push("/profile/overview");
         },
-        goProfileWallpapers: function () {
-            return this.$router.push("/profile/wallpapers");
+        goProfileCollection: function () {
+            return this.$router.push("/profile/collection");
+        },
+        goProfileUpload: function () {
+            return this.$router.push("/profile/upload");
         },
         goProfileSettings: function () {
             return this.$router.push("/profile/settings");
@@ -122,7 +126,6 @@ let headerC = {
     async created() {
         if (this.isInited) return;
         store.state.isInited = true;
-        store.state.isLoggedIn = await store.getUser() !== null;
-        console.log(this.isLoggedIn)
+        store.state.isLoggedIn = await cmnIsLoggedIn();
     }
 };

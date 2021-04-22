@@ -1,7 +1,7 @@
-let profileWallpapersC = {
+let profileAdminC = {
     template: `
     <div>
-    Wallpapers
+    Admin
     </div>
     `
 }
