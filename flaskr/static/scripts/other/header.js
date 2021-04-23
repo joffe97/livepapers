@@ -64,7 +64,7 @@ let headerC = {
         </div>
       </div>
     </nav>
-    <div style="height: 100px"></div>
+    <div id="nav-space"></div>
     `,
     data() {
         return {
@@ -120,6 +120,7 @@ let headerC = {
             if (json.loggedIn) return 0;
             store.state.isLoggedIn = false;
             store.state.user = null;
+            setAlert("You have been logged out.", "warning");
             return 1;
         }
     },

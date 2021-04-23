@@ -9,6 +9,8 @@ from flask_login import LoginManager, current_user, login_user, login_required, 
 from db import get_user, verify_user, verify_and_get_user, get_favorite_ids, get_uploaded_ids, get_wallpaper, \
     get_likes_count_for_wallpaper, get_tags_for_wallpaper, get_users_total_received_stars
 from user import User, register_if_valid
+from common import get_reply
+from media import create_media_file
 
 
 DATABASE = os.path.dirname(os.path.realpath(__file__)) + r"\database.db"
@@ -141,6 +143,19 @@ def get_wallpaperdata(aid: int):
         return json.dumps({"likes": get_likes_count_for_wallpaper(get_db(), aid)})
     else:
         return json.dumps({})
+
+
+# Upload wallpaper
+@app.route("/wallpaperdata", methods=["POST"])
+def add_wallpaper():
+    jsdata = json.loads(request.data)
+    data = jsdata.get("data")
+    tags = jsdata.get("tags")
+    mediatype = jsdata.get("type")
+    if data is None or tags is None or mediatype is None:
+        return json.dumps(get_reply("error", "Did not receive all necessary data"))
+    mediatype = create_media_file(data)
+    return json.dumps(get_reply("success"))
 
 
 if __name__ == '__main__':

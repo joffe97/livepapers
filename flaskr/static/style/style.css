@@ -1,11 +1,10 @@
+* {
+    scrollbar-width: thin
+}
+
 nav {
     z-index: 10000;
     min-width: 300px;
-}
-
-#logo {
-    max-width: 10em;
-    max-height: 100%;
 }
 
 .browse-img-square {
@@ -62,18 +61,51 @@ nav {
 }
 
 .light-img {
-    filter: invert(100%);
+    opacity: 35%;
 }
 
 #alerttmp {
+    position: absolute;
+    top: 100px;
     opacity: 0.96;
     margin: auto;
     min-width: 90vw;
     z-index: 20000;
 }
 
+#upload-wp {
+    max-height: 35vh;
+}
+
+#upload-wp * {
+    max-height: 35vh;
+    object-fit: scale-down;
+}
+
+#logo {
+    max-width: 10em;
+    max-height: 100%;
+}
+
+#nav-space{
+    height: 100px;
+}
+
 @media (min-width: 992px) {
     #alerttmp {
         min-width: 30vw;
+    }
+
+    .portrait-h {
+        max-height: 16em;
+        overflow-y: auto;
+    }
+
+    #upload-wp {
+        height: 35vh;
+    }
+
+    #upload-wp * {
+        height: 100%;
     }
 }

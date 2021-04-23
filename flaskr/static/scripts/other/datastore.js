@@ -1,4 +1,9 @@
-const DEFAULT_UPLOAD_IMAGE = "/static/assets/upload_default_img.png"
+const DEFAULT_UPLOAD_IMAGE = "/static/assets/upload_default_img.png";
+
+const MEDIA_TYPES = {
+    "video": ["mp4"]
+};
+
 const ALERT_TYPES = ["danger", "success", "warning"];
 
 const USER_TYPES = {
@@ -149,4 +154,8 @@ function setAlert(message, type = "danger") {  // TODO: Put into DataStore
     } else {
         store.state.alertType = "danger";
     }
+}
+
+function clearAlert() {
+    store.state.alertMessage = "";
 }

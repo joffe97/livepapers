@@ -11,6 +11,11 @@ let alertCrossC = {
     },
     beforeUnmount() {
         this.alertMessage = "";
+    },
+    watch: {
+        alertMessage: function () {
+            if (this.alertMessage) cmnScrollTop();
+        }
     }
 }
 
@@ -36,10 +41,24 @@ let alertTmpC = {
         }
     },
     created() {
-        this.timeout = setTimeout(() => setAlert(""), 3000);
+        this.setAlertTimeout();
     },
     beforeUnmount() {
-        store.state.alertMessage = "";
-        if (this.timeout) clearTimeout(this.timeout);
+        clearAlert();
+        this.clearAlertTimeout();
+    },
+    methods: {
+        setAlertTimeout: function () {
+            this.clearAlertTimeout();
+            this.timeout = setTimeout(() => clearAlert(), 3000);
+        },
+        clearAlertTimeout: function () {
+            if (this.timeout) clearTimeout(this.timeout);
+        }
+    },
+    watch: {
+        alertMessage: function () {
+            if (this.alertMessage) this.setAlertTimeout();
+        }
     }
 }
