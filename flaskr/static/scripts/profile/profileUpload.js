@@ -147,18 +147,18 @@ let profileUploadC = {
         },
         uploadFile: async function () {
             let mediatype = null;
-            for (let type in MEDIA_TYPES) {
+            let type;
+            for (type in MEDIA_TYPES) {
                 if (this.type.includes(type)) {
                     mediatype = type;
                     break;
                 }
             }
-            if (!mediatype) {
+            if (!mediatype || !type) {
                 console.log(MEDIA_TYPES)
                 setAlert("The current file format is not supported.", "danger");
                 return;
             }
-
             let reply = await fetch("/wallpaperdata", {
                 method: "POST",
                 headers: {
@@ -166,10 +166,22 @@ let profileUploadC = {
                 },
                 body: JSON.stringify({
                     "data": this.userVideo,
-                    "tags": this.tags,
-                    "type": mediatype
+                    "tags": this.tags
                 })
             })
+            this.tags = [];
+            if (reply.status !== 200) {
+                console.log(2)
+                setAlert("Internal error occurred.");
+                return;
+            }
+            let json = await reply.json();
+            if (json.status !== "success"){
+                let msg = json.msg ? json.msg : "unknown";
+                setAlert("Internal error occurred: " + msg, json.status);
+                return;
+            }
+            setAlert("Successfully uploaded " + type + ".", "success");
         },
     }
 }

@@ -9,8 +9,8 @@ from flask_login import LoginManager, current_user, login_user, login_required, 
 from db import get_user, verify_user, verify_and_get_user, get_favorite_ids, get_uploaded_ids, get_wallpaper, \
     get_likes_count_for_wallpaper, get_tags_for_wallpaper, get_users_total_received_stars
 from user import User, register_if_valid
-from common import get_reply
-from media import create_media_file
+from common import get_reply, validate_and_add_tags
+from media import handle_media_uri
 
 
 DATABASE = os.path.dirname(os.path.realpath(__file__)) + r"\database.db"
@@ -147,14 +147,19 @@ def get_wallpaperdata(aid: int):
 
 # Upload wallpaper
 @app.route("/wallpaperdata", methods=["POST"])
+@login_required
 def add_wallpaper():
     jsdata = json.loads(request.data)
     data = jsdata.get("data")
     tags = jsdata.get("tags")
-    mediatype = jsdata.get("type")
-    if data is None or tags is None or mediatype is None:
-        return json.dumps(get_reply("error", "Did not receive all necessary data"))
-    mediatype = create_media_file(data)
+    if data is None or tags is None:
+        return json.dumps(get_reply("error", "Did not receive all necessary data."))
+    aid, error = handle_media_uri(get_db(), data)
+    if error:
+        return json.dumps(get_reply("error", error))
+    warning = validate_and_add_tags(get_db(), tags, aid)
+    if warning:
+        return json.dumps(get_reply("warning", "Couldn't add all tags to wallpaper."))
     return json.dumps(get_reply("success"))
 
 

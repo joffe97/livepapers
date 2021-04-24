@@ -1,4 +1,4 @@
-from common import get_reply
+from common import get_reply, only_chars_and_nums
 from db import user_exist, add_user
 
 
@@ -26,13 +26,6 @@ class User:
 
     def get_dict(self):
         return {"username": self.username, "type": self.type, "settings": self.settings}
-
-
-def only_chars_and_nums(text: str):
-    for i in text:
-        if not ("a" <= i <= "z" or "A" <= i <= "Z" or i.isnumeric()):
-            return False
-    return True
 
 
 # Verifies the registration
