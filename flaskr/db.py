@@ -303,9 +303,9 @@ def setup():
     create_table(conn, CREATE_LIKES_TABLE)
     create_table(conn, CREATE_TAGS_TABLE)
     init_users(conn)
-    init_wallpapers(conn)
-    init_likes(conn)
-    init_tags(conn)
+    # init_wallpapers(conn)
+    # init_likes(conn)
+    # init_tags(conn)
     conn.close()
 
 

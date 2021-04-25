@@ -39,10 +39,10 @@ let profileUploadC = {
                     </div>
                 </div>
                 <div class="col-lg p-0 mx-lg-3 mt-lg-0 mt-3">
-                    <div class="input-group">
+                    <form class="input-group" @submit.prevent @submit="addTag">
                         <input v-model="tagInput" class="form-control" type="text" placeholder="Tagname"/>
-                        <button @click="addTag" class="btn btn-success" type="button">Add tag</button>
-                    </div>
+                        <button class="btn btn-success" type="submit">Add tag</button>
+                    </form>
                     <div class="list-group py-0 border-lg m-lg-1 m-0 my-1 portrait-h">
                         <div v-for="tag in tags.slice().reverse()" role="button"
                         class="list-group-item list-group-item-action text-capitalize alert-dismissible">
