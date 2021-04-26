@@ -19,11 +19,11 @@ let profileCollectionC = {
             </div>
             <table class="col table text-light my-auto mx-lg-5 my-lg-4">
                 <tbody>
-                    <tr><th>Date:</th><td>{{countUploaded}}</td></tr>
-                    <tr><th>Views:</th><td>{{countStarred}}</td></tr>
-                    <tr><th>Stars:</th><td>{{countReceivedStars}}</td></tr>
-                    <tr><th>Resolution:</th><td>{{countReceivedStars}}</td></tr>
-                    <tr><th>Tags:</th><td>{{countReceivedStars}}</td></tr>
+                    <tr><th>Date:</th><td>{{getWpDate(wpId)}}</td></tr>
+                    <tr><th>Views:</th><td>{{}}</td></tr>
+                    <tr><th>Stars:</th><td>{{}}</td></tr>
+                    <tr><th>Resolution:</th><td>{{}}</td></tr>
+                    <tr><th>Tags:</th><td>{{}}</td></tr>
                 </tbody>
             </table>
             <hr class="mt-3">
@@ -38,10 +38,8 @@ let profileCollectionC = {
     async created() {
         let user = await store.getUser();
         if (user) {
-            let uploaded = await user.getUploaded();
-            let starred = await user.getStarred();
-            this.user.wpUploaded = uploaded;
-            this.user.wpStarred = starred;
+            let wpIds = await user.getUploaded();
+            await store.loadManyWallpapers(wpIds);
         }
     },
     computed: {
@@ -51,7 +49,6 @@ let profileCollectionC = {
         wpIds: function () {
             switch (this.mode) {
                 case "uploaded":
-                    console.log(this.user.wpUploaded)
                     return this.user.wpUploaded;
                 case "favorites":
                     return this.user.wpStarred;
@@ -67,5 +64,8 @@ let profileCollectionC = {
         goWallpaper: function(wpId) {
             this.$router.push("/wallpaper/" + wpId);
         },
+        getWpDate: function (wpId) {
+            return store.state.wallpapers.dict[wpId].date;
+        }
     }
 }

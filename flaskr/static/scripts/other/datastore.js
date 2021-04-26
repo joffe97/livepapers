@@ -71,6 +71,7 @@ class Wallpapers {
             let json = await reply.json();
             this.dict[id] = new Wallpaper(json.aid, json.username, json.width, json.height, json.date, json.views)
         }
+        console.log(this.dict)
         return this.dict[id];
     }
 }
@@ -141,7 +142,12 @@ class DataStore {
         return this.state.user;
     }
     async getWallpaper (wpId) {
-        return this.state.wallpapers.getWallpaper(wpId);
+        return await this.state.wallpapers.getWallpaper(wpId);
+    }
+    async loadManyWallpapers (wpIds) {
+        for (let i = 0; i < wpIds.length; i++) {
+            await this.getWallpaper(wpIds[i]);
+        }
     }
 }
 
