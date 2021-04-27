@@ -12,7 +12,7 @@ const USER_TYPES = {
     ADMIN: 1 << 2,
     MANAGER: 1 << 3,
     BLOCKED: 1 << 4
-}
+};
 
 function getUserTypeDesc(type) {
     switch (type) {
@@ -41,7 +41,7 @@ class Wallpaper {
         this.likes = null;      // Int:     Number of likes
     }
     async getTags() {
-        if (!this.tags) {
+        if (!this.tags || this.tags.length === 0) {
             let reply = await fetch("/wallpaperdata/" + this.id + "?data=tags");
             if (reply.status !== 200) return [];
             let json = await reply.json();
@@ -58,20 +58,28 @@ class Wallpaper {
         }
         return this.likes;
     }
+    getDateString() {
+        return this.date.toLocaleString();
+    }
 }
 
 class Wallpapers {
     constructor() {
         this.dict = {};  // wpId[wp]: Object containing loaded wallpapers
     }
-    async getWallpaper(id) {
+    getWallpaper(id) {
+        return this.dict[id];
+    }
+    async loadWallpaper(id) {
         if (!this.dict[id]) {
             let reply = await fetch("/wallpaperdata/" + id);
             if (reply.status !== 200) return null;
             let json = await reply.json();
-            this.dict[id] = new Wallpaper(json.aid, json.username, json.width, json.height, json.date, json.views)
+            let date = new Date();
+            date.setTime(json.date);
+            this.dict[id] = new Wallpaper(json.aid, json.username, json.width, json.height,
+                json.views, date);
         }
-        console.log(this.dict)
         return this.dict[id];
     }
 }
@@ -141,19 +149,54 @@ class DataStore {
         }
         return this.state.user;
     }
-    async getWallpaper (wpId) {
-        return await this.state.wallpapers.getWallpaper(wpId);
+    async loadWallpaper (wpId) {
+        return await this.state.wallpapers.loadWallpaper(wpId);
     }
     async loadManyWallpapers (wpIds) {
         for (let i = 0; i < wpIds.length; i++) {
-            await this.getWallpaper(wpIds[i]);
+            await this.loadWallpaper(wpIds[i]);
         }
+    }
+    async loadManyWallpaperTags (wpIds) {
+        for (let i = 0; i < wpIds.length; i++) {
+            let wp = await this.loadWallpaper(wpIds[i]);
+            wp.tags = await wp.getTags();
+        }
+    }
+    async loadManyWallpaperFavorites (wpIds) {
+        for (let i = 0; i < wpIds.length; i++) {
+            let wp = await this.loadWallpaper(wpIds[i]);
+            wp.likes = await wp.getLikes();
+        }
+    }
+    getWallpaper (wpId) {
+        return this.state.wallpapers.getWallpaper(wpId);
+    }
+    getWpDateStr (wpId) {
+        let wp = this.getWallpaper(wpId);
+        return wp ? wp.getDateString() : "";
+    }
+    getWpViewsStr (wpId) {
+        let wp = this.getWallpaper(wpId);
+        return wp ? wp.views : "";
+    }
+    getWpStarsStr (wpId) {
+        let wp = this.getWallpaper(wpId);
+        return wp ? wp.likes : "";
+    }
+    getWpResolutionStr (wpId) {
+        let wp = this.getWallpaper(wpId);
+        return wp ? (wp.width + " x " + wp.height) : "";
+    }
+    getWpTags (wpId) {
+        let wp = this.getWallpaper(wpId);
+        return wp ? wp.tags : [];
     }
 }
 
 let store = new DataStore();
 
-function setAlert(message, type = "danger") {  // TODO: Put into DataStore
+function setAlert(message, type = "danger") {
     store.state.alertMessage = message;
     if (ALERT_TYPES.includes(type.toLowerCase())) {
         store.state.alertType = type;

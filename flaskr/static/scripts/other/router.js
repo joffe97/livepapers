@@ -10,4 +10,4 @@ const router = VueRouter.createRouter({
       //{ path: '/profile/', redirect: '/profile/overview' },
       { path: '/profile/:pid', component: profileC, props: true}
     ]
-  })
+  });

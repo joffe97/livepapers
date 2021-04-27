@@ -184,4 +184,4 @@ let profileUploadC = {
             setAlert("Successfully uploaded " + type + ".", "success");
         },
     }
-}
+};

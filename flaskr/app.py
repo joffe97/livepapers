@@ -23,21 +23,11 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-# Log in user
-@login_manager.user_loader
-def load_user(username: str, password: str = None) -> User:
-    if password:
-        db_user = verify_and_get_user(get_db(), username, password)
-    else:
-        db_user = get_user(get_db(), username)
-    return User(db_user) if db_user else None
-
-
 # Returns a connection to the database
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
+        db = g._database = sqlite3.connect(DATABASE, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
     return db
 
 
@@ -46,6 +36,16 @@ def close_db():
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
+
+# Log in user
+@login_manager.user_loader
+def load_user(username: str, password: str = None) -> User:
+    if password:
+        db_user = verify_and_get_user(get_db(), username, password)
+    else:
+        db_user = get_user(get_db(), username)
+    return User(db_user) if db_user else None
 
 
 # Renders index template, which initialize the vue application
@@ -136,7 +136,7 @@ def get_userdata():
 def get_wallpaperdata(aid: int):
     datatype = request.args.get("data")
     if datatype is None:
-        return json.dumps(get_wallpaper(get_db(), aid))
+        return json.dumps(get_wallpaper(get_db(), aid, json_conv=True))
     elif datatype == "tags":
         return json.dumps({"tags": get_tags_for_wallpaper(get_db(), aid)})
     elif datatype == "likes":

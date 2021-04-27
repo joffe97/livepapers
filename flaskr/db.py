@@ -153,13 +153,14 @@ def add_wallpaper(conn, username: str,
 
 
 # Gets wallpaper from database
-def get_wallpaper(conn, aid):
+def get_wallpaper(conn, aid, json_conv=False):
     cur = conn.cursor()
     query = "SELECT * FROM wallpapers WHERE aid=?"
     cur.execute(query, (aid,))
     row = cur.fetchone()
     if row:
-        return {"aid": row[0], "username": row[1], "width": row[2], "height": row[3], "date": row[4], "views": row[5]}
+        datestr = int(row[4].timestamp() * 1000) if json_conv else row[4]  # If json_conv: Milliseconds since Jan 1 1970
+        return {"aid": row[0], "username": row[1], "width": row[2], "height": row[3], "date": datestr, "views": row[5]}
     else:
         return None
 
