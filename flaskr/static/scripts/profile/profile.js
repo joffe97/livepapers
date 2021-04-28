@@ -4,11 +4,16 @@ let profileC = {
     <my-head></my-head>
     <div class="container" v-if="user">
         <div class="btn-group col-12 mb-lg-5 mb-4 bg-dark rounded overflow-auto row-auto">
-          <div class="btn btn-outline-primary col-2" :class="{ active: profilePageId == 1 }" @click="goProfileOverview">Overview</div>
-          <div class="btn btn-outline-primary col-2" :class="{ active: profilePageId == 2 }" @click="goProfileCollection">Collection</div>
-          <div class="btn btn-outline-primary col-2" :class="{ active: profilePageId == 3 }" @click="goProfileUpload">Upload</div>
-          <div class="btn btn-outline-primary col-2" :class="{ active: profilePageId == 4 }" @click="goProfileSettings">Settings</div>
-          <div v-if="isAnyAdmin" class="btn btn-outline-primary col-2" :class="{ active: profilePageId == 5 }" @click="goProfileAdmin">Admin</div>
+          <div class="btn btn-outline-primary col-2 text-truncate" 
+          :class="{ active: profilePageId == 1 }" @click="goProfileOverview">Overview</div>
+          <div class="btn btn-outline-primary col-2 text-truncate" 
+          :class="{ active: profilePageId == 2 }" @click="goProfileCollection">Collection</div>
+          <div class="btn btn-outline-primary col-2 text-truncate" 
+          :class="{ active: profilePageId == 3 }" @click="goProfileUpload">Upload</div>
+          <div class="btn btn-outline-primary col-2 text-truncate" 
+          :class="{ active: profilePageId == 4 }" @click="goProfileSettings">Settings</div>
+          <div v-if="isAnyAdmin" class="btn btn-outline-primary col-2 text-truncate" 
+          :class="{ active: profilePageId == 5 }" @click="goProfileAdmin">Admin</div>
         </div>
         <profile-overview v-if="profilePageId == 1"></profile-overview>
         <profile-collection v-if="profilePageId == 2"></profile-collection>

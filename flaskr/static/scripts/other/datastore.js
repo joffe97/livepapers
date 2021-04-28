@@ -49,6 +49,24 @@ class Wallpaper {
         }
         return this.tags;
     }
+    async addTag(tag) {
+        if (!tag) return;
+        if (this.tags.includes(tag)) return 1;
+        let reply = await fetch("/wallpaperdata/tags/" + this.id, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "tag": tag
+            })
+        });
+        if (reply.status !== 200) return 1;
+        let json = await reply.json();
+        if (json.status !== "success") return 1;
+        this.tags.push(tag);
+        return 0
+    }
     async getLikes() {
         if (!this.likes) {
             let reply = await fetch("/wallpaperdata/" + this.id + "?data=likes");

@@ -2,8 +2,8 @@ let browseC = {
     props: ["browseId"],
     template: `
     <my-head></my-head>
+    <alert-tmp></alert-tmp>
     <div class="container">
-        <alert-tmp></alert-tmp>
         <div class="d-flex justify-content-center flex-wrap">
             <div
             v-for="wpId in wallpaperIds"

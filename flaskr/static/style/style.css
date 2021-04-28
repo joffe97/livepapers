@@ -7,6 +7,10 @@ nav {
     min-width: 300px;
 }
 
+.in-front {
+    z-index: 9000;
+}
+
 .browse-img-square {
     overflow: hidden;
     width: 300px;
@@ -62,6 +66,10 @@ nav {
 
 .light-img {
     opacity: 35%;
+}
+
+.btn-close-bg-secondary {
+    background: #343a40;
 }
 
 #alerttmp {
