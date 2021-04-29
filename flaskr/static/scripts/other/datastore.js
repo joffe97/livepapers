@@ -37,11 +37,11 @@ class Wallpaper {
         this.height = height;   // Int      Height
         this.views = views;     // Int      Number of views
         this.date = date;       // Date     Upload date
-        this.tags = [];         // [str]:   List of tags
-        this.likes = null;      // Int:     Number of likes
+        this.tags = undefined;  // [str]:   List of tags
+        this.likes = undefined; // Int:     Number of likes
     }
     async getTags() {
-        if (!this.tags || this.tags.length === 0) {
+        if (this.tags === undefined) {
             let reply = await fetch("/wallpaperdata/" + this.id + "?data=tags");
             if (reply.status !== 200) return [];
             let json = await reply.json();
@@ -51,8 +51,9 @@ class Wallpaper {
     }
     async addTag(tag) {
         if (!tag) return;
+        tag = tag.toLowerCase();
         if (this.tags.includes(tag)) return 1;
-        let reply = await fetch("/wallpaperdata/tags/" + this.id, {
+        let reply = await fetch("/wallpaperdata/" + this.id + "/tags", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -65,10 +66,24 @@ class Wallpaper {
         let json = await reply.json();
         if (json.status !== "success") return 1;
         this.tags.push(tag);
-        return 0
+        return 0;
+    }
+    async removeTag(tag) {
+        if (!tag) return;
+        tag = tag.toLowerCase();
+        let index = this.tags.indexOf(tag);
+        if (index === -1) return 1;
+        let reply = await fetch("/wallpaperdata/" + this.id + "/tags/" + tag, {
+            method: "DELETE"
+        });
+        if (reply.status !== 200) return 1;
+        let json = await reply.json();
+        if (json.status !== "success") return 1;
+        this.tags.splice(index, 1);
+        return 0;
     }
     async getLikes() {
-        if (!this.likes) {
+        if (this.likes === undefined) {
             let reply = await fetch("/wallpaperdata/" + this.id + "?data=likes");
             if (reply.status !== 200) return null;
             let json = await reply.json();
@@ -95,8 +110,7 @@ class Wallpapers {
             let json = await reply.json();
             let date = new Date();
             date.setTime(json.date);
-            this.dict[id] = new Wallpaper(json.aid, json.username, json.width, json.height,
-                json.views, date);
+            this.dict[id] = new Wallpaper(json.aid, json.username, json.width, json.height, json.views, date);
         }
         return this.dict[id];
     }
@@ -107,15 +121,15 @@ class User {
         this.username = username;   // Str:     Username
         this.type = type;           // Int:     Account type
         this.settings = settings;   // Obj:     Settings
-        this.wpUploaded = [];       // [int]:   List containing ids of uploaded wallpapers
-        this.wpStarred = [];        // [int]:   List containing ids of starred wallpapers
-        this.receivedStars = null   // Int:     Number of stars received on uploaded wallpapers
+        this.wpUploaded = undefined;       // [int]:   List containing ids of uploaded wallpapers
+        this.wpStarred = undefined;        // [int]:   List containing ids of starred wallpapers
+        this.receivedStars = undefined   // Int:     Number of stars received on uploaded wallpapers
     }
     getImgUrl() {
         return "static/assets/user_default_img.jpg";  // TODO: Get image from server or database. Needs research on how to.
     }
     async getUploaded() {
-        if (!this.wpUploaded || this.wpUploaded.length === 0) {
+        if (this.wpUploaded === undefined) {
             let reply = await fetch("/userdata?data=uploaded");
             if (reply.status !== 200) return [];
             let json = await reply.json();
@@ -124,7 +138,7 @@ class User {
         return this.wpUploaded;
     }
     async getStarred() {
-        if (!this.wpStarred || this.wpStarred.length === 0) {
+        if (this.wpStarred === undefined) {
             let reply = await fetch("/userdata?data=favorite");
             if (reply.status !== 200) return [];
             let json = await reply.json();
@@ -133,7 +147,7 @@ class User {
         return this.wpStarred;
     }
     async getReceivedStars() {
-        if (!this.receivedStars) {
+        if (this.receivedStars === undefined) {
             let reply = await fetch("/userdata?data=receivedstars");
             if (reply.status !== 200) return [];
             let json = await reply.json();
@@ -194,6 +208,10 @@ class DataStore {
         let wp = this.getWallpaper(wpId);
         return wp ? wp.getDateString() : "";
     }
+    getWpUploaderStr (wpId) {
+        let wp = this.getWallpaper(wpId);
+        return wp ? wp.username : "";
+    }
     getWpViewsStr (wpId) {
         let wp = this.getWallpaper(wpId);
         return wp ? wp.views : "";
@@ -210,6 +228,22 @@ class DataStore {
         let wp = this.getWallpaper(wpId);
         return wp ? wp.tags : [];
     }
+    async removeWallpaper(wpId) {
+        if (!this.state.wallpapers.dict[wpId]) return 1;
+        let reply = await fetch("/wallpaperdata/" + wpId, {
+            method: "DELETE"
+        });
+        if (reply.status !== 200) return 1;
+        let json = await reply.json();
+        if (json.status !== "success") return 1;
+        delete this.state.wallpapers.dict[wpId];
+
+        cmnPopValue(this.state.user.wpUploaded, wpId);
+        cmnPopValue(this.state.user.wpStarred, wpId);
+
+        return 0;
+    }
+
 }
 
 let store = new DataStore();

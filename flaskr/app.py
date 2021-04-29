@@ -7,10 +7,11 @@ from flask import g, render_template, url_for, request, session
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 from db import get_user, verify_user, verify_and_get_user, get_favorite_ids, get_uploaded_ids, get_wallpaper, \
-    get_likes_count_for_wallpaper, get_tags_for_wallpaper, get_users_total_received_stars
+    get_likes_count_for_wallpaper, get_tags_for_wallpaper, get_users_total_received_stars, is_wallpapers_owner, \
+    delete_tag, delete_wallpaper_likes_tags
 from user import User, register_if_valid
 from common import get_reply, validate_and_add_tags
-from media import handle_media_uri
+from media import handle_media_uri, delete_wallpaper_media
 
 
 DATABASE = os.path.dirname(os.path.realpath(__file__)) + r"\database.db"
@@ -40,11 +41,13 @@ def close_db():
 
 # Log in user
 @login_manager.user_loader
-def load_user(username: str, password: str = None) -> User:
-    if password:
-        db_user = verify_and_get_user(get_db(), username, password)
-    else:
-        db_user = get_user(get_db(), username)
+def load_user(username: str) -> User:
+    db_user = get_user(get_db(), username)
+    return User(db_user) if db_user else None
+
+
+def verify_and_load_user(username: str, password: str):
+    db_user = verify_and_get_user(get_db(), username, password)
     return User(db_user) if db_user else None
 
 
@@ -63,7 +66,7 @@ def register():
     pw_verify: str = credentials.get("pw_verify", None)
 
     reply_dict = register_if_valid(get_db(), username, password, pw_verify)
-    user = load_user(username, password) if reply_dict.get("status") == "success" else None
+    user = verify_and_load_user(username, password) if reply_dict.get("status") == "success" else None
     if user:
         login_user(user)
         reply_dict["loggedIn"] = True
@@ -80,7 +83,7 @@ def login():
     credentials = json.loads(request.data)
     username: str = credentials.get("username", None)
     password: str = credentials.get("password", None)
-    user = load_user(username, password)
+    user = verify_and_load_user(username, password)
     reply_dict = {}
     if user:
         login_user(user)
@@ -148,7 +151,7 @@ def get_wallpaperdata(aid: int):
 # Upload wallpaper
 @app.route("/wallpaperdata", methods=["POST"])
 @login_required
-def add_wallpaper():
+def ajax_add_wallpaper():
     jsdata = json.loads(request.data)
     data = jsdata.get("data")
     tags = jsdata.get("tags")
@@ -160,7 +163,42 @@ def add_wallpaper():
     warning = validate_and_add_tags(get_db(), tags, aid)
     if warning:
         return json.dumps(get_reply("warning", "Couldn't add all tags to wallpaper."))
+    reply = get_reply("success")
+    reply["id"] = aid
+    return json.dumps(reply)
+
+
+# Delete wallpaper and its stars and tags
+@app.route("/wallpaperdata/<int:aid>", methods=["DELETE"])
+@login_required
+def ajax_delete_wallpaper(aid: int):
+    error = delete_wallpaper_likes_tags(get_db(), aid)
+    if error:
+        return json.dumps(get_reply("error"))
+    delete_wallpaper_media(aid)
     return json.dumps(get_reply("success"))
+
+
+# Add tag to wallpaper
+@app.route("/wallpaperdata/<int:aid>/tags", methods=["POST"])
+@login_required
+def ajax_add_tag(aid: int):
+    jsdata = json.loads(request.data)
+    tag = jsdata.get("tag")
+    error = validate_and_add_tags(get_db(), [tag], aid)
+    reply = get_reply("success") if not error else get_reply("error", "Couldn't add tag to wallpaper.")
+    return json.dumps(reply)
+
+
+# Remove tag from wallpaper
+@app.route("/wallpaperdata/<int:aid>/tags/<string:tag>", methods=["DELETE"])
+@login_required
+def ajax_delete_tag(aid: int, tag: str):
+    if not is_wallpapers_owner(get_db(), aid, current_user.username):
+        return get_reply("error", "Cannot remove tags for this wallpaper.")
+    error = delete_tag(get_db(), tag, aid)
+    reply = get_reply("success") if not error else get_reply("error", "Couldn't remove tag from wallpaper.")
+    return json.dumps(reply)
 
 
 if __name__ == '__main__':

@@ -138,9 +138,11 @@ def verify_user(conn, username: str, password: str) -> bool:
 def add_wallpaper(conn, username: str,
                   width: int,
                   height: int,
-                  date: datetime.datetime = datetime.datetime.now(),
+                  date: datetime.datetime = None,
                   views: int = 0,
                   return_id: bool = False) -> Union[int, None]:
+    if not date:
+        date = datetime.datetime.now()
     try:
         cur: Cursor = conn.cursor()
         query = "INSERT INTO wallpapers (username, width, height, date, views) VALUES (?,?,?,?,?)"
@@ -165,6 +167,19 @@ def get_wallpaper(conn, aid, json_conv=False):
         return None
 
 
+# Deletes wallpaper from database
+def delete_wallpaper(conn, aid):
+    try:
+        cur = conn.cursor()
+        query = "DELETE FROM wallpapers WHERE aid=?"
+        cur.execute(query, (aid,))
+        conn.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
+
+
 # Returns list of ids of uploaded wallpapers by user
 def get_uploaded_ids(conn, username: str):
     cur = conn.cursor()
@@ -176,6 +191,12 @@ def get_uploaded_ids(conn, username: str):
     return id_list
 
 
+# Checks if the username is the wallpapers uploader
+def is_wallpapers_owner(conn, aid, username: str):
+    wp = get_wallpaper(conn, aid)
+    return wp.get("username") == username.lower()
+
+
 # --------------- Likes ---------------
 
 # Adds a like to a wallpaper to the database
@@ -185,8 +206,23 @@ def add_like(conn, aid: int, username: str):
         query = "INSERT INTO likes (aid, username) VALUES (?,?)"
         cur.execute(query, (aid, username.lower()))
         conn.commit()
+        return 0
     except Error as e:
         print(e)
+        return 1
+
+
+# Delete a like from a wallpaper
+def delete_like(conn, aid: int, username: str):
+    try:
+        cur = conn.cursor()
+        query = "DELETE FROM likes WHERE aid=? AND username=?"
+        cur.execute(query, (aid, username.lower()))
+        conn.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
 
 
 # Get like from database
@@ -196,6 +232,19 @@ def get_likes_count_for_wallpaper(conn, aid: int):
     cur.execute(query, (aid,))
     result = cur.fetchone()
     return result[0] if result else None
+
+
+# Delete all likes from wallpaper
+def delete_likes_for_wallpaper(conn, aid: int):
+    try:
+        cur = conn.cursor()
+        query = "DELETE FROM likes WHERE aid=?"
+        cur.execute(query, (aid,))
+        conn.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
 
 
 # Returns list of ids of favorite wallpapers by user
@@ -224,6 +273,19 @@ def add_tag(conn, tag: str, aid: int):
         return 1
 
 
+# Delete tag from wallpaper
+def delete_tag(conn, tag: str, aid: int):
+    try:
+        cur = conn.cursor()
+        query = "DELETE FROM tags WHERE tag=? AND aid=?"
+        cur.execute(query, (tag.lower(), aid))
+        conn.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
+
+
 # Returns list of tags for wallpaper
 def get_tags_for_wallpaper(conn, aid: int):
     cur = conn.cursor()
@@ -233,6 +295,19 @@ def get_tags_for_wallpaper(conn, aid: int):
     for row in cur:
         tags.append(row[0])
     return tags
+
+
+# Delete all tags for wallpaper
+def delete_tags_for_wallpaper(conn, aid: int):
+    try:
+        cur = conn.cursor()
+        query = "DELETE FROM tags WHERE aid=?"
+        cur.execute(query, (aid,))
+        conn.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
 
 
 # --------------- Multiple tables ---------------
@@ -246,6 +321,22 @@ def get_users_total_received_stars(conn, username: str):
     cur.execute(query, (username.lower(),))
     result = cur.fetchone()
     return result[0] if result else None
+
+
+# Deletes wallpaper and its likes and tags
+def delete_wallpaper_likes_tags(conn, aid):
+    try:
+        cur = conn.cursor()
+        queries = ["DELETE FROM wallpapers WHERE aid=?",
+                   "DELETE FROM likes WHERE aid=?",
+                   "DELETE FROM tags WHERE aid=?"]
+        for query in queries:
+            cur.execute(query, (aid,))
+        conn.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
 
 
 # --------------- Setup ---------------

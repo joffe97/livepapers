@@ -43,3 +43,10 @@ function cmnIsGoodString (string, checkFlags) {
 	}
 	return true;
 }
+
+function cmnPopValue(array, value) {
+	let index = array.indexOf(value);
+	if (index === -1) return 1;
+	array.splice(index, 1);
+	return 0;
+}

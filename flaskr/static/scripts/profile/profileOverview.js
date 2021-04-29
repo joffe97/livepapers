@@ -26,9 +26,9 @@ let profileOverviewC = {
             let uploaded = await user.getUploaded();
             let starred = await user.getStarred();
             let rstars = await user.getReceivedStars();
-            this.user.wpUploaded = uploaded;
-            this.user.wpStarred = starred;
-            this.user.receivedStars = rstars;
+            user.wpUploaded = uploaded;
+            user.wpStarred = starred;
+            user.receivedStars = rstars;
         }
     },
     computed: {
@@ -39,10 +39,12 @@ let profileOverviewC = {
             return this.user.getImgUrl();
         },
         countUploaded: function () {
-            return this.user.wpUploaded.length;
+            let uploaded = this.user.wpUploaded;
+            return uploaded ? uploaded.length : 0;
         },
         countStarred: function () {
-            return this.user.wpStarred.length;
+            let starred = this.user.wpStarred;
+            return starred ? starred.length : 0;
         },
         countReceivedStars: function () {
             return this.user.receivedStars;

@@ -29,8 +29,7 @@ let profileUploadC = {
                         </div>            
                         <div class="input-group rounded-0">
                             <span class="input-group-text w-25">
-                                <span class="d-none d-lg-inline">Width ✕ height</span>
-                                <span class="d-lg-none">W ✕ H</span>
+                                Resolution
                             </span>
                             <input v-bind:value="displayWidth" type="text" class="form-control text-end" disabled>
                             <span class="input-group-text">✕</span>
@@ -155,7 +154,6 @@ let profileUploadC = {
                 }
             }
             if (!mediatype || !type) {
-                console.log(MEDIA_TYPES)
                 setAlert("The current file format is not supported.", "danger");
                 return;
             }
@@ -168,10 +166,9 @@ let profileUploadC = {
                     "data": this.userVideo,
                     "tags": this.tags
                 })
-            })
+            });
             this.tags = [];
             if (reply.status !== 200) {
-                console.log(2)
                 setAlert("Internal error occurred.");
                 return;
             }
@@ -182,6 +179,8 @@ let profileUploadC = {
                 return;
             }
             setAlert("Successfully uploaded " + type + ".", "success");
+            let wpId = json.id;
+            if (wpId) store.state.user.wpUploaded.push(wpId);
         },
     }
 };

@@ -13,8 +13,13 @@ let profileCollectionC = {
         </div>
         <hr>
         <div v-for="wpId in wpIds" class="row mx-0 justify-content-between flex-lg-row flex-column position-relative">
-            <div class="position-absolute end-0 top-0 me-1 p-2 btn-close btn-close-white d-none d-lg-block" 
-            role="button" title="Delete wallpaper" @click="removeWallpaper(wpId)"></div>
+            <div class="position-absolute end-0 top-0 me-1 p-2 d-none d-lg-block col-auto">
+                <div v-if="mode === 'uploaded'" class="btn-close btn-close-white"
+                role="button" title="Delete wallpaper" @click="removeWallpaper(wpId)"></div>
+                <i v-if="mode === 'favorites'" class="bi text-warning" 
+                :class="[isUnfavorited(wpId) ? 'bi-star' : 'bi-star-fill']"
+                role="button" title="Unfavorite" @click="unfavoriteWallpaper(wpId)"></i>
+            </div>
             <div class="browse-img-square col-lg-5 m-auto btn p-0" @click="goWallpaper(wpId)">
                 <figure class="figure m-0">
                     <img class="img-fluid" :src="getImageUrl(wpId)">
@@ -22,22 +27,23 @@ let profileCollectionC = {
             </div>
             <table class="col table text-light my-auto mx-lg-5 my-lg-4 align-middle position-relative">
                 <tbody>
+                    <tr v-if="mode === 'favorites'" class="text-capitalize"><th>Uploader:</th><td colspan="2">{{store.getWpUploaderStr(wpId)}}</td></tr>
                     <tr><th>Date:</th><td colspan="2">{{store.getWpDateStr(wpId)}}</td></tr>
                     <tr><th>Views:</th><td colspan="2">{{store.getWpViewsStr(wpId)}}</td></tr>
                     <tr><th>Stars:</th><td colspan="2">{{store.getWpStarsStr(wpId)}}</td></tr>
                     <tr><th>Resolution:</th><td colspan="2">{{store.getWpResolutionStr(wpId)}}</td></tr>
                     <tr><th>Tags:</th>
                         <td class="col-7">
-                            <div class="btn-group btn-group-sm col-12">
+                            <form class="btn-group btn-group-sm col-12" @submit.prevent @submit="removeTag(wpId)">
                                 <select v-model="selectedTags[wpId]" class="form-select form-select-sm rounded-0 rounded-start">
                                     <option v-if="!selectedTags[wpId]" value="">--- Select tag ---</option>
                                     <option v-for="tag in store.getWpTags(wpId)" :value="tag">
                                         {{tag}}
                                     </option>
                                 </select>
-                                <div class="btn btn-dark rounded-0 rounded-end px-3" 
-                                :class="{'disabled': !this.selectedTags[wpId]}" @click="removeTag(wpId)">Del</div>
-                            </div>
+                                <button type="submit" class="btn btn-dark rounded-0 rounded-end px-3" 
+                                :class="{'disabled': !this.selectedTags[wpId]}">Del</button>
+                            </form>
                         </td>
                         <td class="col-2">
                             <button class="btn btn-outline-dark btn-sm col-12" data-bs-toggle="collapse"
@@ -46,10 +52,11 @@ let profileCollectionC = {
                     </tr>
                     <tr class="collapse position-absolute text-secondary col-12" :id="'collapseAdd' + wpId">
                         <td class="card card-body position-relative bg-dark in-front rounded-0 rounded-bottom" colspan="3">
-                            <form @submit.prevent @submit="" class="row">
+                            <form @submit.prevent @submit="addTag(wpId)" class="row">
                                 <div class="btn-group col">
-                                    <input type="text" class="form-control" placeholder="Tagname">
-                                    <div class="btn btn-success">Add</div>
+                                    <input v-model="addTagInputs[wpId]" type="text" class="form-control" placeholder="Tagname">
+                                    <button type="submit" class="btn btn-success" data-bs-toggle="collapse"
+                                    :data-bs-target="'#collapseAdd' + wpId">Add</button>
                                 </div>
                                 <div class="btn btn-close me-3 my-auto" data-bs-toggle="collapse"
                                 :data-bs-target="'#collapseAdd' + wpId"></div>
@@ -58,7 +65,11 @@ let profileCollectionC = {
                     </tr>
                 </tbody>
             </table>
-            <div class="btn btn-outline-danger col-auto mx-auto mt-2 d-lg-none" @click="removeWallpaper(wpId)">Delete wallpaper</div>
+            <div class="btn col-auto mx-auto mt-2 d-lg-none" 
+            :class="[mode === 'favorites' ? 'btn-outline-warning' : 'btn-outline-danger']" 
+            @click="mode === 'favorites' ? unfavoriteWallpaper(wpId) : removeWallpaper(wpId)">
+                {{mode === 'favorites' ? 'Unfavorite' : 'Delete wallpaper'}}
+            </div>
             <hr class="mt-4">
         </div>
     </div>
@@ -69,13 +80,13 @@ let profileCollectionC = {
             store: store,
             selectedTags: {},
             addTagInputs: {},
-            selectedEditTag: null
+            favoritesStart: []
         }
     },
     async created() {
         let user = await store.getUser();
         if (user) {
-            this.loadWallpapers();
+            await this.loadWallpapers();
         }
     },
     watch: {
@@ -92,7 +103,7 @@ let profileCollectionC = {
                 case "uploaded":
                     return this.user.wpUploaded;
                 case "favorites":
-                    return this.user.wpStarred;
+                    return this.favoritesStart;
                 default:
                     return [];
             }
@@ -101,20 +112,24 @@ let profileCollectionC = {
     methods: {
         loadWallpapers: async function() {
             let wpIds = [];
+            await store.loadManyWallpaperFavorites(wpIds);
+            await store.loadManyWallpaperTags(wpIds);
             switch (this.mode) {
                 case "uploaded":
                     wpIds = await this.user.getUploaded();
-                    await store.loadManyWallpaperFavorites(wpIds);
-                    await store.loadManyWallpaperTags(wpIds);
                     break;
                 case "favorites":
                     wpIds = await this.user.getStarred();
+                    this.favoritesStart = [...wpIds];
                     break;
             }
             await store.loadManyWallpapers(wpIds);
             for (let i = 0; i < wpIds.length; i++) {
                 this.selectedTags[wpIds[i]] = "";
             }
+        },
+        isUnfavorited: function (wpId) {
+            return !this.user.wpStarred.includes(wpId);
         },
         getImageUrl: function (wpId) {
             return cmnGetImageUrl(wpId);
@@ -126,14 +141,53 @@ let profileCollectionC = {
             return store.getWallpaper(wpId);
         },
         removeTag: async function (wpId) {
+            let wp = this.getWp(wpId);
             let tag = this.selectedTags[wpId];
-            if (!tag || !confirm('Remove "' + tag + '" from tags?')) return;
-            let reply = await fetch(
+            if (!wp || !tag || !confirm('Remove "' + tag + '" from tags?')) {
+                setAlert("Couldn't remove tag from wallpaper.");
+                return;
+            }
+            let error = await wp.removeTag(tag);
+            if (error) {
+                setAlert("Couldn't remove tag from wallpaper");
+            } else {
+                setAlert("Removed tag from wallpaper.", "success");
+                this.selectedTags[wpId] = "";
+            }
 
-            )
         },
-        removeWallpaper: function (wpId) {
-            return
+        addTag: async function (wpId) {
+            let wp = this.getWp(wpId);
+            if (!wp) {
+                setAlert("Couldn't add tag to wallpaper.");
+                return;
+            }
+            let tag = this.addTagInputs[wpId];
+            let error = await wp.addTag(tag);
+            if (error) {
+                setAlert("Couldn't add tag to wallpaper.");
+            } else {
+                setAlert("Added tag to wallpaper.", "success");
+                setTimeout(()=>this.addTagInputs[wpId] = "", 500);
+            }
+        },
+        removeWallpaper: async function (wpId) {
+            if (!confirm("Delete wallpaper?")) {
+                setAlert("Couldn't delete wallpaper.");
+                return;
+            }
+            let error = await store.removeWallpaper(wpId);
+            if (error) {
+                setAlert("Couldn't delete wallpaper.");
+                return;
+            }
+            delete this.selectedTags[wpId];
+            delete this.addTagInputs[wpId];
+            setAlert("Successfully deleted wallpaper.", "success");
+        },
+        unfavoriteWallpaper: async function (wpId) {
+            console.log("Unfavorite");
+            cmnPopValue(this.user.wpStarred, wpId);
         }
     }
 };
