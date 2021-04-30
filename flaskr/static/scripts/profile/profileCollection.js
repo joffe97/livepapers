@@ -18,7 +18,7 @@ let profileCollectionC = {
                 role="button" title="Delete wallpaper" @click="removeWallpaper(wpId)"></div>
                 <i v-if="mode === 'favorites'" class="bi text-warning" 
                 :class="[isUnfavorited(wpId) ? 'bi-star' : 'bi-star-fill']"
-                role="button" title="Unfavorite" @click="unfavoriteWallpaper(wpId)"></i>
+                role="button" title="Unfavorite" @click="toggleFavoriteWallpaper(wpId)"></i>
             </div>
             <div class="browse-img-square col-lg-5 m-auto btn p-0" @click="goWallpaper(wpId)">
                 <figure class="figure m-0">
@@ -27,25 +27,31 @@ let profileCollectionC = {
             </div>
             <table class="col table text-light my-auto mx-lg-5 my-lg-4 align-middle position-relative">
                 <tbody>
-                    <tr v-if="mode === 'favorites'" class="text-capitalize"><th>Uploader:</th><td colspan="2">{{store.getWpUploaderStr(wpId)}}</td></tr>
+                    <tr v-if="mode === 'favorites'" class="text-capitalize">
+                        <th>Uploader:</th><td colspan="2">{{store.getWpUploaderStr(wpId)}}</td>
+                    </tr>
                     <tr><th>Date:</th><td colspan="2">{{store.getWpDateStr(wpId)}}</td></tr>
                     <tr><th>Views:</th><td colspan="2">{{store.getWpViewsStr(wpId)}}</td></tr>
                     <tr><th>Stars:</th><td colspan="2">{{store.getWpStarsStr(wpId)}}</td></tr>
                     <tr><th>Resolution:</th><td colspan="2">{{store.getWpResolutionStr(wpId)}}</td></tr>
                     <tr><th>Tags:</th>
                         <td class="col-7">
-                            <form class="btn-group btn-group-sm col-12" @submit.prevent @submit="removeTag(wpId)">
-                                <select v-model="selectedTags[wpId]" class="form-select form-select-sm rounded-0 rounded-start">
-                                    <option v-if="!selectedTags[wpId]" value="">--- Select tag ---</option>
+                            <form class="col-12 btn-group btn-group-sm"
+                            @submit.prevent @submit="removeTag(wpId)">
+                                <select v-model="selectedTags[wpId]" class="form-select form-select-sm"
+                                :class="{'rounded-0 rounded-start': mode === 'uploaded'}">
+                                    <option v-if="!selectedTags[wpId]" value="">
+                                        --- {{ getTagSelectDefault(wpId) }} ---
+                                    </option>
                                     <option v-for="tag in store.getWpTags(wpId)" :value="tag">
                                         {{tag}}
                                     </option>
                                 </select>
-                                <button type="submit" class="btn btn-dark rounded-0 rounded-end px-3" 
+                                <button v-if="mode === 'uploaded'" type="submit" class="btn btn-dark rounded-0 rounded-end px-3" 
                                 :class="{'disabled': !this.selectedTags[wpId]}">Del</button>
                             </form>
                         </td>
-                        <td class="col-2">
+                        <td v-if="mode === 'uploaded'" class="col-2">
                             <button class="btn btn-outline-dark btn-sm col-12" data-bs-toggle="collapse"
                             :data-bs-target="'#collapseAdd' + wpId">New</button>
                         </td>
@@ -66,12 +72,15 @@ let profileCollectionC = {
                 </tbody>
             </table>
             <div class="btn col-auto mx-auto mt-2 d-lg-none" 
-            :class="[mode === 'favorites' ? 'btn-outline-warning' : 'btn-outline-danger']" 
-            @click="mode === 'favorites' ? unfavoriteWallpaper(wpId) : removeWallpaper(wpId)">
+            :class="[mode === 'favorites' ? (isUnfavorited(wpId) ? 'btn-outline-warning' : 'btn-warning') : 'btn-outline-danger']" 
+            @click="mode === 'favorites' ? toggleFavoriteWallpaper(wpId) : removeWallpaper(wpId)">
                 {{mode === 'favorites' ? 'Unfavorite' : 'Delete wallpaper'}}
             </div>
             <hr class="mt-4">
         </div>
+        <h5 v-if="!wpIds || wpIds.length === 0" class="mt-5 text-center">
+            No wallpapers {{mode === 'uploaded' ? 'uploaded yet' : 'added to favorites'}}.
+        </h5>
     </div>
     `,
     data() {
@@ -112,8 +121,6 @@ let profileCollectionC = {
     methods: {
         loadWallpapers: async function() {
             let wpIds = [];
-            await store.loadManyWallpaperFavorites(wpIds);
-            await store.loadManyWallpaperTags(wpIds);
             switch (this.mode) {
                 case "uploaded":
                     wpIds = await this.user.getUploaded();
@@ -123,6 +130,8 @@ let profileCollectionC = {
                     this.favoritesStart = [...wpIds];
                     break;
             }
+            await store.loadManyWallpaperFavorites(wpIds);
+            await store.loadManyWallpaperTags(wpIds);
             await store.loadManyWallpapers(wpIds);
             for (let i = 0; i < wpIds.length; i++) {
                 this.selectedTags[wpIds[i]] = "";
@@ -130,6 +139,15 @@ let profileCollectionC = {
         },
         isUnfavorited: function (wpId) {
             return !this.user.wpStarred.includes(wpId);
+        },
+        getTagSelectDefault: function (wpId) {
+            let tags = store.getWpTags(wpId);
+            if (!tags || tags.length === 0) return "No tags";
+            if (this.mode === 'uploaded') {
+                return "Select tag";
+            } else {
+                return "View tags";
+            }
         },
         getImageUrl: function (wpId) {
             return cmnGetImageUrl(wpId);
@@ -173,7 +191,6 @@ let profileCollectionC = {
         },
         removeWallpaper: async function (wpId) {
             if (!confirm("Delete wallpaper?")) {
-                setAlert("Couldn't delete wallpaper.");
                 return;
             }
             let error = await store.removeWallpaper(wpId);
@@ -185,9 +202,28 @@ let profileCollectionC = {
             delete this.addTagInputs[wpId];
             setAlert("Successfully deleted wallpaper.", "success");
         },
+        toggleFavoriteWallpaper: async function (wpId) {
+            if (this.isUnfavorited(wpId)) {
+                await this.favoriteWallpaper(wpId);
+            } else {
+                await this.unfavoriteWallpaper(wpId);
+            }
+        },
+        favoriteWallpaper: async function (wpId) {
+            let error = await this.user.addFavorite(wpId);
+            if (error) {
+                setAlert("Couldn't add to favorites.");
+                return;
+            }
+            clearAlert();
+        },
         unfavoriteWallpaper: async function (wpId) {
-            console.log("Unfavorite");
-            cmnPopValue(this.user.wpStarred, wpId);
+            let error = await this.user.removeFavorite(wpId);
+            if (error) {
+                setAlert("Couldn't remove from favorites.");
+                return;
+            }
+            clearAlert();
         }
     }
 };

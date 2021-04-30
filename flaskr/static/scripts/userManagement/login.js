@@ -47,14 +47,13 @@ let loginC = {
                 setAlert("An unknown error occured.", "danger");
                 return 0;
             }
-            console.log(reply);
             let json = await reply.json();
             if (!json.loggedIn) {
                 setAlert("Wrong username or password. Try again.", "danger");
                 return 0;
             }
             store.state.isLoggedIn = this.succLogin = true;
-            return this.$router.push("/#/");
+            return this.$router.go(-1);
         }
     }
 };

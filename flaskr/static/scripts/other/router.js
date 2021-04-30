@@ -6,7 +6,7 @@ const router = VueRouter.createRouter({
       { path: '/:browseId', component: browseC, props: true },
       { path: '/login/', component: loginC },
       { path: '/register/', component: registerC },
-      { path: '/wallpaper/:wpId', component: wallpaperC, props: true },
+      { path: '/wallpaper/:wpIdStr', component: wallpaperC, props: true },
       //{ path: '/profile/', redirect: '/profile/overview' },
       { path: '/profile/:pid', component: profileC, props: true}
     ]

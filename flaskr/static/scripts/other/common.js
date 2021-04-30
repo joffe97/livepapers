@@ -10,6 +10,10 @@ async function cmnIsLoggedIn() {
 	return json.loggedIn === true;
 }
 
+function cmnGetTimeStamp (wpId) {
+	return
+}
+
 function cmnGetVideoUrl (wpId) {
 	return 'static/wallpapers/videos/' + wpId + '.mp4'
 }
@@ -35,8 +39,8 @@ function cmnIsGoodString (string, checkFlags) {
 	if (typeof string !== "string") return false;
 	for (let i = 0; i < string.length; i++) {
 		let ch = string[i];
-		if (	((checkFlags & STRING_CHECKS.ALPHA) && cmnCharIsAlpha(ch))
-			|| 	((checkFlags & STRING_CHECKS.NUM) && cmnCharIsNum(ch))) {
+		if (((checkFlags & STRING_CHECKS.ALPHA) && cmnCharIsAlpha(ch))
+			|| ((checkFlags & STRING_CHECKS.NUM) && cmnCharIsNum(ch))) {
 			continue;
 		}
 		return false;
@@ -45,6 +49,7 @@ function cmnIsGoodString (string, checkFlags) {
 }
 
 function cmnPopValue(array, value) {
+	if (!array) return 1;
 	let index = array.indexOf(value);
 	if (index === -1) return 1;
 	array.splice(index, 1);

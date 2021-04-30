@@ -32,7 +32,7 @@
 
 **How to run:**  run `python3 app.py` from the `./flaskr` directory.
 
-**Python version:** 3.9
+**Python version:** 3.8
 
 **Python packages:** See requrements.txt
 

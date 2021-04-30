@@ -61,7 +61,7 @@ let registerC = {
             }
             store.state.isLoggedIn = message.loggedIn;
             this.succRegister = true;
-            return this.$router.push("/#/");
+            return this.$router.go(-1);
         }
     }
 }

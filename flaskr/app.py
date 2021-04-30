@@ -8,7 +8,7 @@ from flask_login import LoginManager, current_user, login_user, login_required, 
 
 from db import get_user, verify_user, verify_and_get_user, get_favorite_ids, get_uploaded_ids, get_wallpaper, \
     get_likes_count_for_wallpaper, get_tags_for_wallpaper, get_users_total_received_stars, is_wallpapers_owner, \
-    delete_tag, delete_wallpaper_likes_tags
+    delete_tag, delete_wallpaper_likes_tags, add_like, delete_like, wallpaper_exists
 from user import User, register_if_valid
 from common import get_reply, validate_and_add_tags
 from media import handle_media_uri, delete_wallpaper_media
@@ -198,6 +198,28 @@ def ajax_delete_tag(aid: int, tag: str):
         return get_reply("error", "Cannot remove tags for this wallpaper.")
     error = delete_tag(get_db(), tag, aid)
     reply = get_reply("success") if not error else get_reply("error", "Couldn't remove tag from wallpaper.")
+    return json.dumps(reply)
+
+
+# Remove wallpaper from current users favorites
+@app.route("/userdata/favorites/<int:aid>", methods=["DELETE"])
+@login_required
+def ajax_delete_favorite(aid: int):
+    error = delete_like(get_db(), aid, current_user.username)
+    reply = get_reply("success") if not error else get_reply("error")
+    return json.dumps(reply)
+
+
+# Add wallpaper to current users favorites
+@app.route("/userdata/favorites", methods=["POST"])
+@login_required
+def ajax_add_favorite():
+    jsdata = json.loads(request.data)
+    aid = jsdata.get("wpId")
+    if not aid or not wallpaper_exists(get_db(), aid):
+        return json.dumps(get_reply("error"))
+    error = add_like(get_db(), aid, current_user.username)
+    reply = get_reply("success") if not error else get_reply("error")
     return json.dumps(reply)
 
 

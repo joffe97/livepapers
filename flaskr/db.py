@@ -3,6 +3,7 @@ import datetime
 from sqlite3 import Error, Cursor, Connection
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Dict, Union
+from random import randint
 
 
 DATABASE = "./database.db"
@@ -145,10 +146,11 @@ def add_wallpaper(conn, username: str,
         date = datetime.datetime.now()
     try:
         cur: Cursor = conn.cursor()
-        query = "INSERT INTO wallpapers (username, width, height, date, views) VALUES (?,?,?,?,?)"
-        cur.execute(query, (username.lower(), width, height, date, views))
+        aid = int(date.timestamp() * 1000000)
+        query = "INSERT INTO wallpapers VALUES (?,?,?,?,?,?)"
+        cur.execute(query, (aid, username.lower(), width, height, date, views))
         conn.commit()
-        return cur.lastrowid if return_id else None
+        return aid if return_id else None
     except Error as e:
         print(e)
         return None
@@ -195,6 +197,11 @@ def get_uploaded_ids(conn, username: str):
 def is_wallpapers_owner(conn, aid, username: str):
     wp = get_wallpaper(conn, aid)
     return wp.get("username") == username.lower()
+
+
+# Checks if the wallpaper exists
+def wallpaper_exists(conn, aid):
+    return get_wallpaper(conn, aid) is not None
 
 
 # --------------- Likes ---------------

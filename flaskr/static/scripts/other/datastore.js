@@ -50,7 +50,7 @@ class Wallpaper {
         return this.tags;
     }
     async addTag(tag) {
-        if (!tag) return;
+        if (!tag || this.tags === undefined) return 1;
         tag = tag.toLowerCase();
         if (this.tags.includes(tag)) return 1;
         let reply = await fetch("/wallpaperdata/" + this.id + "/tags", {
@@ -118,12 +118,12 @@ class Wallpapers {
 
 class User {
     constructor(username, type, settings) {
-        this.username = username;   // Str:     Username
-        this.type = type;           // Int:     Account type
-        this.settings = settings;   // Obj:     Settings
-        this.wpUploaded = undefined;       // [int]:   List containing ids of uploaded wallpapers
-        this.wpStarred = undefined;        // [int]:   List containing ids of starred wallpapers
-        this.receivedStars = undefined   // Int:     Number of stars received on uploaded wallpapers
+        this.username = username;       // Str:     Username
+        this.type = type;               // Int:     Account type
+        this.settings = settings;       // Obj:     Settings
+        this.wpUploaded = undefined;    // [int]:   List containing ids of uploaded wallpapers
+        this.wpStarred = undefined;     // [int]:   List containing ids of starred wallpapers
+        this.receivedStars = undefined  // Int:     Number of stars received on uploaded wallpapers
     }
     getImgUrl() {
         return "static/assets/user_default_img.jpg";  // TODO: Get image from server or database. Needs research on how to.
@@ -154,6 +154,35 @@ class User {
             this.receivedStars = json.receivedStars;
         }
         return this.receivedStars;
+    }
+    async removeFavorite(wpId) {
+        let index = this.wpStarred.indexOf(wpId);
+        if (index === -1) return 1;
+        let reply = await fetch("/userdata/favorites/" + wpId, {
+            method: "DELETE"
+        });
+        if (reply.status !== 200) return 1;
+        let json = await reply.json();
+        if (json.status !== "success") return 1;
+        this.wpStarred.splice(index, 1);
+        return 0;
+    }
+    async addFavorite(wpId) {
+        if (!wpId) return 1;
+        let reply = await fetch("/userdata/favorites", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "wpId": wpId
+            })
+        });
+        if (reply.status !== 200) return 1;
+        let json = await reply.json();
+        if (json.status !== "success") return 1;
+        this.wpStarred.push(wpId);
+        return 0;
     }
     isAnyAdmin() {
         return (this.type & (USER_TYPES.ADMIN | USER_TYPES.MANAGER)) !== 0;
@@ -214,11 +243,13 @@ class DataStore {
     }
     getWpViewsStr (wpId) {
         let wp = this.getWallpaper(wpId);
-        return wp ? wp.views : "";
+        if (!wp) return "0"
+        return wp.views ? wp.views : "0";
     }
     getWpStarsStr (wpId) {
         let wp = this.getWallpaper(wpId);
-        return wp ? wp.likes : "";
+        if (!wp) return "0"
+        return wp.likes ? wp.likes : "0";
     }
     getWpResolutionStr (wpId) {
         let wp = this.getWallpaper(wpId);
