@@ -4,16 +4,26 @@ let profileC = {
     <my-head></my-head>
     <div class="container" v-if="user">
         <div class="btn-group col-12 mb-lg-5 mb-4 bg-dark rounded overflow-auto row-auto">
-          <div class="btn btn-outline-primary col-2 text-truncate" 
-          :class="{ active: profilePageId == 1 }" @click="goProfileOverview">Overview</div>
-          <div class="btn btn-outline-primary col-2 text-truncate" 
-          :class="{ active: profilePageId == 2 }" @click="goProfileCollection">Collection</div>
-          <div class="btn btn-outline-primary col-2 text-truncate" 
-          :class="{ active: profilePageId == 3 }" @click="goProfileUpload">Upload</div>
-          <div class="btn btn-outline-primary col-2 text-truncate" 
-          :class="{ active: profilePageId == 4 }" @click="goProfileSettings">Settings</div>
-          <div v-if="isAnyAdmin" class="btn btn-outline-primary col-2 text-truncate" 
-          :class="{ active: profilePageId == 5 }" @click="goProfileAdmin">Admin</div>
+            <div class="btn btn-outline-primary col-2" 
+            :class="{ active: profilePageId == 1 }" @click="goProfileOverview">
+                <i class="bi bi-person-fill d-sm-none"></i><span class="d-sm-inline d-none">Overview</span>
+            </div>
+            <div class="btn btn-outline-primary col-2" 
+            :class="{ active: profilePageId == 2 }" @click="goProfileCollection">
+                <i class="bi bi-collection-fill d-sm-none"></i><span class="d-sm-inline d-none">Collection</span>
+            </div>
+            <div class="btn btn-outline-primary col-2" 
+            :class="{ active: profilePageId == 3 }" @click="goProfileUpload">
+                <i class="bi bi-upload d-sm-none"></i><span class="d-sm-inline d-none">Upload</span>
+            </div>
+            <div class="btn btn-outline-primary col-2" 
+            :class="{ active: profilePageId == 4 }" @click="goProfileSettings">
+                <i class="bi bi-gear-fill d-sm-none"></i><span class="d-sm-inline d-none">Settings</span>
+            </div>
+            <div v-if="isAnyAdmin" class="btn btn-outline-primary col-2" 
+            :class="{ active: profilePageId == 5 }" @click="goProfileAdmin">
+                <i class="bi bi-command d-sm-none"></i><span class="d-sm-inline d-none">Admin</span>
+            </div>
         </div>
         <profile-overview v-if="profilePageId == 1"></profile-overview>
         <profile-collection v-if="profilePageId == 2"></profile-collection>

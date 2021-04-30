@@ -1,6 +1,5 @@
 let profileCollectionC = {
     template: `
-    <alert-tmp></alert-tmp>
     <div class="col col-lg-11 mx-lg-auto">
         <div class="justify-content-between position-relative mx-lg-2">
             <div class="display-5 d-inline-block">Collection</div>

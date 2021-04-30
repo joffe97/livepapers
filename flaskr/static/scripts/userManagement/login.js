@@ -44,12 +44,12 @@ let loginC = {
                 })
             });
             if (reply.status !== 200) {
-                setAlert("An unknown error occured.", "danger");
+                setAlert("An unknown error occured.", "danger", "cross");
                 return 0;
             }
             let json = await reply.json();
             if (!json.loggedIn) {
-                setAlert("Wrong username or password. Try again.", "danger");
+                setAlert("Wrong username or password. Try again.", "danger", "cross");
                 return 0;
             }
             store.state.isLoggedIn = this.succLogin = true;

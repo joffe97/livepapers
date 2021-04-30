@@ -7,24 +7,29 @@ let wallpaperC = {
         <div class="col">
             <div class="wallpaper-video row-12 m-auto">
                 <div class="my-4">
-                    <video class="unclickable p-0" autoplay loop muted>
+                    <video class="unclickable p-0 wallpaper-page-video" autoplay loop muted>
                         <source :src="getVideoUrl()">
                     </video>
                 </div>
                 <div class="row-auto p-0">
                     <div class="btn-group m-0" role="group">
-                        <div v-if="user" class="btn btn-primary rounded-0 rounded-top border-warning border-2 border-bottom-0" 
+                        <div v-if="user" class="me-1 btn rounded-0 rounded-top border-warning border-2 border-bottom-0" 
+                        @mouseover="hoverFavorite = true" @mouseleave="hoverFavorite = false" 
+                        :class="[hoverFavorite ? 'btn-warning' : 'btn-primary text-warning']" 
                         @click="toggleFavoriteWallpaper()">
-                            <i class="bi text-warning" :class="[isFavorited ? 'bi-star-fill' : 'bi-star']"></i> Favorite
+                            <i class="bi" :class="[isFavorited ? 'bi-star-fill' : 'bi-star']"></i> Favorite
                         </div>
-                        <a class="btn btn-primary rounded-0 rounded-top border-success border-2 border-bottom-0" :href="getVideoUrl()" :download="wpId">
-                            <i class="bi bi-download text-success"></i> Download
+                        <a class="btn btn-primary rounded-0 rounded-top border-success border-2 border-bottom-0" 
+                        @mouseover="hoverUpdate = true" @mouseleave="hoverUpdate = false" 
+                        :class="[hoverUpdate ? 'btn-success' : 'btn-primary text-success'], {'ms-1': user}" 
+                        :href="getVideoUrl()" :download="wpId">
+                            <i class="bi bi-download"></i> Download
                         </a>
                     </div>
                     <ul class="col-2 list-group p-0 rounded-0 rounded-bottom">
-                        <li v-for="info in [getViewsStr(), getUploadDateStr(), getResolution()]"
+                        <li v-for="info in [viewsStr, timeSinceUploadStr, resolutionStr]"
                         class="list-group-item bg-light">
-                            <strong>{{info}}</strong>
+                            {{info}}
                         </li>
                     </ul>
                 </div>
@@ -34,18 +39,19 @@ let wallpaperC = {
     `,
     data() {
         return {
+            hoverUpdate: false,
+            hoverFavorite: false,
             wpId: parseInt(this.wpIdStr),
-            username: null,
-            width: 1920,
-            height: 1024,
-            date: "15.04.2021",
-            views: 512
         }
     },
     async created() {
         let user = await store.getUser();
         if (user) {
             await store.state.user.getStarred();
+        }
+        let wp = await store.loadWallpaper(this.wpId);
+        if (wp) {
+            await wp.getLikes();
         }
     },
     computed: {
@@ -57,23 +63,23 @@ let wallpaperC = {
         },
         isFavorited: function () {
             return this.user && this.favorites && this.favorites.includes(this.wpId);
+        },
+        wp: function () {
+            return store.state.wallpapers.dict[this.wpId];
+        },
+        timeSinceUploadStr: function () {
+            return this.wp ? this.wp.getTimeSinceString() + " ago" : "";
+        },
+        resolutionStr: function () {
+            return store.getWpResolutionStr(this.wpId);
+        },
+        viewsStr: function () {
+            return store.getWpViewsStr(this.wpId) + " views";
         }
     },
     methods: {
         getVideoUrl: function () {
             return cmnGetVideoUrl(this.wpId)
-        },
-        getResolution: function () {
-            return this.width + " x " + this.height
-        },
-        getUploadDateStr: function () {
-            return "Added 2 weeks ago";
-        },
-        getViewsStr: function () {
-            return 512 + " views";
-        },
-        fillWallpaperData: function () {
-            return;
         },
         toggleFavoriteWallpaper: async function () {
             if (this.isFavorited) {

@@ -46,7 +46,7 @@ let profileUploadC = {
                         <div v-for="tag in tags.slice().reverse()" role="button"
                         class="list-group-item list-group-item-action text-capitalize alert-dismissible">
                             {{ tag }}
-                            <button type="button" class="btn-close p-0 h-100 pe-4"></button>
+                            <button type="button" class="btn-close p-0 h-100 pe-4" @click="removeTag(tag)"></button>
                         </div>
                     </div>
                 </div>
@@ -84,20 +84,27 @@ let profileUploadC = {
         },
         addTag: function () {
             if (!this.tagInput) {
-                setAlert("Cannot add an empty tag.", "danger");
+                setAlert("Cannot add an empty tag.", "danger", "cross");
                 return;
             } else if (!cmnIsGoodString(this.tagInput, STRING_CHECKS.ALPHA)) {
-                setAlert("Tag cannot contain numbers or special signs.", "danger");
+                setAlert("Tag cannot contain numbers or special signs.", "danger", "cross");
                 return;
             }
             let lowerStr = this.tagInput.toLowerCase();
             if (this.tags.includes(lowerStr)) {
-                setAlert("Tag is already added to the list", "danger");
+                setAlert("Tag is already added to the list", "danger", "cross");
                 return;
             }
             clearAlert();
             this.tags.push(lowerStr);
             this.tagInput = "";
+        },
+        removeTag: function (tag) {
+            if (!tag || cmnPopValue(this.tags, tag)) {
+                setAlert("Cannot remove tag.", "danger", "cross");
+                return;
+            }
+            clearAlert();
         },
         onUploadChange: function (e) {
             let files = e.target.files;
@@ -154,7 +161,7 @@ let profileUploadC = {
                 }
             }
             if (!mediatype || !type) {
-                setAlert("The current file format is not supported.", "danger");
+                setAlert("The current file format is not supported.", "danger", "cross");
                 return;
             }
             let reply = await fetch("/wallpaperdata", {
@@ -169,16 +176,16 @@ let profileUploadC = {
             });
             this.tags = [];
             if (reply.status !== 200) {
-                setAlert("Internal error occurred.");
+                setAlert("Internal error occurred.", "danger", "cross");
                 return;
             }
             let json = await reply.json();
             if (json.status !== "success"){
                 let msg = json.msg ? json.msg : "unknown";
-                setAlert("Internal error occurred: " + msg, json.status);
+                setAlert("Internal error occurred: " + msg, json.status, "cross");
                 return;
             }
-            setAlert("Successfully uploaded " + type + ".", "success");
+            setAlert("Successfully uploaded " + type + ".", "success", "cross");
             let wpId = json.id;
             if (wpId) store.state.user.wpUploaded.push(wpId);
         },

@@ -6,6 +6,8 @@ const MEDIA_TYPES = {
 
 const ALERT_TYPES = ["danger", "success", "warning"];
 
+const ALERT_MODES = ["tmp", "cross"];
+
 const USER_TYPES = {
     WP_ADD: 1,
     WP_REM: 1 << 1,
@@ -93,6 +95,23 @@ class Wallpaper {
     }
     getDateString() {
         return this.date.toLocaleString();
+    }
+    getTimeSinceString() {
+        if (!this.date) return "";
+        let seconds = Math.floor((new Date() - this.date) / 1000);
+        let interval, unit;
+
+        if ((interval = cmnConvertSeconds(seconds, SEC_IN_YEAR, true)) >= 1) unit = "year";
+        else if ((interval = cmnConvertSeconds(seconds, SEC_IN_MONTH, true)) >= 1) unit = "month";
+        else if ((interval = cmnConvertSeconds(seconds, SEC_IN_DAY, true)) >= 1) unit = "day";
+        else if ((interval = cmnConvertSeconds(seconds, SEC_IN_HOUR, true)) >= 1) unit = "hour";
+        else if ((interval = cmnConvertSeconds(seconds, SEC_IN_MIN, true)) >= 1) unit = "minute";
+        else {
+            interval = seconds;
+            unit = "second";
+        }
+        if (interval !== 1) unit += "s";
+        return interval.toString() + " " + unit;
     }
 }
 
@@ -196,7 +215,8 @@ class DataStore {
             isLoggedIn: false,
             pageId: 0,
             alertMessage: "",
-            alertType: "danger",
+            alertType: "",
+            alertMode: "",
             user: null,
             wallpapers: new Wallpapers() // Wps: Object containing loaded wallpapers
         });
@@ -279,15 +299,14 @@ class DataStore {
 
 let store = new DataStore();
 
-function setAlert(message, type = "danger") {
+function setAlert(message, type = "danger", mode = "tmp") {
     store.state.alertMessage = message;
-    if (ALERT_TYPES.includes(type.toLowerCase())) {
-        store.state.alertType = type;
-    } else {
-        store.state.alertType = "danger";
-    }
+    store.state.alertType = ALERT_TYPES.includes(type.toLowerCase()) ? type : "danger";
+    store.state.alertMode = ALERT_MODES.includes(mode.toLowerCase()) ? mode : "tmp";
 }
 
 function clearAlert() {
     store.state.alertMessage = "";
+    store.state.alertType = "";
+    store.state.alertMode = "";
 }

@@ -32,6 +32,10 @@ nav {
     opacity: 80%;
 }
 
+.wallpaper-page-video {
+    max-height: 50vh;
+}
+
 .wallpaper-video {
     width: 100%;
 }
@@ -74,7 +78,7 @@ nav {
 
 #alerttmp {
     position: absolute;
-    top: 100px;
+    top: 130px;
     opacity: 0.96;
     margin: auto;
     min-width: 90vw;

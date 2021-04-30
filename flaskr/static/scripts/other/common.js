@@ -3,6 +3,13 @@ const STRING_CHECKS = {
 	NUM: 1 << 1
 };
 
+const SEC_IN_MIN = 60;
+const SEC_IN_HOUR = SEC_IN_MIN * 60;
+const SEC_IN_DAY = SEC_IN_HOUR * 24;
+const SEC_IN_WEEK = SEC_IN_DAY * 7;
+const SEC_IN_YEAR = SEC_IN_DAY * 365;
+const SEC_IN_MONTH = Math.floor(SEC_IN_YEAR / 12);
+
 async function cmnIsLoggedIn() {
 	let reply = await fetch("/validate");
 	if (reply.status !== 200) return false;
@@ -54,4 +61,9 @@ function cmnPopValue(array, value) {
 	if (index === -1) return 1;
 	array.splice(index, 1);
 	return 0;
+}
+
+function cmnConvertSeconds(seconds, format, toInt) {
+	let time = seconds / format;
+	return toInt ? Math.floor(time) : time;
 }

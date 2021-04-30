@@ -1,20 +1,25 @@
 let alertCrossC = {
     template: `
     <div class="alert alert-dismissible fade" 
-    :class="[ alertMessage !== '' ? 'show' : 'p-0 m-0 unclickable', 'alert-' + alertType ]">
+    :class="[ alertMessage !== '' && alertMode === 'cross'  ? 'show' : 'p-0 m-0 unclickable d-none', 'alert-' + alertType ]">
         {{ alertMessage }}
-        <button type="button" class="btn-close" @click="alertMessage = ''"></button>
+        <button type="button" class="btn-close" @click="clearAlert()"></button>
     </div>
     `,
     data() {
         return store.state;
     },
     beforeUnmount() {
-        this.alertMessage = "";
+        clearAlert();
     },
     watch: {
         alertMessage: function () {
-            if (this.alertMessage) cmnScrollTop();
+            if (this.alertMessage && this.alertMode === "cross") cmnScrollTop();
+        }
+    },
+    methods: {
+        clearAlert: function () {
+            clearAlert();
         }
     }
 }
@@ -23,7 +28,7 @@ let alertTmpC = {
     template: `
     <div id="alerttmp" 
     class="alert alert-dismissible fade border-0 position-fixed shadow-lg translate-middle-x start-50" 
-    :class="[ alertMessage !== '' ? 'show' : 'p-0 m-0 unclickable', 'alert-' + alertType ]">
+    :class="[ alertMessage !== '' && alertMode === 'tmp' ? 'show' : 'p-0 m-0 unclickable d-none', 'alert-' + alertType ]">
         {{ alertMessage }}
     </div>
     `,
@@ -38,6 +43,9 @@ let alertTmpC = {
         },
         alertMessage: function () {
             return store.state.alertMessage;
+        },
+        alertMode: function () {
+            return store.state.alertMode;
         }
     },
     created() {

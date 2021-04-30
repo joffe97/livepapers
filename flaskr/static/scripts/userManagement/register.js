@@ -51,12 +51,12 @@ let registerC = {
                 })
             });
             if (reply.status !== 200) {
-                setAlert("An unknown error occured.");
+                setAlert("An unknown error occured.", "danger", "cross");
                 return 0;
             }
             let message = await reply.json();
             if (message.status === "error") {
-                setAlert(message.msg);
+                setAlert(message.msg, "danger", "cross");
                 return 0;
             }
             store.state.isLoggedIn = message.loggedIn;
