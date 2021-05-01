@@ -93,6 +93,16 @@ class Wallpaper {
         }
         return this.likes;
     }
+    async incrementViews () {
+        let reply = await fetch("/wallpaperdata/" + this.id + "/views", {
+            method: "PUT"
+        });
+        if (reply.status !== 200) return 1;
+        let json = await reply.json();
+        if (json.status !== "success") return 1;
+        this.views += 1;
+        return 0;
+    }
     getDateString() {
         return this.date.toLocaleString();
     }

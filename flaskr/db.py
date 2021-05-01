@@ -183,7 +183,7 @@ def delete_wallpaper(conn, aid):
 
 
 # Returns list of ids of uploaded wallpapers by user
-def get_uploaded_ids(conn, username: str):
+def get_uploaded_aids(conn, username: str):
     cur = conn.cursor()
     query = "SELECT aid FROM wallpapers WHERE username=?"
     cur.execute(query, (username.lower(),))
@@ -191,6 +191,19 @@ def get_uploaded_ids(conn, username: str):
     for row in cur:
         id_list.append(row[0])
     return id_list
+
+
+# Increament views for wallpaper
+def increment_wallpaper_views(conn, aid: int):
+    try:
+        cur = conn.cursor()
+        query = "UPDATE wallpapers SET views=views+1 WHERE aid=?"
+        cur.execute(query, (aid,))
+        conn.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
 
 
 # Checks if the username is the wallpapers uploader

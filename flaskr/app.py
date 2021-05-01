@@ -6,9 +6,7 @@ import json
 from flask import g, render_template, url_for, request, session
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
-from db import get_user, verify_user, verify_and_get_user, get_favorite_ids, get_uploaded_ids, get_wallpaper, \
-    get_likes_count_for_wallpaper, get_tags_for_wallpaper, get_users_total_received_stars, is_wallpapers_owner, \
-    delete_tag, delete_wallpaper_likes_tags, add_like, delete_like, wallpaper_exists
+import db
 from user import User, register_if_valid
 from common import get_reply, validate_and_add_tags
 from media import handle_media_uri, delete_wallpaper_media
@@ -26,28 +24,28 @@ login_manager.init_app(app)
 
 # Returns a connection to the database
 def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
-    return db
+    database = getattr(g, '_database', None)
+    if database is None:
+        database = g._database = sqlite3.connect(DATABASE, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+    return database
 
 
 # Closes the connection to the database
 def close_db():
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+    database = getattr(g, '_database', None)
+    if database is not None:
+        database.close()
 
 
 # Log in user
 @login_manager.user_loader
 def load_user(username: str) -> User:
-    db_user = get_user(get_db(), username)
+    db_user = db.get_user(get_db(), username)
     return User(db_user) if db_user else None
 
 
 def verify_and_load_user(username: str, password: str):
-    db_user = verify_and_get_user(get_db(), username, password)
+    db_user = db.verify_and_get_user(get_db(), username, password)
     return User(db_user) if db_user else None
 
 
@@ -121,11 +119,11 @@ def get_userdata():
     if datatype == "user":
         return json.dumps(current_user.get_dict())
     elif datatype == "uploaded":
-        return json.dumps({"uploaded": get_uploaded_ids(get_db(), current_user.username)})
+        return json.dumps({"uploaded": db.get_uploaded_aids(get_db(), current_user.username)})
     elif datatype == "favorite":
-        return json.dumps({"favorite": get_favorite_ids(get_db(), current_user.username)})
+        return json.dumps({"favorite": db.get_favorite_ids(get_db(), current_user.username)})
     elif datatype == "receivedstars":
-        return json.dumps({"receivedStars": get_users_total_received_stars(get_db(), current_user.username)})
+        return json.dumps({"receivedStars": db.get_users_total_received_stars(get_db(), current_user.username)})
     else:
         return json.dumps({})
 
@@ -139,11 +137,11 @@ def get_userdata():
 def get_wallpaperdata(aid: int):
     datatype = request.args.get("data")
     if datatype is None:
-        return json.dumps(get_wallpaper(get_db(), aid, json_conv=True))
+        return json.dumps(db.get_wallpaper(get_db(), aid, json_conv=True))
     elif datatype == "tags":
-        return json.dumps({"tags": get_tags_for_wallpaper(get_db(), aid)})
+        return json.dumps({"tags": db.get_tags_for_wallpaper(get_db(), aid)})
     elif datatype == "likes":
-        return json.dumps({"likes": get_likes_count_for_wallpaper(get_db(), aid)})
+        return json.dumps({"likes": db.get_likes_count_for_wallpaper(get_db(), aid)})
     else:
         return json.dumps({})
 
@@ -172,7 +170,7 @@ def ajax_add_wallpaper():
 @app.route("/wallpaperdata/<int:aid>", methods=["DELETE"])
 @login_required
 def ajax_delete_wallpaper(aid: int):
-    error = delete_wallpaper_likes_tags(get_db(), aid)
+    error = db.delete_wallpaper_likes_tags(get_db(), aid)
     if error:
         return json.dumps(get_reply("error"))
     delete_wallpaper_media(aid)
@@ -194,10 +192,18 @@ def ajax_add_tag(aid: int):
 @app.route("/wallpaperdata/<int:aid>/tags/<string:tag>", methods=["DELETE"])
 @login_required
 def ajax_delete_tag(aid: int, tag: str):
-    if not is_wallpapers_owner(get_db(), aid, current_user.username):
+    if not db.is_wallpapers_owner(get_db(), aid, current_user.username):
         return get_reply("error", "Cannot remove tags for this wallpaper.")
-    error = delete_tag(get_db(), tag, aid)
+    error = db.delete_tag(get_db(), tag, aid)
     reply = get_reply("success") if not error else get_reply("error", "Couldn't remove tag from wallpaper.")
+    return json.dumps(reply)
+
+
+# Increment views on wallpaper
+@app.route("/wallpaperdata/<int:aid>/views", methods=["PUT"])
+def increment_views(aid: int):
+    error = db.increment_wallpaper_views(get_db(), aid)
+    reply = get_reply("success") if not error else get_reply("error")
     return json.dumps(reply)
 
 
@@ -205,7 +211,7 @@ def ajax_delete_tag(aid: int, tag: str):
 @app.route("/userdata/favorites/<int:aid>", methods=["DELETE"])
 @login_required
 def ajax_delete_favorite(aid: int):
-    error = delete_like(get_db(), aid, current_user.username)
+    error = db.delete_like(get_db(), aid, current_user.username)
     reply = get_reply("success") if not error else get_reply("error")
     return json.dumps(reply)
 
@@ -216,9 +222,9 @@ def ajax_delete_favorite(aid: int):
 def ajax_add_favorite():
     jsdata = json.loads(request.data)
     aid = jsdata.get("wpId")
-    if not aid or not wallpaper_exists(get_db(), aid):
+    if not aid or not db.wallpaper_exists(get_db(), aid):
         return json.dumps(get_reply("error"))
-    error = add_like(get_db(), aid, current_user.username)
+    error = db.add_like(get_db(), aid, current_user.username)
     reply = get_reply("success") if not error else get_reply("error")
     return json.dumps(reply)
 

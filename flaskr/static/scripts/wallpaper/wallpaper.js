@@ -26,11 +26,10 @@ let wallpaperC = {
                             <i class="bi bi-download"></i> Download
                         </a>
                     </div>
-                    <ul class="col-2 list-group p-0 rounded-0 rounded-bottom">
-                        <li v-for="info in [viewsStr, timeSinceUploadStr, resolutionStr]"
-                        class="list-group-item bg-light">
-                            {{info}}
-                        </li>
+                    <ul class="col-2 list-group list-group-horizontal-lg p-0 rounded-0 rounded-bottom">
+                        <li class="list-group-item bg-light">{{viewsStr}}</li>
+                        <li class="list-group-item bg-light">{{timeSinceUploadStr}}</li>
+                        <li class="list-group-item bg-light">{{resolutionStr}}</li>
                     </ul>
                 </div>
             </div>
@@ -52,6 +51,7 @@ let wallpaperC = {
         let wp = await store.loadWallpaper(this.wpId);
         if (wp) {
             await wp.getLikes();
+            await wp.incrementViews();
         }
     },
     computed: {
@@ -101,7 +101,7 @@ let wallpaperC = {
             if (error) {
                 setAlert("Couldn't remove from favorites.");
             } else {
-                setAlert("Removed wallpaper from favorites.", "success");
+                setAlert("Removed wallpaper from favorites.", "warning");
             }
         }
     }

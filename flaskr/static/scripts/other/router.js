@@ -8,6 +8,7 @@ const router = VueRouter.createRouter({
       { path: '/register/', component: registerC },
       { path: '/wallpaper/:wpIdStr', component: wallpaperC, props: true },
       //{ path: '/profile/', redirect: '/profile/overview' },
-      { path: '/profile/:pid', component: profileC, props: true}
+      { path: '/profile/:pid', component: profileC, props: true},
+      { path: '/profile/collection/:cid', name: 'collection', component: profileC, props: true},
     ]
   });

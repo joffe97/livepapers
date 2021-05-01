@@ -47,6 +47,7 @@ let profileC = {
     },
     methods: {
         updateProfilePageId: function () {
+            console.log(this.pid + " | " + this.cid)
             switch (this.pid) {
                 case "collection":
                     this.profilePageId = 2;

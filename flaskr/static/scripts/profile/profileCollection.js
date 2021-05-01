@@ -1,4 +1,7 @@
+const COLLECTION_TYPES = ["uploaded", "favorites"];
+
 let profileCollectionC = {
+    props: ["cid"],
     template: `
     <div class="col col-lg-11 mx-lg-auto">
         <div class="justify-content-between position-relative mx-lg-2">
@@ -84,7 +87,7 @@ let profileCollectionC = {
     `,
     data() {
         return {
-            mode: "uploaded",
+            mode: "",
             store: store,
             selectedTags: {},
             addTagInputs: {},
@@ -92,6 +95,9 @@ let profileCollectionC = {
         }
     },
     async created() {
+        if (COLLECTION_TYPES.includes(this.cid)) this.mode = this.cid;
+        else this.mode = "uploaded";
+
         let user = await store.getUser();
         if (user) {
             await this.loadWallpapers();
