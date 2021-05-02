@@ -1,5 +1,5 @@
 let profileC = {
-    props: ["pid"],
+    props: ["pid", "cid"],
     template: `
     <my-head></my-head>
     <div class="container" v-if="user">
@@ -26,7 +26,7 @@ let profileC = {
             </div>
         </div>
         <profile-overview v-if="profilePageId == 1"></profile-overview>
-        <profile-collection v-if="profilePageId == 2"></profile-collection>
+        <profile-collection v-bind:cid="cid" v-if="profilePageId == 2"></profile-collection>
         <profile-upload v-if="profilePageId == 3"></profile-upload>
         <profile-settings v-if="profilePageId == 4"></profile-settings>
         <profile-admin v-if="profilePageId == 5 && isAnyAdmin"></profile-admin>
@@ -47,7 +47,6 @@ let profileC = {
     },
     methods: {
         updateProfilePageId: function () {
-            console.log(this.pid + " | " + this.cid)
             switch (this.pid) {
                 case "collection":
                     this.profilePageId = 2;

@@ -67,3 +67,7 @@ function cmnConvertSeconds(seconds, format, toInt) {
 	let time = seconds / format;
 	return toInt ? Math.floor(time) : time;
 }
+
+function cmnGcd(a, b) {
+	return b === 0 ? a : cmnGcd(b, a % b);
+}

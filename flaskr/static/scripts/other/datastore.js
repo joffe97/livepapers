@@ -123,6 +123,10 @@ class Wallpaper {
         if (interval !== 1) unit += "s";
         return interval.toString() + " " + unit;
     }
+    getAspectRatio() {
+        let gcd = cmnGcd(this.width, this.height);
+        return {width: this.width / gcd, height: this.height / gcd};
+    }
 }
 
 class Wallpapers {
@@ -273,17 +277,23 @@ class DataStore {
     }
     getWpViewsStr (wpId) {
         let wp = this.getWallpaper(wpId);
-        if (!wp) return "0"
-        return wp.views ? wp.views : "0";
+        if (!wp) return 0
+        return wp.views ? wp.views : 0;
     }
     getWpStarsStr (wpId) {
         let wp = this.getWallpaper(wpId);
-        if (!wp) return "0"
-        return wp.likes ? wp.likes : "0";
+        if (!wp) return 0
+        return wp.likes ? wp.likes : 0;
     }
     getWpResolutionStr (wpId) {
         let wp = this.getWallpaper(wpId);
         return wp ? (wp.width + " x " + wp.height) : "";
+    }
+    getWpAspectRatioStr (wpId) {
+        let wp = this.getWallpaper(wpId);
+        if (!wp) return "";
+        let ratio = wp.getAspectRatio();
+        return ratio.width + ":" + ratio.height;
     }
     getWpTags (wpId) {
         let wp = this.getWallpaper(wpId);

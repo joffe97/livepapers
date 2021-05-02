@@ -63,8 +63,7 @@ let profileCollectionC = {
                             <form @submit.prevent @submit="addTag(wpId)" class="row">
                                 <div class="btn-group col">
                                     <input v-model="addTagInputs[wpId]" type="text" class="form-control" placeholder="Tagname">
-                                    <button type="submit" class="btn btn-success" data-bs-toggle="collapse"
-                                    :data-bs-target="'#collapseAdd' + wpId">Add</button>
+                                    <button type="submit" class="btn btn-success">Add</button>
                                 </div>
                                 <div class="btn btn-close me-3 my-auto" data-bs-toggle="collapse"
                                 :data-bs-target="'#collapseAdd' + wpId"></div>
@@ -191,7 +190,7 @@ let profileCollectionC = {
                 setAlert("Couldn't add tag to wallpaper.");
             } else {
                 setAlert("Added tag to wallpaper.", "success");
-                setTimeout(()=>this.addTagInputs[wpId] = "", 500);
+                this.addTagInputs[wpId] = "";
             }
         },
         removeWallpaper: async function (wpId) {

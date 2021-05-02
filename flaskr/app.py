@@ -229,5 +229,11 @@ def ajax_add_favorite():
     return json.dumps(reply)
 
 
+# Returns 24 latest wallpapers that's not yet received
+@app.route("/wallpapers/latest", methods=["GET"])
+def get_latest_wallpapers():
+    return json.dumps(db.get_latest_wallpapers(get_db()))
+
+
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")

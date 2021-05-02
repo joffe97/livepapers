@@ -5,32 +5,41 @@ let wallpaperC = {
     <alert-tmp></alert-tmp>
     <div class="container">
         <div class="col">
-            <div class="wallpaper-video row-12 m-auto">
-                <div class="my-4">
+            <div class="row-12 m-auto">
+                <div class="wallpaper-video mb-lg-4 mb-2">
                     <video class="unclickable p-0 wallpaper-page-video" autoplay loop muted>
                         <source :src="getVideoUrl()">
                     </video>
                 </div>
-                <div class="row-auto p-0">
-                    <div class="btn-group m-0" role="group">
-                        <div v-if="user" class="me-1 btn rounded-0 rounded-top border-warning border-2 border-bottom-0" 
-                        @mouseover="hoverFavorite = true" @mouseleave="hoverFavorite = false" 
-                        :class="[hoverFavorite ? 'btn-warning' : 'btn-primary text-warning']" 
-                        @click="toggleFavoriteWallpaper()">
-                            <i class="bi" :class="[isFavorited ? 'bi-star-fill' : 'bi-star']"></i> Favorite
-                        </div>
-                        <a class="btn btn-primary rounded-0 rounded-top border-success border-2 border-bottom-0" 
-                        @mouseover="hoverUpdate = true" @mouseleave="hoverUpdate = false" 
-                        :class="[hoverUpdate ? 'btn-success' : 'btn-primary text-success'], {'ms-1': user}" 
-                        :href="getVideoUrl()" :download="wpId">
-                            <i class="bi bi-download"></i> Download
-                        </a>
+                <div class="btn-group m-0 mb-2 col-12" role="group">
+                    <div v-if="user" class="me-1 py-lg-2 btn border-warning border-2" 
+                    @mouseover="hoverFavorite = true" @mouseleave="hoverFavorite = false" 
+                    :class="[hoverFavorite ? 'btn-warning' : 'btn-primary text-warning'], {'col-6': user}" 
+                    @click="toggleFavoriteWallpaper()">
+                        <i class="bi" :class="[isFavorited ? 'bi-star-fill' : 'bi-star']"></i> 
+                        {{isFavorited ? 'Unfavorite' : 'Favorite'}}
                     </div>
-                    <ul class="col-2 list-group list-group-horizontal-lg p-0 rounded-0 rounded-bottom">
-                        <li class="list-group-item bg-light">{{viewsStr}}</li>
-                        <li class="list-group-item bg-light">{{timeSinceUploadStr}}</li>
-                        <li class="list-group-item bg-light">{{resolutionStr}}</li>
-                    </ul>
+                    <a class="btn btn-primary border-success border-2 py-lg-2" 
+                    @mouseover="hoverUpdate = true" @mouseleave="hoverUpdate = false" 
+                    :class="[hoverUpdate ? 'btn-success' : 'btn-primary text-success'], {'ms-1 col-6': user}" 
+                    :href="getVideoUrl()" :download="wpId">
+                        <i class="bi bi-download"></i> Download
+                    </a>
+                </div>
+                <div class="col-lg-10 mx-auto">
+                    <table class="table text-light my-2">
+                        <tbody>
+                            <tr><th>Uploader</th><td class="text-capitalize">{{uploaderStr}}</td></tr>
+                            <tr><th>Time</th><td>{{timeSinceUploadStr}}</td></tr>
+                            <tr><th>Resolution</th><td>{{resolutionStr}}</td></tr>
+                            <tr><th>Aspect ratio</th><td>{{aspectRatioStr}}</td></tr>
+                            <tr><th>Stars</th><td>{{starsStr}}</td></tr>
+                            <tr><th>Views</th><td>{{viewsStr}}</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="my-4 text-center">
+                        <div v-for="tag in tags" class="h4 mx-4 my-2 d-inline-block">#{{tag}}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -46,11 +55,12 @@ let wallpaperC = {
     async created() {
         let user = await store.getUser();
         if (user) {
-            await store.state.user.getStarred();
+            await user.getStarred();
         }
         let wp = await store.loadWallpaper(this.wpId);
         if (wp) {
             await wp.getLikes();
+            await wp.getTags();
             await wp.incrementViews();
         }
     },
@@ -74,7 +84,21 @@ let wallpaperC = {
             return store.getWpResolutionStr(this.wpId);
         },
         viewsStr: function () {
-            return store.getWpViewsStr(this.wpId) + " views";
+            let views = store.getWpViewsStr(this.wpId);
+            return views + (views !== 1 ? " views" : " view");
+        },
+        uploaderStr: function () {
+            return store.getWpUploaderStr(this.wpId);
+        },
+        starsStr: function () {
+            let stars = store.getWpStarsStr(this.wpId);
+            return stars + (stars !== 1 ? " stars" : " star");
+        },
+        aspectRatioStr: function () {
+            return store.getWpAspectRatioStr(this.wpId);
+        },
+        tags: function () {
+            return store.getWpTags(this.wpId);
         }
     },
     methods: {

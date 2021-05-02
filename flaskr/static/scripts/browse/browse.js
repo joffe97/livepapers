@@ -38,6 +38,9 @@ let browseC = {
         },
         updatePageId: function () {
             switch (this.browseId) {
+                case "latest":
+                    store.state.pageId = 1;
+                    break;
                 case "mostliked":
                     store.state.pageId = 2;
                     break;
@@ -45,7 +48,7 @@ let browseC = {
                     store.state.pageId = 3;
                     break;
                 default:
-                    store.state.pageId = 1;
+                    store.state.pageId = 0;
             }
         }
     },
