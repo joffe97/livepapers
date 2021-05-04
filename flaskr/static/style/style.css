@@ -17,19 +17,23 @@ nav {
     height: 200px;
 }
 
-.browse-img-square figure {
+.browse-img-square figure, .browse-img-square video {
     height: 100%;
     width: 100%;
 }
 
-.browse-img-square figure img {
+.browse-img-square figure img, .browse-img-square video {
     height: 100%;
     width: 100%;
     object-fit: cover;
 }
 
+.browse-img-square video {
+    z-index: 500;
+}
+
 .browse-img-square:hover {
-    opacity: 80%;
+    filter: brightness(105%) contrast(105%) drop-shadow(3px 3px 2px);
 }
 
 .wallpaper-page-video {

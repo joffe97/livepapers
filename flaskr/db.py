@@ -2,7 +2,7 @@ import sqlite3
 import datetime
 from sqlite3 import Error, Cursor, Connection
 from werkzeug.security import generate_password_hash, check_password_hash
-from typing import Dict, Union
+from typing import Dict, List, Union
 from random import randint
 
 
@@ -224,9 +224,44 @@ def wallpaper_exists(conn, aid):
 def get_latest_wallpapers(conn, fromdate: datetime.datetime = None, count=24):
     if fromdate is None:
         fromdate = datetime.datetime.now()
+
     cur = conn.cursor()
     query = "SELECT * FROM (SELECT * FROM wallpapers ORDER BY date DESC) WHERE date < ? LIMIT ?"
     cur.execute(query, (fromdate, count))
+
+    returnlist = []
+    for row in cur:
+        datestr = int(row[4].timestamp() * 1000)
+        returnlist.append({"aid": row[0], "username": row[1], "width": row[2], "height": row[3], "date": datestr, "views": row[5]})
+    return returnlist
+
+
+# Gets most liked wallpapers
+# Parameters:
+#   stars: Number of stars to search from. Defaults to 999_999_999_999.
+#   staraids: Excludeds these wallpapers. Defaults to [].
+#   count: Returns 'count' numbers of wallpapers. Defaults to 24.
+def get_mostliked_wallpapers(conn, stars: int = 999_999_999_999, staraids: List[int] = None, count=24):
+    if stars is None:
+        stars = 999_999_999_999
+    if staraids is None:
+        staraids = []
+
+    cur = conn.cursor()
+    query = f"""SELECT * 
+                FROM wallpapers AS w
+                INNER JOIN (SELECT aid, count(lid) AS stars
+                            FROM likes
+                            WHERE aid NOT IN ({','.join('?' * len(staraids))})
+                            GROUP BY aid
+                            HAVING count(lid) <= ?) AS m
+                ON w.aid = m.aid
+                ORDER BY stars DESC
+                LIMIT ?
+                """
+    staraids.extend([stars, count])
+    cur.execute(query, tuple(staraids))
+
     returnlist = []
     for row in cur:
         datestr = int(row[4].timestamp() * 1000)

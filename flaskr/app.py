@@ -1,5 +1,6 @@
 import flask
 import os
+import sys
 import sqlite3
 import json
 import datetime
@@ -12,6 +13,8 @@ from user import User, register_if_valid
 from common import get_reply, validate_and_add_tags
 from media import handle_media_uri, delete_wallpaper_media
 
+
+INFINITE_SCROLL = False
 
 DATABASE = os.path.dirname(os.path.realpath(__file__)) + r"\database.db"
 
@@ -230,24 +233,72 @@ def ajax_add_favorite():
     return json.dumps(reply)
 
 
-# Returns 24 latest wallpapers that's not yet received
+# Returns wallpapers when the infinite_scroll parameter is set
+def infinite_scroll_func(func, count):
+    return_list = []
+    while len(return_list) < count:
+        wps = func(get_db(), count=count)
+        if len(wps) == 0:
+            break
+        return_list.extend(wps)
+    return json.dumps(return_list)
+
+
+# Returns latest wallpapers that's not yet received
 @app.route("/wallpapers/latest", methods=["GET"])
 def get_latest_wallpapers():
     from_ms = request.args.get("fms")
-    count_str = request.args.get("count")
+    count_str = request.args.get("count", "24")
     from_datetime = None
-    count = None
+
     if from_ms and from_ms.isdecimal():
         time = int(from_ms) / 1000.0
         try:
             from_datetime = datetime.datetime.fromtimestamp(time)
         except OSError:
             pass
-    if count and count_str.isdecimal():
+
+    if not count_str.isdecimal():
+        count = 24
+    else:
         count = int(count_str)
-    from_datetime = None  # TODO: Remove this line
-    return json.dumps(db.get_latest_wallpapers(get_db(), from_datetime))
+
+    if INFINITE_SCROLL:  # Only for testing
+        return infinite_scroll_func(db.get_latest_wallpapers, count)
+
+    return json.dumps(db.get_latest_wallpapers(get_db(), from_datetime, count))
+
+
+# Returns most liked wallpapers that's not yet received
+@app.route("/wallpapers/mostliked", methods=["GET"])
+def get_mostliked_wallpapers():
+    stars_str = request.args.get("stars", "")
+    aids = request.args.get("wpids", "")
+    count_str = request.args.get("count", "24")
+
+    aid_list = []
+    for aid in aids.split(","):
+        if aid and aid.isdecimal():
+            aid_list.append(int(aid))
+
+    if not stars_str.isdecimal():
+        stars = None
+    else:
+        stars = int(stars_str)
+
+    if not count_str.isdecimal():
+        count = 24
+    else:
+        count = int(count_str)
+
+    if INFINITE_SCROLL:  # Only for testing
+        return infinite_scroll_func(db.get_mostliked_wallpapers, count)
+
+    return json.dumps(db.get_mostliked_wallpapers(get_db(), stars, aid_list, count))
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="127.0.0.1")
+    for arg in sys.argv:
+        if arg == "-infinite_scroll":
+            INFINITE_SCROLL = True
+    app.run(debug=True, host="0.0.0.0")

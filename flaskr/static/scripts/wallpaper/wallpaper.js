@@ -37,8 +37,8 @@ let wallpaperC = {
                             <tr><th>Views</th><td>{{viewsStr}}</td></tr>
                         </tbody>
                     </table>
-                    <div class="my-4 text-center">
-                        <div v-for="tag in tags" class="h4 mx-4 my-2 d-inline-block">#{{tag}}</div>
+                    <div class="my-4 d-flex flex-wrap justify-content-center">
+                        <div v-for="tag in tags" class="h4 mx-4 my-2 text-center">#{{tag}}</div>
                     </div>
                 </div>
             </div>
