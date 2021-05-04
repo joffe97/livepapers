@@ -1,3 +1,5 @@
+EMOJI_SCREAMING = "&#128561";
+
 const STRING_CHECKS = {
 	ALPHA: 1,
 	NUM: 1 << 1

@@ -2,6 +2,7 @@ import flask
 import os
 import sqlite3
 import json
+import datetime
 
 from flask import g, render_template, url_for, request, session
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
@@ -232,8 +233,21 @@ def ajax_add_favorite():
 # Returns 24 latest wallpapers that's not yet received
 @app.route("/wallpapers/latest", methods=["GET"])
 def get_latest_wallpapers():
-    return json.dumps(db.get_latest_wallpapers(get_db()))
+    from_ms = request.args.get("fms")
+    count_str = request.args.get("count")
+    from_datetime = None
+    count = None
+    if from_ms and from_ms.isdecimal():
+        time = int(from_ms) / 1000.0
+        try:
+            from_datetime = datetime.datetime.fromtimestamp(time)
+        except OSError:
+            pass
+    if count and count_str.isdecimal():
+        count = int(count_str)
+    from_datetime = None  # TODO: Remove this line
+    return json.dumps(db.get_latest_wallpapers(get_db(), from_datetime))
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host="127.0.0.1")

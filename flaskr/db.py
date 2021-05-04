@@ -217,16 +217,21 @@ def wallpaper_exists(conn, aid):
     return get_wallpaper(conn, aid) is not None
 
 
-# Gets latest wallpapers that's not yet received
-def get_latest_wallpapers(conn, received=None, count=24):
-    if received is None:
-        received = []
-    print(received)
+# Gets latest wallpapers
+# Parameters:
+#   fromdate: Returns latest wallpapers after this date. Defaults to now.
+#   count: Returns 'count' numbers of wallpapers. Defaults to 24.
+def get_latest_wallpapers(conn, fromdate: datetime.datetime = None, count=24):
+    if fromdate is None:
+        fromdate = datetime.datetime.now()
     cur = conn.cursor()
-    query = f"SELECT aid FROM (SELECT aid FROM wallpapers ORDER BY date DESC) WHERE aid NOT IN ({'?' * len(received)}) LIMIT ?"
-    received.append(count)
-    cur.execute(query, tuple(received))
-    return [row[0] for row in cur]
+    query = "SELECT * FROM (SELECT * FROM wallpapers ORDER BY date DESC) WHERE date < ? LIMIT ?"
+    cur.execute(query, (fromdate, count))
+    returnlist = []
+    for row in cur:
+        datestr = int(row[4].timestamp() * 1000)
+        returnlist.append({"aid": row[0], "username": row[1], "width": row[2], "height": row[3], "date": datestr, "views": row[5]})
+    return returnlist
 
 
 # --------------- Likes ---------------

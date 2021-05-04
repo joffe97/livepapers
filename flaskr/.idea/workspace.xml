@@ -4,21 +4,12 @@
     <list default="true" id="0acfe6c4-f288-41bb-97dd-25ac3f27a636" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/database.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media.py" beforeDir="false" afterPath="$PROJECT_DIR$/media.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/browse/browse.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/browse/browse.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/scripts/other/common.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/other/common.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/scripts/other/datastore.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/other/datastore.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/scripts/profile/profileCollection.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/profile/profileCollection.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/scripts/profile/profileOverview.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/profile/profileOverview.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/scripts/profile/profileUpload.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/profile/profileUpload.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/wallpapers/images/1.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/wallpapers/images/1.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/wallpapers/images/2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/wallpapers/images/2.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/wallpapers/images/3.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/wallpapers/videos/1.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/static/wallpapers/videos/1.mp4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/wallpapers/videos/2.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/static/wallpapers/videos/2.mp4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/wallpapers/videos/3.mp4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/wallpaper/wallpaper.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/wallpaper/wallpaper.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -200,16 +191,43 @@
       <workItem from="1619607140080" duration="77000" />
       <workItem from="1619680399050" duration="31559000" />
       <workItem from="1619763663525" duration="82000" />
+      <workItem from="1620114120468" duration="22573000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="WindowStateProjectService">
+    <state width="1493" height="93" key="GridCell.Tab.0.bottom" timestamp="1620136868353">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="93" key="GridCell.Tab.0.bottom/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1620136868353" />
+    <state width="1493" height="93" key="GridCell.Tab.0.center" timestamp="1620136868353">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="93" key="GridCell.Tab.0.center/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1620136868353" />
+    <state width="1493" height="93" key="GridCell.Tab.0.left" timestamp="1620136868353">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="93" key="GridCell.Tab.0.left/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1620136868353" />
+    <state width="1493" height="93" key="GridCell.Tab.0.right" timestamp="1620136868353">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="93" key="GridCell.Tab.0.right/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1620136868353" />
+    <state x="398" y="109" width="740" height="606" key="find.popup" timestamp="1620136326774">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="398" y="109" width="740" height="606" key="find.popup/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1620136326774" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1620133796366">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/1920.0.1536.824@0.0.1536.824" timestamp="1620133796366" />
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/app_py$db.coverage" NAME="db Coverage Results" MODIFIED="1619703310385" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/app_py$app.coverage" NAME="app Coverage Results" MODIFIED="1619708847508" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/flaskr$app.coverage" NAME="app Coverage Results" MODIFIED="1619014528287" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/flaskr$db.coverage" NAME="db Coverage Results" MODIFIED="1619014516397" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/app_py$db.coverage" NAME="db Coverage Results" MODIFIED="1619703310385" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/app_py$app.coverage" NAME="app Coverage Results" MODIFIED="1620124528768" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

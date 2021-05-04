@@ -141,11 +141,19 @@ class Wallpapers {
             let reply = await fetch("/wallpaperdata/" + id);
             if (reply.status !== 200) return null;
             let json = await reply.json();
-            let date = new Date();
-            date.setTime(json.date);
-            this.dict[id] = new Wallpaper(json.aid, json.username, json.width, json.height, json.views, date);
+            this.saveWallpaper(json)
+            // let date = new Date();
+            // date.setTime(json.date);
+            // this.dict[id] = new Wallpaper(json.aid, json.username, json.width, json.height, json.views, date);
         }
         return this.dict[id];
+    }
+    saveWallpaper(wpObject) {
+        if (this.dict[wpObject.aid]) return;
+        let date = new Date();
+        date.setTime(wpObject.date);
+        this.dict[wpObject.aid] = new Wallpaper(wpObject.aid, wpObject.username, wpObject.width, wpObject.height,
+            wpObject.views, date);
     }
 }
 
@@ -232,7 +240,8 @@ class DataStore {
             alertType: "",
             alertMode: "",
             user: null,
-            wallpapers: new Wallpapers() // Wps: Object containing loaded wallpapers
+            wallpapers: new Wallpapers(),  // Wps: Object containing loaded wallpapers
+            browseIds: undefined
         });
     }
     async getUser () {
@@ -277,12 +286,12 @@ class DataStore {
     }
     getWpViewsStr (wpId) {
         let wp = this.getWallpaper(wpId);
-        if (!wp) return 0
+        if (!wp) return 0;
         return wp.views ? wp.views : 0;
     }
     getWpStarsStr (wpId) {
         let wp = this.getWallpaper(wpId);
-        if (!wp) return 0
+        if (!wp) return 0;
         return wp.likes ? wp.likes : 0;
     }
     getWpResolutionStr (wpId) {

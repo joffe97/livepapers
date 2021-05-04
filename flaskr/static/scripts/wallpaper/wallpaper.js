@@ -27,7 +27,7 @@ let wallpaperC = {
                     </a>
                 </div>
                 <div class="col-lg-10 mx-auto">
-                    <table class="table text-light my-2">
+                    <table class="table table-sm text-light my-2">
                         <tbody>
                             <tr><th>Uploader</th><td class="text-capitalize">{{uploaderStr}}</td></tr>
                             <tr><th>Time</th><td>{{timeSinceUploadStr}}</td></tr>
@@ -129,4 +129,4 @@ let wallpaperC = {
             }
         }
     }
-}
+};
