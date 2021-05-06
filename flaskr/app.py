@@ -242,7 +242,7 @@ def infinite_scroll_func(func, count):
         return_list.extend(wps)
     if len(return_list) >= count:
         return_list = return_list[:count]
-    return json.dumps(return_list[:(count if len(return_list) >= count else -0)])
+    return json.dumps(return_list)
 
 
 # Returns latest wallpapers that's not yet received
@@ -296,6 +296,30 @@ def get_mostliked_wallpapers():
         return infinite_scroll_func(db.get_mostliked_wallpapers, count)
 
     return json.dumps(db.get_mostliked_wallpapers(get_db(), stars, aid_list, count))
+
+
+# Returns random wallpapers that's not yet received
+@app.route("/wallpapers/random", methods=["GET"])
+def get_random_wallpapers():
+    seed_str = request.args.get("seed", "")
+    received_str = request.args.get("received")
+    count_str = request.args.get("count")
+
+    if not seed_str.isdecimal():
+        seed_str = "1234"
+    if not received_str or not received_str.isdecimal():
+        received_str = "0"
+    if not count_str or not count_str.isdecimal():
+        count_str = "24"
+
+    seed = int(seed_str)
+    received = int(received_str)
+    count = int(count_str)
+
+    if INFINITE_SCROLL:
+        return infinite_scroll_func(db.get_random_wallpapers, count)
+
+    return json.dumps(db.get_random_wallpapers(get_db(), seed, received, count))
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ const WALLPAPER_LOAD_COUNT = 24;
 let browseC = {
     props: ["browseId"],
     template: `
-    <div class="container-fluid">
+    <div class="container-fluid px-0 px-lg-5">
         <div id="browsediv" class="d-flex justify-content-center align-content-start flex-wrap pb-5 position-relative">
             <div
             v-if="wallpaperIds"
@@ -108,7 +108,7 @@ let browseC = {
             let count = WALLPAPER_LOAD_COUNT;
             let lastWp = this.lastWallpaper;
             let query = lastWp ? "&fms=" + lastWp.date.getTime() : "";
-            let reply = await fetch("/wallpapers/latest?count?" + count + query);
+            let reply = await fetch("/wallpapers/latest?count=" + count + query);
             if (reply.status !== 200) return null;
             let wps = await reply.json();
             this.addWallpapers(wps);
@@ -122,7 +122,7 @@ let browseC = {
             if (stars) {
                 query = "&stars=" + stars;
                 let sameStars = [];
-                for (let i = this.wallpaperIds.length - 2; i >= 0 ; i--) {  // TODO: This needs fix?
+                for (let i = this.wallpaperIds.length - 2; i >= 0 ; i--) {  // TODO: This can be improved
                     let curWpId = this.wallpaperIds[i];
                     let wp = store.getWallpaper(curWpId);
                     if (!wp) continue;

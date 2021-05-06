@@ -242,18 +242,16 @@ def get_latest_wallpapers(conn, fromdate: datetime.datetime = None, count=24):
 #   staraids: Excludeds these wallpapers. Defaults to [].
 #   count: Returns 'count' numbers of wallpapers. Defaults to 24.
 def get_mostliked_wallpapers(conn, stars: int = 999_999_999_999, staraids: List[int] = None, count=24):
-    if stars is None:
-        stars = 999_999_999_999
     if staraids is None:
         staraids = []
 
     cur = conn.cursor()
     query = f"""SELECT * 
-                FROM wallpapers AS w
+                FROM wallpapers w
                 LEFT JOIN (SELECT aid, count(lid) AS stars
                             FROM likes
                             GROUP BY aid
-                            HAVING count(lid) <= ?) AS m
+                            HAVING count(lid) <= ?) m
                 ON w.aid = m.aid
                 WHERE aid NOT IN ({','.join('?' * len(staraids))})
                 ORDER BY stars DESC
@@ -266,7 +264,25 @@ def get_mostliked_wallpapers(conn, stars: int = 999_999_999_999, staraids: List[
         datestr = int(row[4].timestamp() * 1000)
         returnlist.append({"aid": row[0], "username": row[1], "width": row[2], "height": row[3], "date": datestr,
                            "views": row[5], "stars": row[7] if row[7] else 0})
+    return returnlist
 
+
+# Gets random wallpapers
+# Parameters:
+#   seed: Seed to use when sorting random.
+#   received: Number of wallpapers already received. Defaults to 24.
+#   count: Returns 'count' numbers of wallpapers. Defaults to 24.
+def get_random_wallpapers(conn, seed: int = 1234, received: int = 0, count=24):
+    cur = conn.cursor()
+    query = f"""SELECT * FROM wallpapers w
+                ORDER BY substr(w.aid * ?, length(w.aid) + 2)
+                LIMIT ?, ?
+                """
+    cur.execute(query, (seed, received, count))
+    returnlist = []
+    for row in cur:
+        datestr = int(row[4].timestamp() * 1000)
+        returnlist.append({"aid": row[0], "username": row[1], "width": row[2], "height": row[3], "date": datestr, "views": row[5]})
     return returnlist
 
 

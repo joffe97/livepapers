@@ -154,6 +154,8 @@ class Wallpapers {
         date.setTime(wpObject.date);
         this.dict[wpObject.aid] = new Wallpaper(wpObject.aid, wpObject.username, wpObject.width, wpObject.height,
             wpObject.views, date);
+        if (wpObject.tags !== undefined) this.dict[wpObject.aid].likes = wpObject.tags;
+        if (wpObject.stars !== undefined) this.dict[wpObject.aid].likes = wpObject.stars;
     }
 }
 
