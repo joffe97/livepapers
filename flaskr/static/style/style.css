@@ -89,6 +89,10 @@ nav {
     z-index: 20000;
 }
 
+#browsediv {
+    min-height: 105vh;
+}
+
 #upload-wp {
     max-height: 35vh;
 }

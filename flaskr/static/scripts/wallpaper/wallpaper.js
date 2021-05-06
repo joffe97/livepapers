@@ -1,8 +1,6 @@
 let wallpaperC = {
     props: ["wpIdStr"],
     template: `
-    <my-head></my-head>
-    <alert-tmp></alert-tmp>
     <div class="container">
         <div class="col">
             <div class="row-12 m-auto">

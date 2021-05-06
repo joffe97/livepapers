@@ -1,10 +1,10 @@
+const WALLPAPER_LOAD_COUNT = 24;
+
 let browseC = {
     props: ["browseId"],
     template: `
-    <my-head></my-head>
-    <alert-tmp></alert-tmp>
     <div class="container-fluid">
-        <div class="d-flex justify-content-center flex-wrap mb-5">
+        <div id="browsediv" class="d-flex justify-content-center align-content-start flex-wrap pb-5 position-relative">
             <div
             v-if="wallpaperIds"
             v-for="wpId, i in wallpaperIds"
@@ -29,11 +29,15 @@ let browseC = {
             </div>
         </div>
     </div>
+    <div v-if="reachedEnd" class="w-100 bottom-0 text-center">
+        <h4 class="mb-4">You've reached the end</h4>
+    </div>
     `,
     data() {
         return {
             wallpaperIds: store.state.browseIds,
-            isLoading: true,
+            isLoading: false,
+            reachedEnd: false,
             hoverIndex: -1
         }
     },
@@ -77,10 +81,15 @@ let browseC = {
                 default:
                     store.state.pageId = 0;
             }
-            if (oldPageId !== store.state.pageId && store.state.pageId !== 0) this.wallpaperIds = [];
+            if (oldPageId !== store.state.pageId && store.state.pageId !== 0) {
+                this.wallpaperIds = [];
+                this.reachedEnd = false;
+            }
             await this.loadIfNotFullPage()
         },
         loadMoreWallpapers: async function () {
+            if (this.isLoading || this.reachedEnd) return;
+            this.isLoading = true;
             switch (this.browseId) {
                 case "latest":
                     await this.getLatest();
@@ -96,14 +105,17 @@ let browseC = {
             this.isLoading = false;
         },
         getLatest: async function () {
+            let count = WALLPAPER_LOAD_COUNT;
             let lastWp = this.lastWallpaper;
             let query = lastWp ? "&fms=" + lastWp.date.getTime() : "";
-            let reply = await fetch("/wallpapers/latest?count?24" + query);
+            let reply = await fetch("/wallpapers/latest?count?" + count + query);
             if (reply.status !== 200) return null;
             let wps = await reply.json();
             this.addWallpapers(wps);
+            this.verifyWpReplyCount(wps, count)
         },
         getMostliked: async function () {
+            let count = WALLPAPER_LOAD_COUNT;
             let lastWp = this.lastWallpaper;
             let stars = lastWp ? await lastWp.getLikes() : "";
             let query = "";
@@ -112,17 +124,22 @@ let browseC = {
                 let sameStars = [];
                 for (let i = this.wallpaperIds.length - 2; i >= 0 ; i--) {  // TODO: This needs fix?
                     let curWpId = this.wallpaperIds[i];
-                    let wp = await store.state.getWallpaper(curWpId);
-                    if (wp) continue;
+                    let wp = store.getWallpaper(curWpId);
+                    if (!wp) continue;
                     let curstars = await wp.getLikes();
                     if (curstars === stars) sameStars.push(curWpId);
                 }
                 if (sameStars.length) query += "&wpids=" + sameStars.join(",");
             }
-            let reply = await fetch("/wallpapers/mostliked?count=1" + query);
+            let reply = await fetch("/wallpapers/mostliked?count=" + count + query);
             if (reply.status !== 200) return null;
             let wps = await reply.json();
             this.addWallpapers(wps);
+            this.verifyWpReplyCount(wps, count)
+        },
+        verifyWpReplyCount: function (wps, count) {
+            if (!wps || wps.length === count) return;
+            this.reachedEnd = true;
         },
         addWallpapers: function (wps) {
             for (let i = 0; i < wps.length; i++) {
@@ -132,22 +149,25 @@ let browseC = {
         },
         onBottomScroll: async function () {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) {
-                if (this.isLoading) return;
-                this.isLoading = true;
                 await this.loadMoreWallpapers();
             }
         },
         loadIfNotFullPage: async function (i) {
             if (i === undefined) i = 12;
-            if (!i || document.body.offsetHeight - 400 > window.innerHeight) return;
+            if (!i) return;
+            if (document.body.offsetHeight - 400 > window.innerHeight) {
+                setTimeout(()=>this.loadIfNotFullPage(i - 1), 10);
+                return;
+            }
             this.loadMoreWallpapers().then(() => {
-                this.loadIfNotFullPage(i - 1)
+                setTimeout(()=>this.loadIfNotFullPage(i - 1), 10)
             })
         }
     },
     watch: {
         browseId: async function () {
-            await this.updatePageId()
+            await this.updatePageId();
+                setTimeout(()=>cmnScrollTop(), 10)
         }
     },
 };

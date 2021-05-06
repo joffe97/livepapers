@@ -1,7 +1,6 @@
 let profileC = {
     props: ["pid", "cid"],
     template: `
-    <my-head></my-head>
     <div class="container" v-if="user">
         <div class="btn-group col-12 mb-lg-5 mb-4 bg-dark rounded overflow-auto row-auto">
             <div class="btn btn-outline-primary col-2" 

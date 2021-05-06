@@ -57,6 +57,7 @@ let alertTmpC = {
     },
     methods: {
         setAlertTimeout: function () {
+            if (this.alertMode !== "tmp") return;
             this.clearAlertTimeout();
             this.timeout = setTimeout(() => clearAlert(), 3000);
         },
@@ -69,4 +70,4 @@ let alertTmpC = {
             if (this.alertMessage) this.setAlertTimeout();
         }
     }
-}
+};

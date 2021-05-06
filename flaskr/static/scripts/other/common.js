@@ -19,10 +19,6 @@ async function cmnIsLoggedIn() {
 	return json.loggedIn === true;
 }
 
-function cmnGetTimeStamp (wpId) {
-	return
-}
-
 function cmnGetVideoUrl (wpId) {
 	return 'static/wallpapers/videos/' + wpId + '.mp4'
 }

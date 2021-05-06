@@ -1,6 +1,5 @@
 let registerC = {
     template: `
-    <my-head></my-head>
     <div class="container">
         <form class="okform" @submit.prevent @submit="onRegister()">
             <alert-cross></alert-cross>

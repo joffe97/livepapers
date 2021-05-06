@@ -1,6 +1,5 @@
 let loginC = {
     template: `
-    <my-head></my-head>
     <div class="container">
         <form class="okform" @submit.prevent @submit="onLogin()">
             <alert-cross></alert-cross>

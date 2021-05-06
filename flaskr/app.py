@@ -1,11 +1,10 @@
-import flask
 import os
 import sys
 import sqlite3
 import json
 import datetime
 
-from flask import g, render_template, url_for, request, session
+from flask import g, render_template, url_for, request, session, Flask
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 import db
@@ -18,7 +17,7 @@ INFINITE_SCROLL = False
 
 DATABASE = os.path.dirname(os.path.realpath(__file__)) + r"\database.db"
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 app.secret_key = "\xba\xf5\x1e\xde\x07:\x1b0/@\x92\xc90#\xdev\xb4\xce\x87\xa7v\xb8\x7f\xbb"
 app.config["MAX_CONTENT_LENGTH"] = 128 * (1024 ** 2)
 
@@ -241,7 +240,9 @@ def infinite_scroll_func(func, count):
         if len(wps) == 0:
             break
         return_list.extend(wps)
-    return json.dumps(return_list)
+    if len(return_list) >= count:
+        return_list = return_list[:count]
+    return json.dumps(return_list[:(count if len(return_list) >= count else -0)])
 
 
 # Returns latest wallpapers that's not yet received

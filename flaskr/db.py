@@ -250,22 +250,23 @@ def get_mostliked_wallpapers(conn, stars: int = 999_999_999_999, staraids: List[
     cur = conn.cursor()
     query = f"""SELECT * 
                 FROM wallpapers AS w
-                INNER JOIN (SELECT aid, count(lid) AS stars
+                LEFT JOIN (SELECT aid, count(lid) AS stars
                             FROM likes
-                            WHERE aid NOT IN ({','.join('?' * len(staraids))})
                             GROUP BY aid
                             HAVING count(lid) <= ?) AS m
                 ON w.aid = m.aid
+                WHERE aid NOT IN ({','.join('?' * len(staraids))})
                 ORDER BY stars DESC
                 LIMIT ?
                 """
     staraids.extend([stars, count])
     cur.execute(query, tuple(staraids))
-
     returnlist = []
     for row in cur:
         datestr = int(row[4].timestamp() * 1000)
-        returnlist.append({"aid": row[0], "username": row[1], "width": row[2], "height": row[3], "date": datestr, "views": row[5]})
+        returnlist.append({"aid": row[0], "username": row[1], "width": row[2], "height": row[3], "date": datestr,
+                           "views": row[5], "stars": row[7] if row[7] else 0})
+
     return returnlist
 
 
