@@ -109,44 +109,51 @@ def validate_user():
     return json.dumps({"loggedIn": current_user.is_authenticated})
 
 
-# Get userdata for current user
-#   data:
-#       user: Gets username, type and settings
-#       uploaded: Gets ids of uploaded wallpapers
-#       favorite: Gets ids of favorite wallpapers
-#       receivedstars: Gets number of received stars
-@app.route("/userdata", methods=["GET"])
+# Gets username, type and settings
+@app.route("/userdata/user", methods=["GET"])
+def get_user():
+    if not current_user or not current_user.is_authenticated:
+        return json.dumps({})
+    return json.dumps(current_user.get_dict())
+
+
+# Gets ids of uploaded wallpapers
+@app.route("/userdata/uploaded", methods=["GET"])
 @login_required
-def get_userdata():
-    datatype = request.args.get("data")
-    if datatype == "user":
-        return json.dumps(current_user.get_dict())
-    elif datatype == "uploaded":
-        return json.dumps({"uploaded": db.get_uploaded_aids(get_db(), current_user.username)})
-    elif datatype == "favorite":
-        return json.dumps({"favorite": db.get_favorite_ids(get_db(), current_user.username)})
-    elif datatype == "receivedstars":
-        return json.dumps({"receivedStars": db.get_users_total_received_stars(get_db(), current_user.username)})
-    else:
-        return json.dumps({})
+def get_user_uploaded():
+    return json.dumps({"uploaded": db.get_uploaded_aids(get_db(), current_user.username)})
 
 
-# Get wallpaperdata for wallpaper
-#   data:
-#       None: Gets id, username of uploader, width, height, upload date and views
-#       tags: Gets list of tags
-#       likes: Gets number of likes on wallpaper
+# Gets ids of favorite wallpapers
+@app.route("/userdata/favorites", methods=["GET"])
+@login_required
+def get_user_favorite():
+    return json.dumps({"favorite": db.get_favorite_ids(get_db(), current_user.username)})
+
+
+# Gets number of received stars
+@app.route("/userdata/receivedstars", methods=["GET"])
+@login_required
+def get_user_received_stars():
+    return json.dumps({"receivedStars": db.get_users_total_received_stars(get_db(), current_user.username)})
+
+
+# Gets id, username of uploader, width, height, upload date and views for wallpaper
 @app.route("/wallpaperdata/<int:aid>", methods=["GET"])
-def get_wallpaperdata(aid: int):
-    datatype = request.args.get("data")
-    if datatype is None:
-        return json.dumps(db.get_wallpaper(get_db(), aid, json_conv=True))
-    elif datatype == "tags":
-        return json.dumps({"tags": db.get_tags_for_wallpaper(get_db(), aid)})
-    elif datatype == "likes":
-        return json.dumps({"likes": db.get_likes_count_for_wallpaper(get_db(), aid)})
-    else:
-        return json.dumps({})
+def get_wallpaper(aid: int):
+    return json.dumps(db.get_wallpaper(get_db(), aid, json_conv=True))
+
+
+# Gets list of tags for wallpaper
+@app.route("/wallpaperdata/<int:aid>/tags", methods=["GET"])
+def get_wallpaper_tags(aid: int):
+    return json.dumps({"tags": db.get_tags_for_wallpaper(get_db(), aid)})
+
+
+# Gets number of likes on wallpaper
+@app.route("/wallpaperdata/<int:aid>/likes", methods=["GET"])
+def get_wallpaper_likes(aid: int):
+    return json.dumps({"likes": db.get_likes_count_for_wallpaper(get_db(), aid)})
 
 
 # Upload wallpaper
@@ -274,18 +281,18 @@ def get_latest_wallpapers():
 @app.route("/wallpapers/mostliked", methods=["GET"])
 def get_mostliked_wallpapers():
     stars_str = request.args.get("stars", "")
-    aids = request.args.get("wpids", "")
+    aid_str = request.args.get("wpid", "")
     count_str = request.args.get("count", "24")
-
-    aid_list = []
-    for aid in aids.split(","):
-        if aid and aid.isdecimal():
-            aid_list.append(int(aid))
 
     if not stars_str.isdecimal():
         stars = None
     else:
         stars = int(stars_str)
+
+    if not aid_str.isdecimal():
+        aid = None
+    else:
+        aid = int(aid_str)
 
     if not count_str.isdecimal():
         count = 24
@@ -295,7 +302,7 @@ def get_mostliked_wallpapers():
     if INFINITE_SCROLL:  # Only for testing
         return infinite_scroll_func(db.get_mostliked_wallpapers, count)
 
-    return json.dumps(db.get_mostliked_wallpapers(get_db(), stars, aid_list, count))
+    return json.dumps(db.get_mostliked_wallpapers(get_db(), stars, aid, count))
 
 
 # Returns random wallpapers that's not yet received

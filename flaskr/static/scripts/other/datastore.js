@@ -44,7 +44,7 @@ class Wallpaper {
     }
     async getTags() {
         if (this.tags === undefined) {
-            let reply = await fetch("/wallpaperdata/" + this.id + "?data=tags");
+            let reply = await fetch("/wallpaperdata/" + this.id + "/tags");
             if (reply.status !== 200) return [];
             let json = await reply.json();
             this.tags = json.tags;
@@ -86,7 +86,7 @@ class Wallpaper {
     }
     async getLikes() {
         if (this.likes === undefined) {
-            let reply = await fetch("/wallpaperdata/" + this.id + "?data=likes");
+            let reply = await fetch("/wallpaperdata/" + this.id + "/likes");
             if (reply.status !== 200) return null;
             let json = await reply.json();
             this.likes = json.likes;
@@ -173,7 +173,7 @@ class User {
     }
     async getUploaded() {
         if (this.wpUploaded === undefined) {
-            let reply = await fetch("/userdata?data=uploaded");
+            let reply = await fetch("/userdata/uploaded");
             if (reply.status !== 200) return [];
             let json = await reply.json();
             this.wpUploaded = json.uploaded;
@@ -182,7 +182,7 @@ class User {
     }
     async getStarred() {
         if (this.wpStarred === undefined) {
-            let reply = await fetch("/userdata?data=favorite");
+            let reply = await fetch("/userdata/favorites");
             if (reply.status !== 200) return [];
             let json = await reply.json();
             this.wpStarred = json.favorite;
@@ -191,7 +191,7 @@ class User {
     }
     async getReceivedStars() {
         if (this.receivedStars === undefined) {
-            let reply = await fetch("/userdata?data=receivedstars");
+            let reply = await fetch("/userdata/receivedstars");
             if (reply.status !== 200) return [];
             let json = await reply.json();
             this.receivedStars = json.receivedStars;
@@ -247,11 +247,14 @@ class DataStore {
         });
     }
     async getUser () {
+        if (!this.state.isLoggedIn) this.state.isLoggedIn = await cmnIsLoggedIn();
         if (!this.state.user) {
-            let reply = await fetch("/userdata?data=user");
+            let reply = await fetch("/userdata/user");
             if (reply.status !== 200) return null;
             let json = await reply.json();
-            this.state.user = new User(json.username, json.type, json.settings);
+            if (json.username !== undefined && json.type !== undefined && json.settings !== undefined) {
+                this.state.user = new User(json.username, json.type, json.settings);
+            }
         }
         return this.state.user;
     }

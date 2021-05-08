@@ -1,9 +1,9 @@
 let headerC = {
     template: `   
-    <nav class="position-fixed w-100 navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-3 p-0">
+    <nav class="position-fixed w-100 navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-3 p-0 navbar">
       <div class="container-fluid">
         <div class="navbar-brand"><img @click="goLatest()" id="logo" role="button" class="img-fluid w-50 unselectable" 
-        src="static/assets/logo_l.png"></div>
+        src="static/assets/logo_l.png" width="100" height="65"></div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -64,7 +64,7 @@ let headerC = {
         </div>
       </div>
     </nav>
-    <div id="nav-space"></div>
+    <div class="nav-space"></div>
     `,
     data() {
         return {

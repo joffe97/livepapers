@@ -3,6 +3,28 @@ const WALLPAPER_LOAD_COUNT = 24;
 let browseC = {
     props: ["browseId"],
     template: `
+    <div class="nav-dropdown position-fixed top-0 end-0 p-0 bg-primary w-100">
+        <form class="p-2 p-lg-4">
+            <div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="1" id="radioPortrait" name="radios">            
+                    <label class="form-check-label" for="radioPortrait">Portrait</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="2" id="radioLandscape" name="radios">            
+                    <label class="form-check-label" for="radioLandscape">Landscape</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="3" id="radioBoth" name="radios" checked>
+                    <label class="form-check-label" for="radioPortrait">Both</label>
+                </div>
+            </div>
+        </form>
+        <div class="shadow position-absolute top-100 end-0 btn btn-warning pt-2 me-3 border-2 border-primary rounded-0 
+        rounded-bottom border-top-0">
+            <h5 class="m-0">Filters</h5>
+        </div>
+    </div>
     <div class="container-fluid px-0 px-lg-5">
         <div id="browsediv" class="d-flex justify-content-center align-content-start flex-wrap pb-5 position-relative">
             <div
@@ -38,7 +60,8 @@ let browseC = {
             wallpaperIds: store.state.browseIds,
             isLoading: false,
             reachedEnd: false,
-            hoverIndex: -1
+            hoverIndex: -1,
+            randomSeed: undefined
         }
     },
     async created() {
@@ -76,6 +99,7 @@ let browseC = {
                     store.state.pageId = 2;
                     break;
                 case "random":
+                    this.randomSeed = undefined;
                     store.state.pageId = 3;
                     break;
                 default:
@@ -98,6 +122,7 @@ let browseC = {
                     await this.getMostliked();
                     break;
                 case "random":
+                    await this.getRandom();
                     break;
                 default:
                     break;
@@ -112,30 +137,33 @@ let browseC = {
             if (reply.status !== 200) return null;
             let wps = await reply.json();
             this.addWallpapers(wps);
-            this.verifyWpReplyCount(wps, count)
+            this.verifyWpReplyCount(wps, count);
         },
         getMostliked: async function () {
             let count = WALLPAPER_LOAD_COUNT;
             let lastWp = this.lastWallpaper;
-            let stars = lastWp ? await lastWp.getLikes() : "";
+            let stars = lastWp ? await lastWp.getLikes() : undefined;
             let query = "";
-            if (stars) {
+            if (stars !== undefined) {
                 query = "&stars=" + stars;
-                let sameStars = [];
-                for (let i = this.wallpaperIds.length - 2; i >= 0 ; i--) {  // TODO: This can be improved
-                    let curWpId = this.wallpaperIds[i];
-                    let wp = store.getWallpaper(curWpId);
-                    if (!wp) continue;
-                    let curstars = await wp.getLikes();
-                    if (curstars === stars) sameStars.push(curWpId);
-                }
-                if (sameStars.length) query += "&wpids=" + sameStars.join(",");
+                let wpid = lastWp.id;
+                if (wpid) query += "&wpid=" + wpid;
             }
             let reply = await fetch("/wallpapers/mostliked?count=" + count + query);
             if (reply.status !== 200) return null;
             let wps = await reply.json();
             this.addWallpapers(wps);
-            this.verifyWpReplyCount(wps, count)
+            this.verifyWpReplyCount(wps, count);
+        },
+        getRandom: async function () {
+            let count = WALLPAPER_LOAD_COUNT;
+            if (this.randomSeed === undefined) this.randomSeed = Math.floor(Math.random() * 10000) + 1;
+            let received = this.wallpaperIds ? this.wallpaperIds.length : 0;
+            let reply = await fetch(`/wallpapers/random?count=${count}&received=${received}&seed=${this.randomSeed}`);
+            if (reply.status !== 200) return null;
+            let wps = await reply.json();
+            this.addWallpapers(wps);
+            this.verifyWpReplyCount(wps, count);
         },
         verifyWpReplyCount: function (wps, count) {
             if (!wps || wps.length === count) return;

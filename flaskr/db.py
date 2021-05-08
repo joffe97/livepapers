@@ -241,24 +241,24 @@ def get_latest_wallpapers(conn, fromdate: datetime.datetime = None, count=24):
 #   stars: Number of stars to search from. Defaults to 999_999_999_999.
 #   staraids: Excludeds these wallpapers. Defaults to [].
 #   count: Returns 'count' numbers of wallpapers. Defaults to 24.
-def get_mostliked_wallpapers(conn, stars: int = 999_999_999_999, staraids: List[int] = None, count=24):
-    if staraids is None:
-        staraids = []
-
+def get_mostliked_wallpapers(conn, stars: int = None, fromaid: int = None, count=24):
+    if stars is None:
+        stars = 999_999_999_999
+    if fromaid is None:
+        fromaid = 0
     cur = conn.cursor()
     query = f"""SELECT * 
                 FROM wallpapers w
                 LEFT JOIN (SELECT aid, count(lid) AS stars
                             FROM likes
-                            GROUP BY aid
-                            HAVING count(lid) <= ?) m
+                            GROUP BY aid) m
                 ON w.aid = m.aid
-                WHERE aid NOT IN ({','.join('?' * len(staraids))})
-                ORDER BY stars DESC
+                WHERE (IFNULL(stars, 0) = ? AND w.aid > ?)
+                OR IFNULL(stars, 0) < ?
+                ORDER BY stars DESC, w.aid
                 LIMIT ?
                 """
-    staraids.extend([stars, count])
-    cur.execute(query, tuple(staraids))
+    cur.execute(query, (stars, fromaid, stars, count))
     returnlist = []
     for row in cur:
         datestr = int(row[4].timestamp() * 1000)

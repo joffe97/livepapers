@@ -173,9 +173,9 @@ let profileUploadC = {
                     "data": this.userVideo,
                     "tags": this.tags
                 })
-            });
+            }).catch(()=>{});
             this.tags = [];
-            if (reply.status !== 200) {
+            if (!reply || reply.status !== 200) {
                 setAlert("Internal error occurred.", "danger", "cross");
                 return;
             }

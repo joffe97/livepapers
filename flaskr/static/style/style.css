@@ -5,6 +5,18 @@
 nav {
     z-index: 10000;
     min-width: 300px;
+    min-height: 75px;
+}
+
+.nav-space {
+    z-index: 9500;
+    height: 100px;
+}
+
+.nav-dropdown {
+    z-index: 9600;
+    margin-top: 75px;
+    height: 0;
 }
 
 .in-front {
@@ -105,10 +117,6 @@ nav {
 #logo {
     max-width: 10em;
     max-height: 100%;
-}
-
-#nav-space{
-    height: 100px;
 }
 
 @media (min-width: 992px) {

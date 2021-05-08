@@ -63,6 +63,9 @@ let profileC = {
                     this.profilePageId = 1;
             }
         },
+        goBack: function () {
+            return this.$router.go(-1);
+        },
         goProfileOverview: function () {
             return this.$router.push("/profile/overview");
         },
