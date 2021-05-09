@@ -1,30 +1,47 @@
 const WALLPAPER_LOAD_COUNT = 24;
 
+const RATIOS = [{name: "general", types: ["portrait", "landscape"]},
+                {name: "ultrawide", types: ["21x9", "32x9"]},
+                {name: "wide", types: ["16x9", "16x10"]},
+                {name: "portrait", types: ["9x16", "18x37"]}]
+
 let browseC = {
     props: ["browseId"],
     template: `
-    <div class="nav-dropdown position-fixed top-0 end-0 p-0 bg-primary w-100">
-        <form class="p-2 p-lg-4">
-            <div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" value="1" id="radioPortrait" name="radios">            
-                    <label class="form-check-label" for="radioPortrait">Portrait</label>
+    <div class="nav-dropdown position-fixed top-0 start-50 translate-middle-x px-2 bg-info col-12 col-lg-11 border border-2 border-top-0
+    border-primary rounded-bottom" 
+    :class="{'nav-dropdown-view': !filterMenu}">
+        <form class="w-100 h-100 p-3 overflow-hidden d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Ratio</h4>
+            <div class="btn-group">
+                <div class="btn-group btn-group-sm btn-group-vertical">
+                    <p class="my-0">abc</p>
+                    <input class="btn-check" type="radio" value="1" id="radioPortrait" name="radios">            
+                    <label class="btn btn-outline-dark" for="radioPortrait">Portrait</label>
+                    <input class="btn-check" type="radio" value="2" id="radioLandscape" name="radios">            
+                    <label class="btn btn-outline-dark" for="radioLandscape">Landscape</label>
+                    <input class="btn-check" type="radio" value="3" id="radioBoth" name="radios" checked>
+                    <label class="btn btn-outline-dark" for="radioBoth">Both</label>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" value="2" id="radioLandscape" name="radios">            
-                    <label class="form-check-label" for="radioLandscape">Landscape</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" value="3" id="radioBoth" name="radios" checked>
-                    <label class="form-check-label" for="radioPortrait">Both</label>
+                <div class="btn-group btn-group-sm btn-group-vertical">
+                    <p class="my-0">def</p>
+                    <input class="btn-check" type="radio" value="1" id="radioPortrait" name="radios">            
+                    <label class="btn btn-outline-dark" for="radioPortrait">Portrait</label>
+                    <input class="btn-check" type="radio" value="2" id="radioLandscape" name="radios">            
+                    <label class="btn btn-outline-dark" for="radioLandscape">Landscape</label>
+                    <input class="btn-check" type="radio" value="3" id="radioBoth" name="radios" checked>
+                    <label class="btn btn-outline-dark" for="radioBoth">Both</label>
                 </div>
             </div>
+        </div>
         </form>
         <div class="shadow position-absolute top-100 end-0 btn btn-warning pt-2 me-3 border-2 border-primary rounded-0 
-        rounded-bottom border-top-0">
+        rounded-bottom" @click="filterMenu = !filterMenu">
             <h5 class="m-0">Filters</h5>
         </div>
     </div>
+
     <div class="container-fluid px-0 px-lg-5">
         <div id="browsediv" class="d-flex justify-content-center align-content-start flex-wrap pb-5 position-relative">
             <div
@@ -61,12 +78,17 @@ let browseC = {
             isLoading: false,
             reachedEnd: false,
             hoverIndex: -1,
-            randomSeed: undefined
+            randomSeed: undefined,
+            filterMenu: false,
+            ratios: RATIOS
         }
     },
     async created() {
         await this.updatePageId();
-        window.onscroll = async () => await this.onBottomScroll();
+        window.onscroll = async () => {
+            this.filterMenu = false;
+            await this.onBottomScroll();
+        }
     },
     beforeUnmount() {
         window.onscroll = null;
