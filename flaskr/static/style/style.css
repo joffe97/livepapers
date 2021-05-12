@@ -15,8 +15,8 @@ nav {
 
 .nav-dropdown {
     z-index: 9600;
-    margin-top: calc(-15em + 75px);
-    height: 15em;
+    margin-top: calc(-25em + 75px);
+    height: 25em;
     transition: margin-top 0.4s ease-out;
 }
 
@@ -97,6 +97,12 @@ nav {
     background: #343a40;
 }
 
+.btn-sm-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.2rem;
+}
+
 #alerttmp {
     position: absolute;
     top: 130px;
@@ -134,11 +140,21 @@ nav {
         overflow-y: auto;
     }
 
-    #upload-wp {
-        height: 35vh;
-    }
-
     #upload-wp * {
         height: 100%;
+    }
+}
+
+@media (min-width: 768px) {
+    .nav-dropdown {
+        right: 10vh;
+    }
+}
+
+@media (min-width: 576px) {
+    .btn-sm-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        border-radius: 0.25rem;
     }
 }

@@ -1,41 +1,85 @@
 const WALLPAPER_LOAD_COUNT = 24;
 
+const UPLOADED_TIMES = {
+    ALL_TIME: 0,
+    LAST_SIX_HOURS: 1,
+    LAST_DAY: 2,
+    LAST_WEEK: 3,
+    LAST_MONTH: 4,
+    LAST_THREE_MONTHS: 5,
+    LAST_SIX_MONTHS: 6,
+    LAST_YEAR: 7,
+};
+
 const RATIOS = [{name: "general", types: ["portrait", "landscape"]},
                 {name: "ultrawide", types: ["21x9", "32x9"]},
                 {name: "wide", types: ["16x9", "16x10"]},
                 {name: "portrait", types: ["9x16", "18x37"]}]
 
+const COLORS = ["red", "blue", "green", "yellow", "orange", "pink", "white", "gray", "black"]
+
+function getUploadedTimesDesc(type) {
+    switch (type) {
+        case UPLOADED_TIMES.ALL_TIME:
+            return "All time";
+        case UPLOADED_TIMES.LAST_SIX_HOURS:
+            return "Last six hours";
+        case UPLOADED_TIMES.LAST_DAY:
+            return "Last day";
+        case UPLOADED_TIMES.LAST_WEEK:
+            return "Last week";
+        case UPLOADED_TIMES.LAST_MONTH:
+            return "Last month";
+        case UPLOADED_TIMES.LAST_THREE_MONTHS:
+            return "Last three months";
+        case UPLOADED_TIMES.LAST_SIX_MONTHS:
+            return "Last six months";
+        case UPLOADED_TIMES.LAST_YEAR:
+            return "Last year";
+    }
+}
+
 let browseC = {
     props: ["browseId"],
     template: `
-    <div class="nav-dropdown position-fixed top-0 start-50 translate-middle-x px-2 bg-info col-12 col-lg-11 border border-2 border-top-0
+    <div class="nav-dropdown position-fixed top-0 bg-info col-12 col-md-auto border border-2 border-top-0
     border-primary rounded-bottom" 
-    :class="{'nav-dropdown-view': !filterMenu}">
-        <form class="w-100 h-100 p-3 overflow-hidden d-flex justify-content-between align-items-center">
-        <div>
-            <h4>Ratio</h4>
-            <div class="btn-group">
-                <div class="btn-group btn-group-sm btn-group-vertical">
-                    <p class="my-0">abc</p>
-                    <input class="btn-check" type="radio" value="1" id="radioPortrait" name="radios">            
-                    <label class="btn btn-outline-dark" for="radioPortrait">Portrait</label>
-                    <input class="btn-check" type="radio" value="2" id="radioLandscape" name="radios">            
-                    <label class="btn btn-outline-dark" for="radioLandscape">Landscape</label>
-                    <input class="btn-check" type="radio" value="3" id="radioBoth" name="radios" checked>
-                    <label class="btn btn-outline-dark" for="radioBoth">Both</label>
+    :class="{'nav-dropdown-view': filterMenu}">
+        <form class="w-100 h-100 py-3 px-3 overflow-auto d-flex flex-column flex-sm-row justify-content-sm-around 
+        align-items-center justify-content-start">
+            <div class="d-flex flex-column col-12 col-sm-auto px-sm-3">
+                <div class="py-3 col-12 col-sm-auto">
+                    <h4 class="border-bottom px-2 py-1">Ratio</h4>
+                    <div v-for="ratio in ratios" class="btn-group-vertical col-3 col-sm-auto">
+                        <p class="my-0 px-2 text-capitalize">{{ ratio.name }}</p>
+                        <input type="button" v-for="ratioType in ratio.types" class="btn btn-sm-sm 
+                        text-capitalize text-truncate" :value="ratioType" 
+                        :class="[filterRatio === ratioType ? 'btn-dark' : 'btn-outline-dark']"
+                        @click="updateFilterRatio(ratioType)">
+                    </div>
                 </div>
-                <div class="btn-group btn-group-sm btn-group-vertical">
-                    <p class="my-0">def</p>
-                    <input class="btn-check" type="radio" value="1" id="radioPortrait" name="radios">            
-                    <label class="btn btn-outline-dark" for="radioPortrait">Portrait</label>
-                    <input class="btn-check" type="radio" value="2" id="radioLandscape" name="radios">            
-                    <label class="btn btn-outline-dark" for="radioLandscape">Landscape</label>
-                    <input class="btn-check" type="radio" value="3" id="radioBoth" name="radios" checked>
-                    <label class="btn btn-outline-dark" for="radioBoth">Both</label>
+                <div>
+                    <h4 class="border-bottom px-2 py-1">Colors</h4>
+                    <div class="row d-flex justify-content-center">
+                        <button v-for="color in colors" class="btn m-1 py-3 col-3"
+                        :style="'background-color: ' + color"></button>
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="py-3 px-sm-3 col-12 col-sm-auto">
+                <h4 class="border-bottom px-2 py-1">Uploaded</h4>
+                <div class="btn-group-vertical col-12 col-sm-auto">
+                    <div v-for="uploadTime in uploadTimes" class="w-100 form-check p-0 m-0">
+                        <input class="btn-check" type="radio" name="uploadRadios" 
+                        :id="'uploadRadio' + uploadTime" :value="uploadTime" v-model="filterUploadTime">
+                        <label class="btn btn-sm btn-outline-dark w-100" :for="'uploadRadio' + uploadTime">
+                            {{ getUploadDesc(uploadTime) }}
+                        </label>
+                    </div>
+                </div>
+            </div>
         </form>
+        {{filterRatio}}
         <div class="shadow position-absolute top-100 end-0 btn btn-warning pt-2 me-3 border-2 border-primary rounded-0 
         rounded-bottom" @click="filterMenu = !filterMenu">
             <h5 class="m-0">Filters</h5>
@@ -80,7 +124,8 @@ let browseC = {
             hoverIndex: -1,
             randomSeed: undefined,
             filterMenu: false,
-            ratios: RATIOS
+            filterRatio: "",
+            filterUploadTime: 0
         }
     },
     async created() {
@@ -99,6 +144,15 @@ let browseC = {
             if (!this.wallpaperIds || !this.wallpaperIds.length) return undefined;
             let wpId = this.wallpaperIds[this.wallpaperIds.length - 1];
             return store.state.wallpapers.dict[wpId];
+        },
+        ratios: function () {
+            return RATIOS;
+        },
+        uploadTimes: function () {
+            return UPLOADED_TIMES;
+        },
+        colors: function () {
+            return COLORS;
         }
     },
     methods: {
@@ -212,6 +266,13 @@ let browseC = {
             this.loadMoreWallpapers().then(() => {
                 setTimeout(()=>this.loadIfNotFullPage(i - 1), 10)
             })
+        },
+        getUploadDesc: function (type) {
+            return getUploadedTimesDesc(type);
+        },
+        updateFilterRatio: function (type) {
+            if (type === this.filterRatio) this.filterRatio = "";
+            else this.filterRatio = type;
         }
     },
     watch: {
