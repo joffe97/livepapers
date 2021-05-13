@@ -1,6 +1,43 @@
 from typing import List
+import datetime
+from enum import Flag
 from flask_login import current_user
 from db import add_tag
+
+
+DAYS_IN_MONTH = 365 / 12
+
+
+class UploadedTimes(Flag):
+    last_six_hours = 1
+    last_day = 2
+    last_week = 3
+    last_month = 4
+    last_three_months = 5
+    last_six_months = 6
+    last_year = 7
+
+
+    # Returns datetime from upload times flag
+    @staticmethod
+    def get_datetime(flag):
+        now = datetime.datetime.now()
+        if flag == UploadedTimes.last_six_hours:
+            return now - datetime.timedelta(hours=6)
+        elif flag == UploadedTimes.last_day:
+            return now - datetime.timedelta(days=1)
+        elif flag == UploadedTimes.last_week:
+            return now - datetime.timedelta(weeks=1)
+        elif flag == UploadedTimes.last_month:
+            return now - datetime.timedelta(days=DAYS_IN_MONTH)
+        elif flag == UploadedTimes.last_three_month:
+            return now - datetime.timedelta(days=3*DAYS_IN_MONTH)
+        elif flag == UploadedTimes.last_six_month:
+            return now - datetime.timedelta(days=6*DAYS_IN_MONTH)
+        elif flag == UploadedTimes.last_year:
+            return now - datetime.timedelta(days=365)
+        else:
+            return None
 
 
 def get_reply(status: str, msg: str = ""):
@@ -34,3 +71,44 @@ def validate_and_add_tags(conn, tags: List[str], aid):
             has_failed = True
 
     return has_failed
+
+
+# Returns filter variables
+def get_filter_vars(args):
+    filter_vars = {}
+
+    ratio_str = args.get("ratio")
+    color_str = args.get("color", "")
+    uploadtime_str = args.get("uploadtime_str")
+
+    if ratio_str == "portrait":
+        filter_vars["ratio"] = (0, 1)
+    elif ratio_str == "landscape":
+        filter_vars["ratio"] = (1, 0)
+    elif "x" in ratio_str:
+        ratio_split = ratio_str.split("x")
+        try:
+            filter_vars["ratio"] = (int(ratio_split[0], int(ratio_split[1])))
+        except ValueError:
+            pass
+
+    if len(color_str) == 7 and color_str[0] == "#":
+        try:
+            int(color_str[1:3], 16)
+            int(color_str[3:5], 16)
+            int(color_str[5:7], 16)
+            filter_vars["color"] = f"#{color_str[1:3]}{color_str[3:5]}{color_str[5:7]}"
+        except ValueError:
+            pass
+
+    if uploadtime_str.isdecimal():
+        uploadtime_temp = UploadedTimes.get_datetime(int(uploadtime_str))
+        if uploadtime_temp:
+            filter_vars["uploadtime"] = uploadtime_temp
+
+    return filter_vars
+
+
+def get_filter_where_query(filters):
+    if "ratio" in filters:
+

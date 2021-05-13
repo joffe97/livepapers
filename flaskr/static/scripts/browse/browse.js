@@ -14,9 +14,9 @@ const UPLOADED_TIMES = {
 const RATIOS = [{name: "general", types: ["portrait", "landscape"]},
                 {name: "ultrawide", types: ["21x9", "32x9"]},
                 {name: "wide", types: ["16x9", "16x10"]},
-                {name: "portrait", types: ["9x16", "18x37"]}]
+                {name: "portrait", types: ["9x16", "18x37"]}];
 
-const COLORS = ["red", "blue", "green", "yellow", "orange", "pink", "white", "gray", "black"]
+const COLORS = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffffff", "#808080", "#000000"];
 
 function getUploadedTimesDesc(type) {
     switch (type) {
@@ -44,48 +44,61 @@ let browseC = {
     template: `
     <div class="nav-dropdown position-fixed top-0 bg-info col-12 col-md-auto border border-2 border-top-0
     border-primary rounded-bottom" 
-    :class="{'nav-dropdown-view': filterMenu}">
-        <form class="w-100 h-100 py-3 px-3 overflow-auto d-flex flex-column flex-sm-row justify-content-sm-around 
-        align-items-center justify-content-start">
-            <div class="d-flex flex-column col-12 col-sm-auto px-sm-3">
-                <div class="py-3 col-12 col-sm-auto">
-                    <h4 class="border-bottom px-2 py-1">Ratio</h4>
-                    <div v-for="ratio in ratios" class="btn-group-vertical col-3 col-sm-auto">
-                        <p class="my-0 px-2 text-capitalize">{{ ratio.name }}</p>
-                        <input type="button" v-for="ratioType in ratio.types" class="btn btn-sm-sm 
-                        text-capitalize text-truncate" :value="ratioType" 
-                        :class="[filterRatio === ratioType ? 'btn-dark' : 'btn-outline-dark']"
-                        @click="updateFilterRatio(ratioType)">
+    :class="{'nav-dropdown-view': !filterMenu}">
+        <div class="w-100 h-100 py-3 px-3 overflow-auto d-flex justify-content-start justify-content-sm-center
+        align-items-sm-center flex-column">
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column col-12 col-sm-auto px-sm-3">
+                    <div class="pb-3 col-12 col-sm-auto">
+                        <h4 class="border-bottom px-2 pb-1">Ratio</h4>
+                        <div v-for="ratio in ratios" class="btn-group-vertical col-3 col-sm-auto">
+                            <p class="my-0 px-2 text-capitalize">{{ ratio.name }}</p>
+                            <input 
+                            v-for="ratioType in ratio.types" 
+                            type="button" 
+                            class="btn btn-sm-sm text-capitalize text-truncate" 
+                            :class="[filterRatio === ratioType ? 'btn-dark' : 'btn-outline-dark']"
+                            :value="ratioType" 
+                            @click="updateFilterRatio(ratioType)">
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="border-bottom px-2 py-1">Colors</h4>
+                        <div class="row d-flex justify-content-center">
+                            <button v-for="color in colors" 
+                            type="button"
+                            class="btn m-1 py-3 col-3 border-3"
+                            :class="[filterColor === color ? (isLightColor(color) ? 'border-dark' : 'border-primary') : '']"
+                            :style="'background-color: ' + color"
+                            @click="updateFilterColor(color)">
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <h4 class="border-bottom px-2 py-1">Colors</h4>
-                    <div class="row d-flex justify-content-center">
-                        <button v-for="color in colors" class="btn m-1 py-3 col-3"
-                        :style="'background-color: ' + color"></button>
+                <div class="py-3 px-sm-3 col-12 col-sm-auto">
+                    <h4 class="border-bottom px-2 py-1">Uploaded</h4>
+                    <div class="btn-group-vertical col-12 col-sm-auto">
+                        <div v-for="uploadTime in uploadTimes" class="w-100 form-check p-0 m-0">
+                            <input class="btn-check" type="radio" name="uploadRadios" 
+                            :id="'uploadRadio' + uploadTime" :value="uploadTime" v-model="filterUploadTime">
+                            <label class="btn btn-sm btn-outline-dark w-100" :for="'uploadRadio' + uploadTime">
+                                {{ getUploadDesc(uploadTime) }}
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="py-3 px-sm-3 col-12 col-sm-auto">
-                <h4 class="border-bottom px-2 py-1">Uploaded</h4>
-                <div class="btn-group-vertical col-12 col-sm-auto">
-                    <div v-for="uploadTime in uploadTimes" class="w-100 form-check p-0 m-0">
-                        <input class="btn-check" type="radio" name="uploadRadios" 
-                        :id="'uploadRadio' + uploadTime" :value="uploadTime" v-model="filterUploadTime">
-                        <label class="btn btn-sm btn-outline-dark w-100" :for="'uploadRadio' + uploadTime">
-                            {{ getUploadDesc(uploadTime) }}
-                        </label>
-                    </div>
-                </div>
+            <div class="pt-4 pb-2 col-lg-8">
+                <button class="btn btn-primary col-5" :class="{'me-1': isLoggedIn}">Update</button>
+                <button v-if="isLoggedIn" class="btn btn-primary col-5" :class="{'ms-1': isLoggedIn}">Save</button>
             </div>
-        </form>
-        {{filterRatio}}
-        <div class="shadow position-absolute top-100 end-0 btn btn-warning pt-2 me-3 border-2 border-primary rounded-0 
+        </div>
+        <div class="shadow position-absolute top-100 end-0 btn btn-warning pt-2 me-3 border-3 border-primary rounded-0 
         rounded-bottom" @click="filterMenu = !filterMenu">
             <h5 class="m-0">Filters</h5>
         </div>
     </div>
-
+    
     <div class="container-fluid px-0 px-lg-5">
         <div id="browsediv" class="d-flex justify-content-center align-content-start flex-wrap pb-5 position-relative">
             <div
@@ -125,6 +138,7 @@ let browseC = {
             randomSeed: undefined,
             filterMenu: false,
             filterRatio: "",
+            filterColor: "",
             filterUploadTime: 0
         }
     },
@@ -153,6 +167,9 @@ let browseC = {
         },
         colors: function () {
             return COLORS;
+        },
+        isLoggedIn: function () {
+            return store.state.isLoggedIn;
         }
     },
     methods: {
@@ -209,7 +226,8 @@ let browseC = {
             let count = WALLPAPER_LOAD_COUNT;
             let lastWp = this.lastWallpaper;
             let query = lastWp ? "&fms=" + lastWp.date.getTime() : "";
-            let reply = await fetch("/wallpapers/latest?count=" + count + query);
+            let uri = "/wallpapers/latest?count=" + count + query + this.getFilterQuery();
+            let reply = await fetch(uri);
             if (reply.status !== 200) return null;
             let wps = await reply.json();
             this.addWallpapers(wps);
@@ -225,7 +243,8 @@ let browseC = {
                 let wpid = lastWp.id;
                 if (wpid) query += "&wpid=" + wpid;
             }
-            let reply = await fetch("/wallpapers/mostliked?count=" + count + query);
+            let uri = "/wallpapers/mostliked?count=" + count + query + this.getFilterQuery();
+            let reply = await fetch(uri);
             if (reply.status !== 200) return null;
             let wps = await reply.json();
             this.addWallpapers(wps);
@@ -235,11 +254,19 @@ let browseC = {
             let count = WALLPAPER_LOAD_COUNT;
             if (this.randomSeed === undefined) this.randomSeed = Math.floor(Math.random() * 10000) + 1;
             let received = this.wallpaperIds ? this.wallpaperIds.length : 0;
-            let reply = await fetch(`/wallpapers/random?count=${count}&received=${received}&seed=${this.randomSeed}`);
+            let uri = `/wallpapers/random?count=${count}&received=${received}&seed=${this.randomSeed}${this.getFilterQuery()}`;
+            let reply = await fetch(uri);
             if (reply.status !== 200) return null;
             let wps = await reply.json();
             this.addWallpapers(wps);
             this.verifyWpReplyCount(wps, count);
+        },
+        getFilterQuery: function () {
+            let query = "";
+            if (this.filterUploadTime) query += `&uploadtime=${this.filterUploadTime}`;
+            if (this.filterColor) query += `&color=${this.filterColor}`;
+            if (this.filterRatio) query += `&ratio=${this.filterRatio}`;
+            return query;
         },
         verifyWpReplyCount: function (wps, count) {
             if (!wps || wps.length === count) return;
@@ -273,6 +300,18 @@ let browseC = {
         updateFilterRatio: function (type) {
             if (type === this.filterRatio) this.filterRatio = "";
             else this.filterRatio = type;
+        },
+        updateFilterColor: function (color) {
+            if (color === this.filterColor) this.filterColor = "";
+            else this.filterColor = color;
+        },
+        isLightColor: function (hexcolor) {
+            let colorstr = hexcolor.substring(1);
+            let color = parseInt(colorstr, 16);
+            let r = (color >> 16) & 0xff;
+            let g = (color >> 8) & 0xff;
+            let b = (color >> 0) & 0xff;
+            return 299 * r + 587 * g + 114 * b < 120000;
         }
     },
     watch: {

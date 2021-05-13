@@ -9,7 +9,7 @@ from flask_login import LoginManager, current_user, login_user, login_required, 
 
 import db
 from user import User, register_if_valid
-from common import get_reply, validate_and_add_tags
+from common import get_reply, validate_and_add_tags, get_filter_vars
 from media import handle_media_uri, delete_wallpaper_media
 
 
@@ -240,10 +240,10 @@ def ajax_add_favorite():
 
 
 # Returns wallpapers when the infinite_scroll parameter is set
-def infinite_scroll_func(func, count):
+def infinite_scroll_func(func, count, filters):
     return_list = []
     while len(return_list) < count:
-        wps = func(get_db(), count=count)
+        wps = func(get_db(), count=count, filters=filters)
         if len(wps) == 0:
             break
         return_list.extend(wps)
@@ -271,10 +271,12 @@ def get_latest_wallpapers():
     else:
         count = int(count_str)
 
-    if INFINITE_SCROLL:  # Only for testing
-        return infinite_scroll_func(db.get_latest_wallpapers, count)
+    filters = get_filter_vars(request.args)
 
-    return json.dumps(db.get_latest_wallpapers(get_db(), from_datetime, count))
+    if INFINITE_SCROLL:  # Only for testing
+        return infinite_scroll_func(db.get_latest_wallpapers, count, filters)
+
+    return json.dumps(db.get_latest_wallpapers(get_db(), from_datetime, count, filters))
 
 
 # Returns most liked wallpapers that's not yet received
@@ -299,10 +301,12 @@ def get_mostliked_wallpapers():
     else:
         count = int(count_str)
 
-    if INFINITE_SCROLL:  # Only for testing
-        return infinite_scroll_func(db.get_mostliked_wallpapers, count)
+    filters = get_filter_vars(request.args)
 
-    return json.dumps(db.get_mostliked_wallpapers(get_db(), stars, aid, count))
+    if INFINITE_SCROLL:  # Only for testing
+        return infinite_scroll_func(db.get_mostliked_wallpapers, count, filters)
+
+    return json.dumps(db.get_mostliked_wallpapers(get_db(), stars, aid, count, filters))
 
 
 # Returns random wallpapers that's not yet received
@@ -323,10 +327,12 @@ def get_random_wallpapers():
     received = int(received_str)
     count = int(count_str)
 
-    if INFINITE_SCROLL:
-        return infinite_scroll_func(db.get_random_wallpapers, count)
+    filters = get_filter_vars(request.args)
 
-    return json.dumps(db.get_random_wallpapers(get_db(), seed, received, count))
+    if INFINITE_SCROLL:
+        return infinite_scroll_func(db.get_random_wallpapers, count, filters)
+
+    return json.dumps(db.get_random_wallpapers(get_db(), seed, received, count, filters))
 
 
 if __name__ == '__main__':

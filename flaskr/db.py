@@ -221,9 +221,11 @@ def wallpaper_exists(conn, aid):
 # Parameters:
 #   fromdate: Returns latest wallpapers after this date. Defaults to now.
 #   count: Returns 'count' numbers of wallpapers. Defaults to 24.
-def get_latest_wallpapers(conn, fromdate: datetime.datetime = None, count=24):
+def get_latest_wallpapers(conn, fromdate: datetime.datetime = None, count=24, filters=None):
     if fromdate is None:
         fromdate = datetime.datetime.now()
+    if filters is None:
+        filters = {}
 
     cur = conn.cursor()
     query = "SELECT * FROM (SELECT * FROM wallpapers ORDER BY date DESC) WHERE date < ? LIMIT ?"
@@ -241,11 +243,14 @@ def get_latest_wallpapers(conn, fromdate: datetime.datetime = None, count=24):
 #   stars: Number of stars to search from. Defaults to 999_999_999_999.
 #   staraids: Excludeds these wallpapers. Defaults to [].
 #   count: Returns 'count' numbers of wallpapers. Defaults to 24.
-def get_mostliked_wallpapers(conn, stars: int = None, fromaid: int = None, count=24):
+def get_mostliked_wallpapers(conn, stars: int = None, fromaid: int = None, count=24, filters=None):
     if stars is None:
         stars = 999_999_999_999
     if fromaid is None:
         fromaid = 0
+    if filters is None:
+        filters = {}
+
     cur = conn.cursor()
     query = f"""SELECT * 
                 FROM wallpapers w
@@ -259,6 +264,7 @@ def get_mostliked_wallpapers(conn, stars: int = None, fromaid: int = None, count
                 LIMIT ?
                 """
     cur.execute(query, (stars, fromaid, stars, count))
+
     returnlist = []
     for row in cur:
         datestr = int(row[4].timestamp() * 1000)
@@ -272,13 +278,17 @@ def get_mostliked_wallpapers(conn, stars: int = None, fromaid: int = None, count
 #   seed: Seed to use when sorting random.
 #   received: Number of wallpapers already received. Defaults to 24.
 #   count: Returns 'count' numbers of wallpapers. Defaults to 24.
-def get_random_wallpapers(conn, seed: int = 1234, received: int = 0, count=24):
+def get_random_wallpapers(conn, seed: int = 1234, received: int = 0, count=24, filters=None):
+    if filters is None:
+        filters = {}
+
     cur = conn.cursor()
     query = f"""SELECT * FROM wallpapers w
                 ORDER BY substr(w.aid * ?, length(w.aid) + 2)
                 LIMIT ?, ?
                 """
     cur.execute(query, (seed, received, count))
+
     returnlist = []
     for row in cur:
         datestr = int(row[4].timestamp() * 1000)

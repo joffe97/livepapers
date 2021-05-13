@@ -15,8 +15,8 @@ nav {
 
 .nav-dropdown {
     z-index: 9600;
-    margin-top: calc(-25em + 75px);
-    height: 25em;
+    margin-top: calc(-27em + 75px);
+    height: 27em;
     transition: margin-top 0.4s ease-out;
 }
 
