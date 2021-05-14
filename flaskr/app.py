@@ -30,6 +30,7 @@ def get_db():
     database = getattr(g, '_database', None)
     if database is None:
         database = g._database = sqlite3.connect(DATABASE, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+        db.init_functions(database)
     return database
 
 
@@ -180,7 +181,7 @@ def ajax_add_wallpaper():
 @app.route("/wallpaperdata/<int:aid>", methods=["DELETE"])
 @login_required
 def ajax_delete_wallpaper(aid: int):
-    error = db.delete_wallpaper_likes_tags(get_db(), aid)
+    error = db.delete_wallpaper_likes_tags_colors(get_db(), aid)
     if error:
         return json.dumps(get_reply("error"))
     delete_wallpaper_media(aid)
@@ -339,4 +340,5 @@ if __name__ == '__main__':
     for arg in sys.argv:
         if arg == "-infinite_scroll":
             INFINITE_SCROLL = True
+
     app.run(debug=True, host="0.0.0.0")

@@ -56,8 +56,8 @@ let headerC = {
                     </div>
                 </div>
               </ul>
-              <form class="nav-item d-flex p-lg-0 py-2">
-                <input class="form-control me-2" type="search" placeholder="Search">
+              <form class="nav-item d-flex p-lg-0 py-2 btn-group" @submit.prevent @submit="goLatestOrCurrent">
+                <input v-model="searchQuery" class="form-control rounded-0 rounded-start" type="search" placeholder="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
               </form>
           </div>
@@ -68,7 +68,8 @@ let headerC = {
     `,
     data() {
         return {
-            userButtonHover: false
+            userButtonHover: false,
+            searchQuery: ""
         }
     },
     computed: {
@@ -112,6 +113,13 @@ let headerC = {
         },
         goRegister: function () {
             return this.$router.push("/register/");
+        },
+        goLatestOrCurrent: function () {
+            store.state.filterSearch = this.searchQuery;
+            if (this.pageId === 1 || this.pageId === 2 || this.pageId === 3) {
+                return;
+            }
+            return this.goLatest();
         },
         logout: async function () {
             let reply = await fetch("/dologout");

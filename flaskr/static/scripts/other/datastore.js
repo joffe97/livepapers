@@ -166,7 +166,10 @@ class User {
         this.settings = settings;       // Obj:     Settings
         this.wpUploaded = undefined;    // [int]:   List containing ids of uploaded wallpapers
         this.wpStarred = undefined;     // [int]:   List containing ids of starred wallpapers
-        this.receivedStars = undefined  // Int:     Number of stars received on uploaded wallpapers
+        this.receivedStars = undefined; // Int:     Number of stars received on uploaded wallpapers
+        this.settings = {
+            background: undefined
+        }
     }
     getImgUrl() {
         return "static/assets/user_default_img.jpg";  // TODO: Get image from server or database. Needs research on how to.
@@ -243,7 +246,11 @@ class DataStore {
             alertMode: "",
             user: null,
             wallpapers: new Wallpapers(),  // Wps: Object containing loaded wallpapers
-            browseIds: undefined
+            browseIds: undefined,
+            filterRatio: "",
+            filterColor: "",
+            filterUploadTime: 0,
+            filterSearch: ""
         });
     }
     async getUser () {

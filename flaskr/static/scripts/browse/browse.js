@@ -44,7 +44,7 @@ let browseC = {
     template: `
     <div class="nav-dropdown position-fixed top-0 bg-info col-12 col-md-auto border border-2 border-top-0
     border-primary rounded-bottom" 
-    :class="{'nav-dropdown-view': !filterMenu}">
+    :class="{'nav-dropdown-view': filterMenu}">
         <div class="w-100 h-100 py-3 px-3 overflow-auto d-flex justify-content-start justify-content-sm-center
         align-items-sm-center flex-column">
             <div class="d-flex flex-column flex-sm-row">
@@ -88,8 +88,8 @@ let browseC = {
                     </div>
                 </div>
             </div>
-            <div class="pt-4 pb-2 col-lg-8">
-                <button class="btn btn-primary col-5" :class="{'me-1': isLoggedIn}">Update</button>
+            <div class="pt-4 pb-2 col-lg-8 d-flex justify-content-center">
+                <button class="btn btn-primary col-5" :class="{'me-1': isLoggedIn}" @click="refreshWallpapers">Update</button>
                 <button v-if="isLoggedIn" class="btn btn-primary col-5" :class="{'ms-1': isLoggedIn}">Save</button>
             </div>
         </div>
@@ -137,9 +137,9 @@ let browseC = {
             hoverIndex: -1,
             randomSeed: undefined,
             filterMenu: false,
-            filterRatio: "",
-            filterColor: "",
-            filterUploadTime: 0
+            filterRatio: store.state.filterRatio,
+            filterColor: store.state.filterColor,
+            filterUploadTime: store.state.filterUploadTime
         }
     },
     async created() {
@@ -170,6 +170,9 @@ let browseC = {
         },
         isLoggedIn: function () {
             return store.state.isLoggedIn;
+        },
+        filterSearch: function () {
+            return store.state.filterSearch;
         }
     },
     methods: {
@@ -204,8 +207,13 @@ let browseC = {
             }
             await this.loadIfNotFullPage()
         },
-        loadMoreWallpapers: async function () {
-            if (this.isLoading || this.reachedEnd) return;
+        loadMoreWallpapers: async function (force = false) {
+            if (this.isLoading || this.reachedEnd) {
+                if (!force) {
+                    return
+                }
+            }
+            this.reachedEnd = false;
             this.isLoading = true;
             switch (this.browseId) {
                 case "latest":
@@ -261,12 +269,20 @@ let browseC = {
             this.addWallpapers(wps);
             this.verifyWpReplyCount(wps, count);
         },
+        refreshWallpapers: async function () {
+            this.wallpaperIds = []
+            await this.loadMoreWallpapers(true);
+            setTimeout(()=>cmnScrollTop(), 10)
+        },
         getFilterQuery: function () {
             let query = "";
             if (this.filterUploadTime) query += `&uploadtime=${this.filterUploadTime}`;
-            if (this.filterColor) query += `&color=${this.filterColor}`;
             if (this.filterRatio) query += `&ratio=${this.filterRatio}`;
-            return query;
+            if (this.filterSearch) query += `&search=${this.filterSearch}`;
+            query = encodeURI(query);
+
+            if (this.filterColor) query += `&color=${this.filterColor.replace('#', '%23')}`;
+            return query
         },
         verifyWpReplyCount: function (wps, count) {
             if (!wps || wps.length === count) return;
@@ -317,7 +333,11 @@ let browseC = {
     watch: {
         browseId: async function () {
             await this.updatePageId();
-                setTimeout(()=>cmnScrollTop(), 10)
+            setTimeout(()=>cmnScrollTop(), 10)
+        },
+        filterSearch: async function () {
+            console.log(12345)
+            await this.refreshWallpapers();
         }
     },
 };

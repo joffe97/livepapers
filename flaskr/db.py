@@ -3,7 +3,9 @@ import datetime
 from sqlite3 import Error, Cursor, Connection
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Dict, List, Union
-from random import randint
+from math import gcd
+
+from db_common import get_select_query_filter
 
 
 DATABASE = "./database.db"
@@ -46,15 +48,22 @@ CREATE_LIKES_TABLE = """CREATE TABLE IF NOT EXISTS likes (
                           PRIMARY KEY (lid),
                           FOREIGN KEY (aid) REFERENCES wallpapers (aid),
                           FOREIGN KEY (username) REFERENCES users (username),
-                          CONSTRAINT uc_like UNIQUE (aid,username)
+                          CONSTRAINT uc_like UNIQUE (aid, username)
                         );"""
 
 CREATE_TAGS_TABLE = """CREATE TABLE IF NOT EXISTS tags (
                           tag TEXT NOT NULL,
                           aid INTEGER NOT NULL,
-                          PRIMARY KEY (tag,aid),
+                          PRIMARY KEY (tag, aid),
                           FOREIGN KEY (aid) REFERENCES wallpapers (aid)
                         );"""
+
+CREATE_COLORS_TABLE = """CREATE TABLE IF NOT EXISTS colors (
+                            aid INTEGER,
+                            color TEXT,
+                            PRIMARY KEY (aid, color),
+                            FOREIGN KEY (aid) REFERENCES wallpapers (aid)
+                         )"""
 
 
 # --------------- Common ---------------
@@ -227,9 +236,13 @@ def get_latest_wallpapers(conn, fromdate: datetime.datetime = None, count=24, fi
     if filters is None:
         filters = {}
 
+    query, args = get_select_query_filter(filters)
+    args.extend((fromdate, count))
+
     cur = conn.cursor()
-    query = "SELECT * FROM (SELECT * FROM wallpapers ORDER BY date DESC) WHERE date < ? LIMIT ?"
-    cur.execute(query, (fromdate, count))
+    query = f"SELECT * FROM (SELECT * FROM ({query}) ORDER BY date DESC) WHERE date < ? LIMIT ?"
+    print(query)
+    cur.execute(query, tuple(args))
 
     returnlist = []
     for row in cur:
@@ -251,9 +264,12 @@ def get_mostliked_wallpapers(conn, stars: int = None, fromaid: int = None, count
     if filters is None:
         filters = {}
 
+    query, args = get_select_query_filter(filters)
+    args.extend((stars, fromaid, stars, count))
+
     cur = conn.cursor()
     query = f"""SELECT * 
-                FROM wallpapers w
+                FROM ({query}) w
                 LEFT JOIN (SELECT aid, count(lid) AS stars
                             FROM likes
                             GROUP BY aid) m
@@ -263,7 +279,7 @@ def get_mostliked_wallpapers(conn, stars: int = None, fromaid: int = None, count
                 ORDER BY stars DESC, w.aid
                 LIMIT ?
                 """
-    cur.execute(query, (stars, fromaid, stars, count))
+    cur.execute(query, tuple(args))
 
     returnlist = []
     for row in cur:
@@ -282,12 +298,15 @@ def get_random_wallpapers(conn, seed: int = 1234, received: int = 0, count=24, f
     if filters is None:
         filters = {}
 
+    query, args = get_select_query_filter(filters)
+    args.extend((seed, received, count))
+
     cur = conn.cursor()
-    query = f"""SELECT * FROM wallpapers w
+    query = f"""SELECT * FROM ({query}) w
                 ORDER BY substr(w.aid * ?, length(w.aid) + 2)
                 LIMIT ?, ?
                 """
-    cur.execute(query, (seed, received, count))
+    cur.execute(query, tuple(args))
 
     returnlist = []
     for row in cur:
@@ -409,6 +428,32 @@ def delete_tags_for_wallpaper(conn, aid: int):
         return 1
 
 
+# --------------- Colors ---------------
+
+def add_color(conn, aid: int, color: str):
+    try:
+        cur = conn.cursor()
+        query = "INSERT INTO colors VALUES (?,?)"
+        cur.execute(query, (aid, color))
+        conn.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
+
+
+def delete_color_for_wallpaper(conn, aid: int):
+    try:
+        cur = conn.cursor()
+        query = "DELETE FROM colors WHERE aid=?"
+        cur.execute(query, (aid,))
+        conn.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
+
+
 # --------------- Multiple tables ---------------
 
 # Get number of likes gotten on all wallpapers
@@ -423,12 +468,13 @@ def get_users_total_received_stars(conn, username: str):
 
 
 # Deletes wallpaper and its likes and tags
-def delete_wallpaper_likes_tags(conn, aid):
+def delete_wallpaper_likes_tags_colors(conn, aid):
     try:
         cur = conn.cursor()
         queries = ["DELETE FROM wallpapers WHERE aid=?",
                    "DELETE FROM likes WHERE aid=?",
-                   "DELETE FROM tags WHERE aid=?"]
+                   "DELETE FROM tags WHERE aid=?",
+                   "DELETE FROM colors WHERE aid=?"]
         for query in queries:
             cur.execute(query, (aid,))
         conn.commit()
@@ -436,6 +482,19 @@ def delete_wallpaper_likes_tags(conn, aid):
     except Error as e:
         print(e)
         return 1
+
+
+# --------------- Functions ---------------
+
+# Create a function that compares ratios
+def create_ratiocmp_function(conn):
+    def ratiocmp(x1, y1, x2, y2):
+        gcd1 = gcd(x1, y1)
+        gcd2 = gcd(x2, y2)
+        if not gcd1 or not gcd2:
+            return 0
+        return int((x1 // gcd1, y1 // gcd1) == (x2 // gcd2, y2 // gcd2))
+    conn.create_function("ratiocmp", 4, ratiocmp)
 
 
 # --------------- Setup ---------------
@@ -484,6 +543,22 @@ def init_tags(conn):
         add_tag(conn, tag[0], tag[1])
 
 
+def init_colors(conn):
+    colors = (
+        (1, "#0000ff"),
+        (1, "#00ff00"),
+        (1, "#000000"),
+        (2, "#ff0000")
+    )
+    for color in colors:
+        add_color(conn, color[0], color[1])
+
+
+# Initialize functions
+def init_functions(conn):
+    create_ratiocmp_function(conn)
+
+
 # Setup for database.db
 def setup():
     conn = create_connection(DATABASE)
@@ -493,10 +568,12 @@ def setup():
     create_table(conn, CREATE_WALLPAPERS_TABLE)
     create_table(conn, CREATE_LIKES_TABLE)
     create_table(conn, CREATE_TAGS_TABLE)
-    init_users(conn)
+    create_table(conn, CREATE_COLORS_TABLE)
+    # init_users(conn)
     # init_wallpapers(conn)
     # init_likes(conn)
     # init_tags(conn)
+    # init_colors(conn)
     conn.close()
 
 

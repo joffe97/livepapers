@@ -2,11 +2,13 @@ import tempfile
 import cv2
 import os
 import numpy as np
+from colormath.color_objects import sRGBColor, LabColor
+from colormath.color_conversions import convert_color
+from colormath.color_diff import delta_e_cie2000
+from colorthief import ColorThief
 from urllib import request
-from http.client import HTTPResponse
 from flask_login import current_user
-from math import gcd
-from db import add_wallpaper
+from db import add_wallpaper, add_color
 
 MEDIA_TYPES = {
     "video": ["mp4"]
@@ -18,6 +20,10 @@ WP_LOWRESIMG_PATH = "static/wallpapers/images/"
 TEMP_PATH = "temp/"
 
 LOWRES_DIMENTIONS = (450, 300)
+
+COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
+          (255, 255, 0), (255, 0, 255), (0, 255, 255),
+          (0, 0, 0), (128, 128, 128), (255, 255, 255)]
 
 
 # Return path for media type
@@ -103,11 +109,48 @@ def create_lowres_image_from_video(filename, imgname):
     return 0
 
 
+def find_most_similar_color(color: tuple):
+    lowest_diff = 0
+    current = None
+    c1_rgb = sRGBColor(int(color[0]), int(color[1]), int(color[2]), is_upscaled=True)
+    c1_lab = convert_color(c1_rgb, LabColor)
+    for c in COLORS:
+        c2_rgb = sRGBColor(c[0], c[1], c[2], is_upscaled=True)
+        c2_lab = convert_color(c2_rgb, LabColor)
+        diff = delta_e_cie2000(c1_lab, c2_lab)
+        if diff < lowest_diff or current is None:
+            lowest_diff = diff
+            current = c
+    return current
+
+
+# Adds color for image to database
+def add_image_colors_to_database(conn, aid):
+    img_path = f"{WP_LOWRESIMG_PATH}{aid}.jpg"
+    if not os.path.exists(img_path):
+        return
+
+    ct = ColorThief(img_path)
+    colors = ct.get_palette(2, 5)
+    print(colors)
+
+    colors_dict = {}
+    for color in colors:
+        similar_c = find_most_similar_color(color)
+        hex_color = "#%02x%02x%02x" % similar_c
+        colors_dict.setdefault(hex_color, 0)
+        colors_dict[hex_color] += 1
+
+    print(colors_dict)
+
+    for c in colors_dict:
+        add_color(conn, aid, c)
+
+
 # Create media file from datauri, and adds it to database
 def handle_media_uri(conn, datauri):
     # Gets content type and data from datauri
     with request.urlopen(datauri) as response:
-        response: HTTPResponse
         content_type = response.info().get_content_type()
         data = response.read()
     if not content_type or not data:
@@ -139,11 +182,12 @@ def handle_media_uri(conn, datauri):
     with open(filename, "wb") as f:
         f.write(data)
 
-    # Creates image from video
     if media == "video":
-        error = create_lowres_image_from_video(filename, f"{WP_LOWRESIMG_PATH}{aid}.jpg")
+        error = create_lowres_image_from_video(filename, f"{WP_LOWRESIMG_PATH}{aid}.jpg")  # Creates image from video
         if error:
             return "servererror"
+
+    add_image_colors_to_database(conn, aid)
 
     return aid, None
 
