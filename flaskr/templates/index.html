@@ -11,8 +11,10 @@
 
     <script src={{url_for("static", filename="scripts/other/common.js")}}></script>
     <script src={{url_for("static", filename="scripts/other/datastore.js")}}></script>
+    <script src={{url_for("static", filename="scripts/other/style.js")}}></script>
     <script src={{url_for("static", filename="scripts/other/alertsC.js")}}></script>
     <script src={{url_for("static", filename="scripts/other/header.js")}}></script>
+    <script src={{url_for("static", filename="scripts/other/app.js")}}></script>
     <script src={{url_for("static", filename="scripts/userManagement/login.js")}}></script>
     <script src={{url_for("static", filename="scripts/userManagement/register.js")}}></script>
     <script src={{url_for("static", filename="scripts/profile/profile.js")}}></script>
@@ -32,18 +34,12 @@
     <title>Livepapers</title>
 </head>
 
-<body class="bg-secondary text-light">
-    <div id="app">
-        <alert-tmp></alert-tmp>
-        <my-head></my-head>
-        <main class="overflow-auto">
-            <router-view></router-view>
-        </main>
-    </div>
+<body>
+    <div id="app"></div>
 </body>
 
 <script>
-    let app = Vue.createApp({});
+    let app = Vue.createApp(appC);
     app.component("my-head", headerC);
     app.component("alert-cross", alertCrossC);
     app.component("alert-tmp", alertTmpC);

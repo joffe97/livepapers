@@ -1,4 +1,4 @@
-const WALLPAPER_LOAD_COUNT = 24;
+const WALLPAPER_LOAD_COUNT = 5;
 
 const UPLOADED_TIMES = {
     ALL_TIME: 0,
@@ -43,7 +43,7 @@ let browseC = {
     props: ["browseId"],
     template: `
     <div class="nav-dropdown position-fixed top-0 bg-info col-12 col-md-auto border border-2 border-top-0
-    border-primary rounded-bottom" 
+    border-primary rounded-bottom text-light" 
     :class="{'nav-dropdown-view': filterMenu}">
         <div class="w-100 h-100 py-3 px-3 overflow-auto d-flex justify-content-start justify-content-sm-center
         align-items-sm-center flex-column">
@@ -68,7 +68,7 @@ let browseC = {
                             <button v-for="color in colors" 
                             type="button"
                             class="btn m-1 py-3 col-3 border-3"
-                            :class="[filterColor === color ? (isLightColor(color) ? 'border-dark' : 'border-primary') : '']"
+                            :class="[filterColor === color ? (isDarkColor(color) ? 'border-dark' : 'border-primary') : '']"
                             :style="'background-color: ' + color"
                             @click="updateFilterColor(color)">
                             </button>
@@ -173,7 +173,11 @@ let browseC = {
         },
         filterSearch: function () {
             return store.state.filterSearch;
-        }
+        },
+        filterSearchTrigger: function () {
+            return store.state.filterSearchTrigger;
+        },
+
     },
     methods: {
         goWallpaper: function(wpId) {
@@ -207,13 +211,10 @@ let browseC = {
             }
             await this.loadIfNotFullPage()
         },
-        loadMoreWallpapers: async function (force = false) {
+        loadMoreWallpapers: async function () {
             if (this.isLoading || this.reachedEnd) {
-                if (!force) {
-                    return
-                }
+                return
             }
-            this.reachedEnd = false;
             this.isLoading = true;
             switch (this.browseId) {
                 case "latest":
@@ -271,14 +272,18 @@ let browseC = {
         },
         refreshWallpapers: async function () {
             this.wallpaperIds = []
-            await this.loadMoreWallpapers(true);
+            this.reachedEnd = this.isLoading = false;
+            await this.loadIfNotFullPage();
             setTimeout(()=>cmnScrollTop(), 10)
         },
         getFilterQuery: function () {
             let query = "";
             if (this.filterUploadTime) query += `&uploadtime=${this.filterUploadTime}`;
             if (this.filterRatio) query += `&ratio=${this.filterRatio}`;
-            if (this.filterSearch) query += `&search=${this.filterSearch}`;
+            if (this.filterSearch) {
+                query += `&search=${this.filterSearch}`;
+                store.state.filterSearch = "";
+            }
             query = encodeURI(query);
 
             if (this.filterColor) query += `&color=${this.filterColor.replace('#', '%23')}`;
@@ -321,23 +326,19 @@ let browseC = {
             if (color === this.filterColor) this.filterColor = "";
             else this.filterColor = color;
         },
-        isLightColor: function (hexcolor) {
-            let colorstr = hexcolor.substring(1);
-            let color = parseInt(colorstr, 16);
-            let r = (color >> 16) & 0xff;
-            let g = (color >> 8) & 0xff;
-            let b = (color >> 0) & 0xff;
-            return 299 * r + 587 * g + 114 * b < 120000;
+        isDarkColor: function (hexcolor) {
+            return cmnIsDarkColor(hexcolor);
         }
     },
     watch: {
         browseId: async function () {
             await this.updatePageId();
+            this.filterMenu = false;
             setTimeout(()=>cmnScrollTop(), 10)
         },
-        filterSearch: async function () {
-            console.log(12345)
+        filterSearchTrigger: async function () {
             await this.refreshWallpapers();
+            this.filterMenu = false;
         }
     },
 };

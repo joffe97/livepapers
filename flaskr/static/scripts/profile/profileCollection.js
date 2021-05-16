@@ -27,7 +27,7 @@ let profileCollectionC = {
                     <img class="img-fluid" :src="getImageUrl(wpId)">
                 </figure>
             </div>
-            <table class="col table text-light my-auto mx-lg-5 my-lg-4 align-middle position-relative">
+            <table class="col table my-auto mx-lg-5 my-lg-4 align-middle position-relative" :style="tableStyle">
                 <tbody>
                     <tr v-if="mode === 'favorites'" class="text-capitalize">
                         <th>Uploader:</th><td colspan="2">{{store.getWpUploaderStr(wpId)}}</td>
@@ -49,13 +49,13 @@ let profileCollectionC = {
                                         {{tag}}
                                     </option>
                                 </select>
-                                <button v-if="mode === 'uploaded'" type="submit" class="btn btn-dark rounded-0 rounded-end px-3" 
-                                :class="{'disabled': !this.selectedTags[wpId]}">Del</button>
+                                <button v-if="mode === 'uploaded'" type="submit" class="btn rounded-0 rounded-end px-3" 
+                                :class="{'disabled': !this.selectedTags[wpId]}" :style="buttonStyle">Del</button>
                             </form>
                         </td>
                         <td v-if="mode === 'uploaded'" class="col-2">
-                            <button class="btn btn-outline-dark btn-sm col-12" data-bs-toggle="collapse"
-                            :data-bs-target="'#collapseAdd' + wpId">New</button>
+                            <button class="btn btn-sm col-12 btn-grayer-hover" data-bs-toggle="collapse"
+                            :data-bs-target="'#collapseAdd' + wpId" :style="buttonStyle">New</button>
                         </td>
                     </tr>
                     <tr class="collapse position-absolute text-secondary col-12" :id="'collapseAdd' + wpId">
@@ -120,6 +120,12 @@ let profileCollectionC = {
                 default:
                     return [];
             }
+        },
+        tableStyle: function () {
+            return store.getStyle().getTextOutlineColorStr();
+        },
+        buttonStyle: function () {
+            return store.getStyle().getButtonStr();
         }
     },
     methods: {

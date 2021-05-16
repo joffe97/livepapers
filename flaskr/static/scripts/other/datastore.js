@@ -167,9 +167,7 @@ class User {
         this.wpUploaded = undefined;    // [int]:   List containing ids of uploaded wallpapers
         this.wpStarred = undefined;     // [int]:   List containing ids of starred wallpapers
         this.receivedStars = undefined; // Int:     Number of stars received on uploaded wallpapers
-        this.settings = {
-            background: undefined
-        }
+        this.style = null
     }
     getImgUrl() {
         return "static/assets/user_default_img.jpg";  // TODO: Get image from server or database. Needs research on how to.
@@ -250,7 +248,8 @@ class DataStore {
             filterRatio: "",
             filterColor: "",
             filterUploadTime: 0,
-            filterSearch: ""
+            filterSearch: "",
+            filterSearchTrigger: 0
         });
     }
     async getUser () {
@@ -335,7 +334,16 @@ class DataStore {
 
         return 0;
     }
-
+    getStyle() {
+        if (this.state.user) {
+            let style = this.state.user.style;
+            if (style) return style;
+        }
+        return DEFAULT_STYLE;
+    }
+    getStyleStr() {
+        return this.getStyle().getStr();
+    }
 }
 
 let store = new DataStore();

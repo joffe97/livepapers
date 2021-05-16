@@ -56,20 +56,19 @@ let headerC = {
                     </div>
                 </div>
               </ul>
-              <form class="nav-item d-flex p-lg-0 py-2 btn-group" @submit.prevent @submit="goLatestOrCurrent">
-                <input v-model="searchQuery" class="form-control rounded-0 rounded-start" type="search" placeholder="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
+              <form class="nav-item d-flex p-lg-0 py-2 btn-group" @submit.prevent @submit="triggerSearch">
+                <input v-model="state.filterSearch" class="form-control rounded-0 rounded-start" 
+                type="search" placeholder="Enter tag">
+                <button class="btn btn-outline-success position-relative" type="submit">Search</button>
               </form>
           </div>
         </div>
       </div>
     </nav>
-    <div class="nav-space"></div>
     `,
     data() {
         return {
-            userButtonHover: false,
-            searchQuery: ""
+            userButtonHover: false
         }
     },
     computed: {
@@ -81,6 +80,9 @@ let headerC = {
         },
         pageId: function () {
             return store.state.pageId;
+        },
+        state: function () {
+            return store.state
         }
     },
     methods: {
@@ -114,8 +116,8 @@ let headerC = {
         goRegister: function () {
             return this.$router.push("/register/");
         },
-        goLatestOrCurrent: function () {
-            store.state.filterSearch = this.searchQuery;
+        triggerSearch: function () {
+            store.state.filterSearchTrigger = !store.state.filterSearchTrigger;
             if (this.pageId === 1 || this.pageId === 2 || this.pageId === 3) {
                 return;
             }

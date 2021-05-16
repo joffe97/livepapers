@@ -6,7 +6,7 @@ let profileOverviewC = {
         </div>
         <div class="col-7 ms-lg-3">
             <div class="display-5 text-capitalize m-0 mb-3 text-lg-start text-center">{{user.username}}</div>
-            <table class="table text-light">
+            <table class="table" :style="tableStyle">
                 <tbody>
                     <tr><th>Uploaded:</th><td>{{countUploaded}}</td></tr>
                     <tr><th>Favorites:</th><td>{{countStarred}}</td></tr>
@@ -48,6 +48,9 @@ let profileOverviewC = {
         },
         countReceivedStars: function () {
             return this.user.receivedStars;
-        }
+        },
+        tableStyle: function () {
+            return store.getStyle().getTextOutlineColorStr();
+        },
     }
 };

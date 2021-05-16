@@ -69,3 +69,12 @@ function cmnConvertSeconds(seconds, format, toInt) {
 function cmnGcd(a, b) {
 	return b === 0 ? a : cmnGcd(b, a % b);
 }
+
+function cmnIsDarkColor(hexcolor) {
+	let colorstr = hexcolor.substring(1);
+	let color = parseInt(colorstr, 16);
+	let r = (color >> 16) & 0xff;
+	let g = (color >> 8) & 0xff;
+	let b = (color >> 0) & 0xff;
+	return 299 * r + 587 * g + 114 * b < 120000;
+}
