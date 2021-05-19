@@ -47,11 +47,13 @@ let loginC = {
                 return 0;
             }
             let json = await reply.json();
-            if (!json.loggedIn) {
+            if (!json.username || !json.type) {
                 setAlert("Wrong username or password. Try again.", "danger", "cross");
                 return 0;
             }
+            let style = json.style ? JSON.parse(json.style) : null;
             store.state.isLoggedIn = this.succLogin = true;
+            store.state.user = new User(json.username, json.type, style);
             return this.$router.go(-1);
         }
     }

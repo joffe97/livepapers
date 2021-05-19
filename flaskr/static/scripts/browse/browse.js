@@ -65,13 +65,13 @@ let browseC = {
                     <div>
                         <h4 class="border-bottom px-2 py-1">Colors</h4>
                         <div class="row d-flex justify-content-center">
-                            <button v-for="color in colors" 
+                            <div v-for="color in colors" 
                             type="button"
-                            class="btn m-1 py-3 col-3 border-3"
-                            :class="[filterColor === color ? (isDarkColor(color) ? 'border-dark' : 'border-primary') : '']"
+                            class="btn m-1 py-3 col-3 border-3 outline-primary"
+                            :class="{'outline-thick': filterColor === color}"
                             :style="'background-color: ' + color"
                             @click="updateFilterColor(color)">
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -88,7 +88,7 @@ let browseC = {
                     </div>
                 </div>
             </div>
-            <div class="pt-4 pb-2 col-lg-8 d-flex justify-content-center">
+            <div class="pt-4 pb-2 col-sm-8 d-flex justify-content-center">
                 <button class="btn btn-primary col-5" :class="{'me-1': isLoggedIn}" @click="refreshWallpapers">Update</button>
                 <button v-if="isLoggedIn" class="btn btn-primary col-5" :class="{'ms-1': isLoggedIn}">Save</button>
             </div>
@@ -126,7 +126,7 @@ let browseC = {
         </div>
     </div>
     <div v-if="reachedEnd" class="w-100 bottom-0 text-center">
-        <h4 class="mb-4">You've reached the end</h4>
+        <h4 class="pb-4 mb-0">You've reached the end</h4>
     </div>
     `,
     data() {
@@ -145,6 +145,7 @@ let browseC = {
     async created() {
         await this.updatePageId();
         window.onscroll = async () => {
+            console.log(12345)
             this.filterMenu = false;
             await this.onBottomScroll();
         }
@@ -176,8 +177,7 @@ let browseC = {
         },
         filterSearchTrigger: function () {
             return store.state.filterSearchTrigger;
-        },
-
+        }
     },
     methods: {
         goWallpaper: function(wpId) {

@@ -50,7 +50,7 @@ let profileOverviewC = {
             return this.user.receivedStars;
         },
         tableStyle: function () {
-            return store.getStyle().getTextOutlineColorStr();
+            return store.getStyle().getTextBorderColorStr();
         },
     }
 };

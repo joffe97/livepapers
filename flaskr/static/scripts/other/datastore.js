@@ -1,5 +1,7 @@
 const DEFAULT_UPLOAD_IMAGE = "/static/assets/upload_default_img.png";
 
+const DEFAULT_PROFILE_IMAGE = "static/assets/user_default_img.jpg";
+
 const MEDIA_TYPES = {
     "video": ["mp4"]
 };
@@ -160,17 +162,16 @@ class Wallpapers {
 }
 
 class User {
-    constructor(username, type, settings) {
+    constructor(username, type, style) {
         this.username = username;       // Str:     Username
         this.type = type;               // Int:     Account type
-        this.settings = settings;       // Obj:     Settings
         this.wpUploaded = undefined;    // [int]:   List containing ids of uploaded wallpapers
         this.wpStarred = undefined;     // [int]:   List containing ids of starred wallpapers
         this.receivedStars = undefined; // Int:     Number of stars received on uploaded wallpapers
-        this.style = null
+        this.style = getStyleObjFromJson(style);    // Obj: Object containing style for user
     }
     getImgUrl() {
-        return "static/assets/user_default_img.jpg";  // TODO: Get image from server or database. Needs research on how to.
+        return DEFAULT_PROFILE_IMAGE;  // TODO: Get image from server or database. Needs research on how to.
     }
     async getUploaded() {
         if (this.wpUploaded === undefined) {
@@ -231,6 +232,23 @@ class User {
     isAnyAdmin() {
         return (this.type & (USER_TYPES.ADMIN | USER_TYPES.MANAGER)) !== 0;
     }
+    async updateStyle(style) {
+        if (!style) return 1;
+        let reply = await fetch("/userdata/style", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "style": style
+            })
+        })
+        if (reply.status !== 200) return 1;
+        let json = await reply.json();
+        if (json.status !== "success") return 1;
+        this.style = style;
+        return 0;
+    }
 }
 
 class DataStore {
@@ -258,8 +276,9 @@ class DataStore {
             let reply = await fetch("/userdata/user");
             if (reply.status !== 200) return null;
             let json = await reply.json();
-            if (json.username !== undefined && json.type !== undefined && json.settings !== undefined) {
-                this.state.user = new User(json.username, json.type, json.settings);
+            let style = json.style ? JSON.parse(json.style) : null;
+            if (json.username !== undefined && json.type !== undefined) {
+                this.state.user = new User(json.username, json.type, style);
             }
         }
         return this.state.user;

@@ -20,7 +20,7 @@ let headerC = {
                 <li class="nav-item">
                   <div class="nav-link btn" :class="{active: pageId == 3}" @click="goRandom()">Random</div>
                 </li>
-                <hr class="dropdown-divider d-block d-lg-none">
+                <hr class="dropdown-divider d-block d-lg-none bg-light">
                 <div class="vl d-lg-block d-none"></div>
                 <div v-if="!isLoggedIn" class="nav-item">
                     <div class="btn-group w-100">
@@ -134,9 +134,4 @@ let headerC = {
             return 1;
         }
     },
-    async created() {
-        if (this.isInited) return;
-        store.state.isInited = true;
-        store.state.isLoggedIn = await cmnIsLoggedIn();
-    }
 };

@@ -122,7 +122,7 @@ let profileCollectionC = {
             }
         },
         tableStyle: function () {
-            return store.getStyle().getTextOutlineColorStr();
+            return store.getStyle().getTextBorderColorStr();
         },
         buttonStyle: function () {
             return store.getStyle().getButtonStr();

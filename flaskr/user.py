@@ -1,3 +1,4 @@
+import json
 from common import get_reply, only_chars_and_nums
 from db import user_exist, add_user
 
@@ -9,7 +10,7 @@ class User:
     def __init__(self, db_user):
         self.username = db_user["username"]
         self.type = db_user["type"]
-        self.settings = db_user["settings"]
+        self.style = db_user["style"]
         self.is_authenticated = True
 
     def is_active(self):
@@ -25,7 +26,7 @@ class User:
         return False
 
     def get_dict(self):
-        return {"username": self.username, "type": self.type, "settings": self.settings}
+        return {"username": self.username, "type": self.type, "style": self.style}
 
 
 # Verifies the registration

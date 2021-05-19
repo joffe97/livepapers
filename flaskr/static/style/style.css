@@ -8,6 +8,10 @@ nav {
     min-height: 75px;
 }
 
+main {
+    min-height: 100vh;
+}
+
 .nav-space {
     z-index: 9500;
     height: 100px;
@@ -105,8 +109,41 @@ nav {
 }
 
 .bg-show {
-    width: 5em;
-    height: 3em;
+    width: 6em;
+    height: 3.5em;
+}
+
+.tag-list-item-enter-from, .tag-list-item-leave-to {
+    line-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: all 0.3s ease-out;
+}
+
+.tag-list-item-enter-to, .tag-list-item-leave-from {
+    transition: all 0.3s ease-out;
+}
+
+.outline-thick {
+    outline: solid 3px;
+}
+
+.outline-primary {
+    outline-color: #212529;
+}
+
+.rounded-bottom-left {
+    border-radius: 0 0 0 0.25rem;
+}
+
+.rounded-bottom-right {
+    border-radius: 0 0 0.25rem 0;
+}
+
+.profile-img {
+    object-fit: scale-down;
+    width: 100%;
+    padding-bottom: 100%;
 }
 
 #alerttmp {

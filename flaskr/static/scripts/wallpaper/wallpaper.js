@@ -25,7 +25,7 @@ let wallpaperC = {
                     </a>
                 </div>
                 <div class="col-lg-10 mx-auto">
-                    <table class="table table-sm text-light my-2">
+                    <table class="table table-sm my-2" :style="tableStyle">
                         <tbody>
                             <tr><th>Uploader</th><td class="text-capitalize">{{uploaderStr}}</td></tr>
                             <tr><th>Time</th><td>{{timeSinceUploadStr}}</td></tr>
@@ -36,7 +36,10 @@ let wallpaperC = {
                         </tbody>
                     </table>
                     <div class="my-4 d-flex flex-wrap justify-content-center">
-                        <div v-for="tag in tags" class="h4 mx-4 my-2 text-center">#{{tag}}</div>
+                        <div v-for="tag in tags" role="button" class="h4 mx-4 my-2 text-center"
+                        @click="goSearchTag(tag)">
+                            #{{tag}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -97,7 +100,10 @@ let wallpaperC = {
         },
         tags: function () {
             return store.getWpTags(this.wpId);
-        }
+        },
+        tableStyle: function () {
+            return store.getStyle().getTextBorderColorStr();
+        },
     },
     methods: {
         getVideoUrl: function () {
@@ -125,6 +131,10 @@ let wallpaperC = {
             } else {
                 setAlert("Removed wallpaper from favorites.", "warning");
             }
+        },
+        goSearchTag: async function (tag) {
+            store.state.filterSearch = tag;
+            return this.$router.push("/latest/");
         }
     }
 };

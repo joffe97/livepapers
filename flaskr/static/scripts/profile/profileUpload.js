@@ -19,7 +19,7 @@ let profileUploadC = {
                     <div class="bg-light rounded">
                         <div>
                             <div class="input-group">
-                                <span class="input-group-text w-25" :class="{}">Name</span>
+                                <span class="input-group-text w-25">Name</span>
                                 <input v-model="customName" type="text" class="form-control" placeholder="Example">
                             </div>
                             <div class="input-group">
@@ -43,11 +43,13 @@ let profileUploadC = {
                         <button class="btn btn-success" type="submit">Add tag</button>
                     </form>
                     <div class="list-group py-0 border-lg m-lg-1 m-0 my-1 portrait-h">
-                        <div v-for="tag in tags.slice().reverse()" role="button"
-                        class="list-group-item list-group-item-action text-capitalize alert-dismissible">
-                            {{ tag }}
-                            <button type="button" class="btn-close p-0 h-100 pe-4" @click="removeTag(tag)"></button>
-                        </div>
+                        <transition-group name="tag-list-item">
+                            <div role="button" v-for="tag in tags.slice().reverse()" :key="tag"
+                            class="list-group-item list-group-item-action text-capitalize alert-dismissible overflow-hidden">
+                                {{ tag }}
+                                <div type="button" class="btn-close p-0 h-100 pe-4" @click="removeTag(tag)"></div>
+                            </div>
+                        </transition-group>
                     </div>
                 </div>
             </div>

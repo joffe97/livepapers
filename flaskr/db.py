@@ -26,7 +26,7 @@ CREATE_USERS_TABLE = f"""CREATE TABLE IF NOT EXISTS users (
                           username TEXT,
                           pwhash TEXT NOT NULL,
                           type INTEGER NOT NULL DEFAULT {UserType.WP_ADD | UserType.WP_REM},
-                          settings TEXT DEFAULT NULL,
+                          style TEXT DEFAULT NULL,
                           PRIMARY KEY (username)
                         );"""
 
@@ -113,7 +113,7 @@ def get_user(conn, username: str) -> Dict[str, Union[str, int]]:
     query = "SELECT * FROM users WHERE username=?"
     cur.execute(query, (username.lower(),))
     row = cur.fetchone()
-    return {"username": row[0], "pwhash": row[1], "type": row[2], "settings": row[3]} if row else None
+    return {"username": row[0], "pwhash": row[1], "type": row[2], "style": row[3]} if row else None
 
 
 # Checks if user exists
@@ -139,6 +139,19 @@ def verify_and_get_user(conn, username: str, password: str) -> Union[Dict[str, U
 # Verify user
 def verify_user(conn, username: str, password: str) -> bool:
     return bool(verify_and_get_user(conn, username, password))
+
+
+# Update style
+def update_style(conn, username, style):
+    try:
+        cur: Cursor = conn.cursor()
+        query = "UPDATE users SET style=? WHERE username=?"
+        cur.execute(query, (style, username.lower()))
+        conn.commit()
+        return None
+    except Error as e:
+        print(e)
+        return e
 
 
 # --------------- Wallpapers ---------------

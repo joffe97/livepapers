@@ -4,7 +4,8 @@ import sqlite3
 import json
 import datetime
 
-from flask import g, render_template, url_for, request, session, Flask
+from flask import g, render_template, request, session, Flask
+from flask.sessions import SecureCookieSessionInterface
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 import db
@@ -20,6 +21,7 @@ DATABASE = os.path.dirname(os.path.realpath(__file__)) + r"\database.db"
 app = Flask(__name__)
 app.secret_key = "\xba\xf5\x1e\xde\x07:\x1b0/@\x92\xc90#\xdev\xb4\xce\x87\xa7v\xb8\x7f\xbb"
 app.config["MAX_CONTENT_LENGTH"] = 128 * (1024 ** 2)
+app.config["SESSION_COOKIE_SECURE"] = True
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -86,12 +88,11 @@ def login():
     username: str = credentials.get("username", None)
     password: str = credentials.get("password", None)
     user = verify_and_load_user(username, password)
-    reply_dict = {}
     if user:
         login_user(user)
-        reply_dict["loggedIn"] = True
+        reply_dict = user.get_dict()
     else:
-        reply_dict["loggedIn"] = False
+        reply_dict = {}
 
     return json.dumps(reply_dict)
 
@@ -137,6 +138,21 @@ def get_user_favorite():
 @login_required
 def get_user_received_stars():
     return json.dumps({"receivedStars": db.get_users_total_received_stars(get_db(), current_user.username)})
+
+
+# Update style for user
+@app.route("/userdata/style", methods=["PUT"])
+@login_required
+def update_style():
+    jsdata = json.loads(request.data)
+    style_dict = jsdata.get("style")
+    style = json.dumps(style_dict)
+    if style == current_user.style:
+        return json.dumps(get_reply("success"))
+    error = db.update_style(get_db(), current_user.username, style)
+    if error:
+        return json.dumps(get_reply("error"))
+    return json.dumps(get_reply("success"))
 
 
 # Gets id, username of uploader, width, height, upload date and views for wallpaper

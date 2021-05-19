@@ -2,15 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0acfe6c4-f288-41bb-97dd-25ac3f27a636" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/flaskr.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/flaskr.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/common.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/database.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/db.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/scripts/browse/browse.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/browse/browse.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/other/alertsC.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/other/alertsC.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/other/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/other/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/other/datastore.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/other/datastore.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/other/header.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/other/header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/other/style.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/other/style.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/profile/profileCollection.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/profile/profileCollection.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/profile/profileOverview.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/profile/profileOverview.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/profile/profileSettings.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/profile/profileSettings.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/profile/profileUpload.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/profile/profileUpload.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/userManagement/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/userManagement/login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/scripts/wallpaper/wallpaper.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/scripts/wallpaper/wallpaper.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/style/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/style/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,31 +163,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.app" />
-        <item itemvalue="Python.db" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand>
-              <path>
-                <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-                <item name="root:database" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-              </path>
-              <path>
-                <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-                <item name="root:database" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-                <item name="com.intellij.database.console.session.MessageBusSession@12181cd9" type="9fbbdea:ServiceModel$ServiceNode" />
-              </path>
-            </expand>
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
@@ -219,7 +206,9 @@
       <workItem from="1620391502740" duration="23553000" />
       <workItem from="1620819425265" duration="15228000" />
       <workItem from="1620900941520" duration="18397000" />
-      <workItem from="1621153834714" duration="10617000" />
+      <workItem from="1621153834714" duration="10755000" />
+      <workItem from="1621359600943" duration="28144000" />
+      <workItem from="1621433203978" duration="5000" />
     </task>
     <servers />
   </component>
@@ -228,7 +217,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/app_py$db.coverage" NAME="db Coverage Results" MODIFIED="1620997416606" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/app_py$app.coverage" NAME="app Coverage Results" MODIFIED="1621153877919" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/app_py$app.coverage" NAME="app Coverage Results" MODIFIED="1621434362160" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/flaskr$app.coverage" NAME="app Coverage Results" MODIFIED="1619014528287" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/flaskr$db.coverage" NAME="db Coverage Results" MODIFIED="1619014516397" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

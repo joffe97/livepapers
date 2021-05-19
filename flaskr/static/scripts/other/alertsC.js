@@ -1,7 +1,7 @@
 let alertCrossC = {
     template: `
-    <div class="alert alert-dismissible fade" 
-    :class="[ alertMessage !== '' && alertMode === 'cross'  ? 'show' : 'p-0 m-0 unclickable d-none', 'alert-' + alertType ]">
+    <div v-if="alertMessage !== '' && alertMode === 'cross' && alertType" class="alert alert-dismissible" 
+    :class="[ 'alert-' + alertType ]">
         {{ alertMessage }}
         <button type="button" class="btn-close" @click="clearAlert()"></button>
     </div>
@@ -26,9 +26,9 @@ let alertCrossC = {
 
 let alertTmpC = {
     template: `
-    <div id="alerttmp" 
+    <div v-if="alertMessage !== '' && alertMode === 'tmp' && alertType" id="alerttmp" 
     class="alert alert-dismissible fade border-0 position-fixed shadow-lg translate-middle-x start-50" 
-    :class="[ alertMessage !== '' && alertMode === 'tmp' ? 'show' : 'p-0 m-0 unclickable d-none', 'alert-' + alertType ]">
+    :class="[ 'alert-' + alertType ]">
         {{ alertMessage }}
     </div>
     `,
