@@ -1,6 +1,6 @@
 let profileSettingsC = {
     template: `
-    <div class="col col-lg-11 mx-lg-auto pb-3">
+    <div class="col col-lg-11 mx-lg-auto pb-5">
         <div class="justify-content-between position-relative mx-lg-2">
             <div class="display-5 d-inline-block">Settings</div>
         </div>
@@ -24,11 +24,13 @@ let profileSettingsC = {
             <hr>
             <div class="mx-lg-2">
                 <h3 class="mb-4">Profile picture</h3>
-                <div class="row mx-auto col-lg-4 col-sm-8 col-11 border border-primary rounded">
-                    <img :src="imgurl" class="p-0 rounded-0 rounded-top profile-img" alt="Profile picture">
+                <div class="row mx-auto border border-primary rounded profile-img-upload col-lg-4 col-sm-8 col-11 p-0">
+                    <div class="profile-img rounded-0 rounded-top">
+                        <img :src="imgurl" alt="Profile picture">
+                    </div>
                     <div class="col-12 input-group p-0 border-top border-primary">
                         <input @change="onUploadChange" class="form-control rounded-bottom-left" accept="image/jpeg" type="file"/>
-                        <div @click="uploadProfileImg" class="btn btn-success rounded-bottom-right" type="button">Upload</div>
+                        <div @click="uploadProfileImg" class="btn btn-success rounded-bottom-right" type="button">Change</div>
                     </div>
                 </div>
             </div>
@@ -38,7 +40,7 @@ let profileSettingsC = {
     data() {
         return {
             selected_style: this.getCurrentStyleIndex(),
-            uploadProfileImg: null
+            profileImg: null
         }
     },
     computed: {
@@ -55,8 +57,9 @@ let profileSettingsC = {
             return store.state.user;
         },
         imgurl: function () {
-            if (this.uploadProfileImg) return this.uploadProfileImg;
-            return DEFAULT_PROFILE_IMAGE;
+            if (this.profileImg) return this.profileImg;
+            else if (!this.user) return DEFAULT_PROFILE_IMAGE;
+            else return this.user.getImgUrl();
         }
     },
     methods: {
@@ -66,11 +69,18 @@ let profileSettingsC = {
             }
         },
         changeStyle: async function () {
-            if (!this.user || this.selected_style < 0 || this.selected_style >= this.custom_styles.length) return;
+            if (!this.user || this.selected_style < 0 || this.selected_style >= this.custom_styles.length) {
+                setAlert("Cannot change to the selected style.");
+                return;
+            }
             let new_style = this.custom_styles[this.selected_style];
-            if (!new_style ) return;
+            if (!new_style ) {
+                setAlert("Cannot change to the selected style.");
+                return;
+            }
             let error = await this.user.updateStyle(new_style);
             if (error) setAlert("An internal server error occurred.");
+            else clearAlert();
         },
         onUploadChange: function (e) {
             let files = e.target.files;
@@ -81,19 +91,25 @@ let profileSettingsC = {
                 this.createImage(file);
                 return;
             } else {
-                this.uploadProfileImg = null;
+                this.profileImg = null;
             }
             setAlert("The current file format is not supported.", "danger");
         },
         createImage: function (file) {
             let reader = new FileReader();
             reader.onload = (e) => {
-                this.uploadProfileImg = e.target.result;
+                this.profileImg = e.target.result;
             };
             reader.readAsDataURL(file);
         },
-        uploadProfileImg: function () {
-
+        uploadProfileImg: async function () {
+            if (!this.user || !this.profileImg) {
+                setAlert("Cannot change profile picture.");
+                return;
+            }
+            let error = await this.user.updateImg(this.profileImg);
+            if (error) setAlert("An internal server error occurred.");
+            else setAlert("Successfully changed profile picture.", "success");
         }
     }
-}
+};

@@ -11,6 +11,8 @@ class User:
         self.username = db_user["username"]
         self.type = db_user["type"]
         self.style = db_user["style"]
+        self.img = db_user["img"]
+        self.filters = db_user["filters"]
         self.is_authenticated = True
 
     def is_active(self):
@@ -26,7 +28,7 @@ class User:
         return False
 
     def get_dict(self):
-        return {"username": self.username, "type": self.type, "style": self.style}
+        return {"username": self.username, "type": self.type, "style": self.style, "img": self.img, "filters": self.filters}
 
 
 # Verifies the registration

@@ -1,6 +1,8 @@
-const DEFAULT_UPLOAD_IMAGE = "/static/assets/upload_default_img.png";
+const DEFAULT_UPLOAD_IMAGE = "static/assets/upload_default_img.png";
 
 const DEFAULT_PROFILE_IMAGE = "static/assets/user_default_img.jpg";
+
+const PROFILE_IMAGE_DIRECTIORY = "static/profileimages/";
 
 const MEDIA_TYPES = {
     "video": ["mp4"]
@@ -162,16 +164,19 @@ class Wallpapers {
 }
 
 class User {
-    constructor(username, type, style) {
+    constructor(username, type, style, img, filters) {
+        if (filters && !filters.filterUploadTime) filters.filterUploadTime = 0;
         this.username = username;       // Str:     Username
         this.type = type;               // Int:     Account type
         this.wpUploaded = undefined;    // [int]:   List containing ids of uploaded wallpapers
         this.wpStarred = undefined;     // [int]:   List containing ids of starred wallpapers
         this.receivedStars = undefined; // Int:     Number of stars received on uploaded wallpapers
         this.style = getStyleObjFromJson(style);    // Obj: Object containing style for user
+        this.img = img;                 // Str      Filename of profile picture
+        this.filters = filters;         // Obj      // Obj: Object containing filters
     }
     getImgUrl() {
-        return DEFAULT_PROFILE_IMAGE;  // TODO: Get image from server or database. Needs research on how to.
+        return this.img ? `${PROFILE_IMAGE_DIRECTIORY}${this.img}` : DEFAULT_PROFILE_IMAGE;
     }
     async getUploaded() {
         if (this.wpUploaded === undefined) {
@@ -242,11 +247,45 @@ class User {
             body: JSON.stringify({
                 "style": style
             })
-        })
+        });
         if (reply.status !== 200) return 1;
         let json = await reply.json();
         if (json.status !== "success") return 1;
         this.style = style;
+        return 0;
+    }
+    async updateFilters(filters) {
+        if (!filters) return 1;
+        let reply = await fetch("/userdata/filters", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "filters": filters
+            })
+        });
+        if (reply.status !== 200) return 1;
+        let json = await reply.json();
+        if (json.status !== "success") return 1;
+        this.filters = filters;
+        return 0;
+    }
+    async updateImg(imgdata) {
+        if (!imgdata) return 1;
+        let reply = await fetch("/userdata/img", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "img": imgdata
+            })
+        });
+        if (reply.status !== 200) return 1;
+        let json = await reply.json();
+        if (json.status !== "success" || !json.img) return 1;
+        this.img = json.img;
         return 0;
     }
 }
@@ -262,7 +301,6 @@ class DataStore {
             alertMode: "",
             user: null,
             wallpapers: new Wallpapers(),  // Wps: Object containing loaded wallpapers
-            browseIds: undefined,
             filterRatio: "",
             filterColor: "",
             filterUploadTime: 0,
@@ -277,8 +315,10 @@ class DataStore {
             if (reply.status !== 200) return null;
             let json = await reply.json();
             let style = json.style ? JSON.parse(json.style) : null;
+            let img = json.img ? json.img : null;
+            let filters = json.filters ? JSON.parse(json.filters) : null;
             if (json.username !== undefined && json.type !== undefined) {
-                this.state.user = new User(json.username, json.type, style);
+                this.state.user = new User(json.username, json.type, style, img, filters);
             }
         }
         return this.state.user;

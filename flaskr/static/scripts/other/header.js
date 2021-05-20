@@ -56,7 +56,7 @@ let headerC = {
                     </div>
                 </div>
               </ul>
-              <form class="nav-item d-flex p-lg-0 py-2 btn-group" @submit.prevent @submit="triggerSearch">
+              <form class="nav-item d-flex p-lg-0 py-2 btn-group" @submit.prevent @submit="triggerAndGoSearch">
                 <input v-model="state.filterSearch" class="form-control rounded-0 rounded-start" 
                 type="search" placeholder="Enter tag">
                 <button class="btn btn-outline-success position-relative" type="submit">Search</button>
@@ -96,6 +96,7 @@ let headerC = {
             return this.$router.push("/mostliked/");
         },
         goRandom: function () {
+            this.triggerRandomRefresh();
             return this.$router.push("/random/");
         },
         goProfileOverview: function () {
@@ -116,9 +117,15 @@ let headerC = {
         goRegister: function () {
             return this.$router.push("/register/");
         },
-        triggerSearch: function () {
+        triggerRefresh: function () {
             store.state.filterSearchTrigger = !store.state.filterSearchTrigger;
+        },
+        triggerRandomRefresh: function () {
+            if (this.pageId === 3) this.triggerRefresh();
+        },
+        triggerAndGoSearch: function () {
             if (this.pageId === 1 || this.pageId === 2 || this.pageId === 3) {
+                this.triggerRefresh();
                 return;
             }
             return this.goLatest();
@@ -130,6 +137,7 @@ let headerC = {
             if (json.loggedIn) return 0;
             store.state.isLoggedIn = false;
             store.state.user = null;
+            this.triggerRefresh();
             setAlert("You have been logged out.", "warning");
             return 1;
         }

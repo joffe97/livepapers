@@ -52,8 +52,10 @@ let loginC = {
                 return 0;
             }
             let style = json.style ? JSON.parse(json.style) : null;
+            let img = json.img ? json.img : null;
+            let filters = json.filters ? JSON.parse(json.filters) : null;
             store.state.isLoggedIn = this.succLogin = true;
-            store.state.user = new User(json.username, json.type, style);
+            store.state.user = new User(json.username, json.type, style, img, filters);
             return this.$router.go(-1);
         }
     }

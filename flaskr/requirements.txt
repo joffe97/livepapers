@@ -1,6 +1,7 @@
-Werkzeug~=1.0.1
-Flask~=1.1.2
+Werkzeug~=2.0.1
+Flask~=2.0.0
 opencv-python~=4.5.1.48
 numpy~=1.20.2
 colormath~=3.0.0
 colorthief~=0.2.1
+Flask-Login~=0.5.0

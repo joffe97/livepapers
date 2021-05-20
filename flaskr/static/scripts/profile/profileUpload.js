@@ -133,7 +133,6 @@ let profileUploadC = {
             reader.readAsDataURL(file);
         },
         createVideo: function (file) {
-            console.log(file)
             let reader = new FileReader();
             reader.onload = (e) => {
                 this.userVideo = e.target.result;

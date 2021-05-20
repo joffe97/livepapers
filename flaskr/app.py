@@ -3,16 +3,17 @@ import sys
 import sqlite3
 import json
 import datetime
+import mimetypes
 
-from flask import g, render_template, request, session, Flask
-from flask.sessions import SecureCookieSessionInterface
+from flask import g, render_template, request, Flask, jsonify
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 import db
 from user import User, register_if_valid
 from common import get_reply, validate_and_add_tags, get_filter_vars
-from media import handle_media_uri, delete_wallpaper_media
+from media import handle_media_uri_wallpaper, delete_wallpaper_media, handle_media_uri_profileimg
 
+mimetypes.add_type("application/javascript", ".js")
 
 INFINITE_SCROLL = False
 
@@ -77,8 +78,7 @@ def register():
     else:
         reply_dict["loggedIn"] = False
 
-    reply_json = json.dumps(reply_dict)
-    return reply_json
+    return reply_dict
 
 
 # Log in the user if right credentials
@@ -94,7 +94,7 @@ def login():
     else:
         reply_dict = {}
 
-    return json.dumps(reply_dict)
+    return reply_dict
 
 
 # Log out the user
@@ -102,42 +102,42 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return json.dumps({"loggedIn": False})
+    return {"loggedIn": False}
 
 
 # Check if the user is logged in
 @app.route("/validate", methods=["GET"])
 def validate_user():
-    return json.dumps({"loggedIn": current_user.is_authenticated})
+    return {"loggedIn": current_user.is_authenticated}
 
 
 # Gets username, type and settings
 @app.route("/userdata/user", methods=["GET"])
 def get_user():
     if not current_user or not current_user.is_authenticated:
-        return json.dumps({})
-    return json.dumps(current_user.get_dict())
+        return {}
+    return current_user.get_dict()
 
 
 # Gets ids of uploaded wallpapers
 @app.route("/userdata/uploaded", methods=["GET"])
 @login_required
 def get_user_uploaded():
-    return json.dumps({"uploaded": db.get_uploaded_aids(get_db(), current_user.username)})
+    return {"uploaded": db.get_uploaded_aids(get_db(), current_user.username)}
 
 
 # Gets ids of favorite wallpapers
 @app.route("/userdata/favorites", methods=["GET"])
 @login_required
 def get_user_favorite():
-    return json.dumps({"favorite": db.get_favorite_ids(get_db(), current_user.username)})
+    return {"favorite": db.get_favorite_ids(get_db(), current_user.username)}
 
 
 # Gets number of received stars
 @app.route("/userdata/receivedstars", methods=["GET"])
 @login_required
 def get_user_received_stars():
-    return json.dumps({"receivedStars": db.get_users_total_received_stars(get_db(), current_user.username)})
+    return {"receivedStars": db.get_users_total_received_stars(get_db(), current_user.username)}
 
 
 # Update style for user
@@ -148,29 +148,62 @@ def update_style():
     style_dict = jsdata.get("style")
     style = json.dumps(style_dict)
     if style == current_user.style:
-        return json.dumps(get_reply("success"))
+        return get_reply("success")
     error = db.update_style(get_db(), current_user.username, style)
     if error:
-        return json.dumps(get_reply("error"))
-    return json.dumps(get_reply("success"))
+        return get_reply("error")
+    return get_reply("success")
+
+
+# Update profile picture
+@app.route("/userdata/img", methods=["PUT"])
+@login_required
+def update_profile_img():
+    jsdata = json.loads(request.data)
+    img = jsdata.get("img")
+    if img is None:
+        return get_reply("error", "Did not receive all necessary data.")
+
+    imgname, error = handle_media_uri_profileimg(get_db(), img)
+    if error:
+        reply = get_reply("error", error)
+    else:
+        reply = get_reply("success")
+        reply["img"] = imgname
+    return reply
+
+
+# Update profile picture
+@app.route("/userdata/filters", methods=["PUT"])
+@login_required
+def update_filters():
+    jsdata = json.loads(request.data)
+    filters_dict = jsdata.get("filters")
+    filters = json.dumps(filters_dict)
+    if filters == current_user.filters:
+        return get_reply("success")
+    error = db.update_filters(get_db(), current_user.username, filters)
+    if error:
+        return get_reply("error")
+    return get_reply("success")
 
 
 # Gets id, username of uploader, width, height, upload date and views for wallpaper
 @app.route("/wallpaperdata/<int:aid>", methods=["GET"])
 def get_wallpaper(aid: int):
-    return json.dumps(db.get_wallpaper(get_db(), aid, json_conv=True))
+    return db.get_wallpaper(get_db(), aid, json_conv=True)
 
 
 # Gets list of tags for wallpaper
 @app.route("/wallpaperdata/<int:aid>/tags", methods=["GET"])
 def get_wallpaper_tags(aid: int):
-    return json.dumps({"tags": db.get_tags_for_wallpaper(get_db(), aid)})
+    return {"tags": db.get_tags_for_wallpaper(get_db(), aid)}
 
 
 # Gets number of likes on wallpaper
 @app.route("/wallpaperdata/<int:aid>/likes", methods=["GET"])
 def get_wallpaper_likes(aid: int):
-    return json.dumps({"likes": db.get_likes_count_for_wallpaper(get_db(), aid)})
+    return {"likes": db.get_likes_count_for_wallpaper(get_db(), aid)}
 
 
 # Upload wallpaper
@@ -181,16 +214,16 @@ def ajax_add_wallpaper():
     data = jsdata.get("data")
     tags = jsdata.get("tags")
     if data is None or tags is None:
-        return json.dumps(get_reply("error", "Did not receive all necessary data."))
-    aid, error = handle_media_uri(get_db(), data)
+        return get_reply("error", "Did not receive all necessary data.")
+    aid, error = handle_media_uri_wallpaper(get_db(), data)
     if error:
-        return json.dumps(get_reply("error", error))
+        return get_reply("error", error)
     warning = validate_and_add_tags(get_db(), tags, aid)
     if warning:
-        return json.dumps(get_reply("warning", "Couldn't add all tags to wallpaper."))
+        return get_reply("warning", "Couldn't add all tags to wallpaper.")
     reply = get_reply("success")
     reply["id"] = aid
-    return json.dumps(reply)
+    return reply
 
 
 # Delete wallpaper and its stars and tags
@@ -199,9 +232,9 @@ def ajax_add_wallpaper():
 def ajax_delete_wallpaper(aid: int):
     error = db.delete_wallpaper_likes_tags_colors(get_db(), aid)
     if error:
-        return json.dumps(get_reply("error"))
+        return get_reply("error")
     delete_wallpaper_media(aid)
-    return json.dumps(get_reply("success"))
+    return get_reply("success")
 
 
 # Add tag to wallpaper
@@ -211,8 +244,7 @@ def ajax_add_tag(aid: int):
     jsdata = json.loads(request.data)
     tag = jsdata.get("tag")
     error = validate_and_add_tags(get_db(), [tag], aid)
-    reply = get_reply("success") if not error else get_reply("error", "Couldn't add tag to wallpaper.")
-    return json.dumps(reply)
+    return get_reply("success") if not error else get_reply("error", "Couldn't add tag to wallpaper.")
 
 
 # Remove tag from wallpaper
@@ -222,16 +254,14 @@ def ajax_delete_tag(aid: int, tag: str):
     if not db.is_wallpapers_owner(get_db(), aid, current_user.username):
         return get_reply("error", "Cannot remove tags for this wallpaper.")
     error = db.delete_tag(get_db(), tag, aid)
-    reply = get_reply("success") if not error else get_reply("error", "Couldn't remove tag from wallpaper.")
-    return json.dumps(reply)
+    return get_reply("success") if not error else get_reply("error", "Couldn't remove tag from wallpaper.")
 
 
 # Increment views on wallpaper
 @app.route("/wallpaperdata/<int:aid>/views", methods=["PUT"])
 def increment_views(aid: int):
     error = db.increment_wallpaper_views(get_db(), aid)
-    reply = get_reply("success") if not error else get_reply("error")
-    return json.dumps(reply)
+    return get_reply("success") if not error else get_reply("error")
 
 
 # Remove wallpaper from current users favorites
@@ -239,8 +269,7 @@ def increment_views(aid: int):
 @login_required
 def ajax_delete_favorite(aid: int):
     error = db.delete_like(get_db(), aid, current_user.username)
-    reply = get_reply("success") if not error else get_reply("error")
-    return json.dumps(reply)
+    return get_reply("success") if not error else get_reply("error")
 
 
 # Add wallpaper to current users favorites
@@ -250,10 +279,9 @@ def ajax_add_favorite():
     jsdata = json.loads(request.data)
     aid = jsdata.get("wpId")
     if not aid or not db.wallpaper_exists(get_db(), aid):
-        return json.dumps(get_reply("error"))
+        return get_reply("error")
     error = db.add_like(get_db(), aid, current_user.username)
-    reply = get_reply("success") if not error else get_reply("error")
-    return json.dumps(reply)
+    return get_reply("success") if not error else get_reply("error")
 
 
 # Returns wallpapers when the infinite_scroll parameter is set
@@ -266,7 +294,7 @@ def infinite_scroll_func(func, count, filters):
         return_list.extend(wps)
     if len(return_list) >= count:
         return_list = return_list[:count]
-    return json.dumps(return_list)
+    return jsonify(return_list)
 
 
 # Returns latest wallpapers that's not yet received
@@ -293,7 +321,7 @@ def get_latest_wallpapers():
     if INFINITE_SCROLL:  # Only for testing
         return infinite_scroll_func(db.get_latest_wallpapers, count, filters)
 
-    return json.dumps(db.get_latest_wallpapers(get_db(), from_datetime, count, filters))
+    return jsonify(db.get_latest_wallpapers(get_db(), from_datetime, count, filters))
 
 
 # Returns most liked wallpapers that's not yet received
@@ -323,7 +351,7 @@ def get_mostliked_wallpapers():
     if INFINITE_SCROLL:  # Only for testing
         return infinite_scroll_func(db.get_mostliked_wallpapers, count, filters)
 
-    return json.dumps(db.get_mostliked_wallpapers(get_db(), stars, aid, count, filters))
+    return jsonify(db.get_mostliked_wallpapers(get_db(), stars, aid, count, filters))
 
 
 # Returns random wallpapers that's not yet received
@@ -349,7 +377,7 @@ def get_random_wallpapers():
     if INFINITE_SCROLL:
         return infinite_scroll_func(db.get_random_wallpapers, count, filters)
 
-    return json.dumps(db.get_random_wallpapers(get_db(), seed, received, count, filters))
+    return jsonify(db.get_random_wallpapers(get_db(), seed, received, count, filters))
 
 
 if __name__ == '__main__':

@@ -27,7 +27,10 @@ CREATE_USERS_TABLE = f"""CREATE TABLE IF NOT EXISTS users (
                           pwhash TEXT NOT NULL,
                           type INTEGER NOT NULL DEFAULT {UserType.WP_ADD | UserType.WP_REM},
                           style TEXT DEFAULT NULL,
-                          PRIMARY KEY (username)
+                          img TEXT DEFAULT NULL,
+                          filters TEXT DEFAULT NULL,
+                          PRIMARY KEY (username),
+                          CONSTRAINT uc_img UNIQUE (img)
                         );"""
 
 CREATE_WALLPAPERS_TABLE = """CREATE TABLE IF NOT EXISTS wallpapers (
@@ -97,9 +100,9 @@ def create_table(conn: Connection, query: str) -> int:
 def add_user(conn, username: str, password: str, usertype: int = 3):
     try:
         cur: Cursor = conn.cursor()
-        query = "INSERT INTO users VALUES (?,?,?,?)"
+        query = "INSERT INTO users VALUES (?,?,?,?,?,?)"
         pw_hash = generate_password_hash(password)
-        cur.execute(query, (username.lower(), pw_hash, usertype, None))
+        cur.execute(query, (username.lower(), pw_hash, usertype, None, None, None))
         conn.commit()
         return None
     except Error as e:
@@ -113,7 +116,8 @@ def get_user(conn, username: str) -> Dict[str, Union[str, int]]:
     query = "SELECT * FROM users WHERE username=?"
     cur.execute(query, (username.lower(),))
     row = cur.fetchone()
-    return {"username": row[0], "pwhash": row[1], "type": row[2], "style": row[3]} if row else None
+    return {"username": row[0], "pwhash": row[1], "type": row[2], "style": row[3], "img": row[4], "filters": row[5]} \
+        if row else None
 
 
 # Checks if user exists
@@ -147,6 +151,32 @@ def update_style(conn, username, style):
         cur: Cursor = conn.cursor()
         query = "UPDATE users SET style=? WHERE username=?"
         cur.execute(query, (style, username.lower()))
+        conn.commit()
+        return None
+    except Error as e:
+        print(e)
+        return e
+
+
+# Update style
+def update_img(conn, username, img):
+    try:
+        cur: Cursor = conn.cursor()
+        query = "UPDATE users SET img=? WHERE username=?"
+        cur.execute(query, (img, username.lower()))
+        conn.commit()
+        return None
+    except Error as e:
+        print(e)
+        return e
+
+
+# Update filters
+def update_filters(conn, username, filters):
+    try:
+        cur: Cursor = conn.cursor()
+        query = "UPDATE users SET filters=? WHERE username=?"
+        cur.execute(query, (filters, username.lower()))
         conn.commit()
         return None
     except Error as e:

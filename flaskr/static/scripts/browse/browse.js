@@ -80,7 +80,8 @@ let browseC = {
                     <div class="btn-group-vertical col-12 col-sm-auto">
                         <div v-for="uploadTime in uploadTimes" class="w-100 form-check p-0 m-0">
                             <input class="btn-check" type="radio" name="uploadRadios" 
-                            :id="'uploadRadio' + uploadTime" :value="uploadTime" v-model="filterUploadTime">
+                            :id="'uploadRadio' + uploadTime" :value="uploadTime" 
+                            v-model="filter.filterUploadTime">
                             <label class="btn btn-sm btn-outline-dark w-100" :for="'uploadRadio' + uploadTime">
                                 {{ getUploadDesc(uploadTime) }}
                             </label>
@@ -90,7 +91,9 @@ let browseC = {
             </div>
             <div class="pt-4 pb-2 col-sm-8 d-flex justify-content-center">
                 <button class="btn btn-primary col-5" :class="{'me-1': isLoggedIn}" @click="refreshWallpapers">Update</button>
-                <button v-if="isLoggedIn" class="btn btn-primary col-5" :class="{'ms-1': isLoggedIn}">Save</button>
+                <button v-if="isLoggedIn" class="btn btn-primary col-5" :class="{'ms-1': isLoggedIn}" @click="saveFilters">
+                    Save
+                </button>
             </div>
         </div>
         <div class="shadow position-absolute top-100 end-0 btn btn-warning pt-2 me-3 border-3 border-primary rounded-0 
@@ -131,21 +134,18 @@ let browseC = {
     `,
     data() {
         return {
-            wallpaperIds: store.state.browseIds,
+            wallpaperIds: [],
             isLoading: false,
             reachedEnd: false,
             hoverIndex: -1,
             randomSeed: undefined,
-            filterMenu: false,
-            filterRatio: store.state.filterRatio,
-            filterColor: store.state.filterColor,
-            filterUploadTime: store.state.filterUploadTime
+            filterMenu: false
         }
     },
     async created() {
         await this.updatePageId();
+        if (!store.state.user) await store.getUser();
         window.onscroll = async () => {
-            console.log(12345)
             this.filterMenu = false;
             await this.onBottomScroll();
         }
@@ -155,6 +155,15 @@ let browseC = {
         store.state.pageId = 0;
     },
     computed: {
+        state: function () {
+            return store.state;
+        },
+        user: function () {
+            return store.state.user;
+        },
+        filter: function () {
+            return this.user && this.user.filters ? this.user.filters : this.state;
+        },
         lastWallpaper: function () {
             if (!this.wallpaperIds || !this.wallpaperIds.length) return undefined;
             let wpId = this.wallpaperIds[this.wallpaperIds.length - 1];
@@ -171,6 +180,16 @@ let browseC = {
         },
         isLoggedIn: function () {
             return store.state.isLoggedIn;
+        },
+        filterColor: function () {
+            return this.filter.filterColor;
+        },
+        filterRatio: function () {
+            return this.filter.filterRatio;
+        },
+        filterUploadTime: function () {
+            let time = this.filter.filterUploadTime;
+            return time ? time : UPLOADED_TIMES.ALL_TIME;
         },
         filterSearch: function () {
             return store.state.filterSearch;
@@ -271,7 +290,7 @@ let browseC = {
             this.verifyWpReplyCount(wps, count);
         },
         refreshWallpapers: async function () {
-            this.wallpaperIds = []
+            this.wallpaperIds = [];
             this.reachedEnd = this.isLoading = false;
             await this.loadIfNotFullPage();
             setTimeout(()=>cmnScrollTop(), 10)
@@ -319,15 +338,23 @@ let browseC = {
             return getUploadedTimesDesc(type);
         },
         updateFilterRatio: function (type) {
-            if (type === this.filterRatio) this.filterRatio = "";
-            else this.filterRatio = type;
+            if (type === this.filterRatio) this.filter.filterRatio = "";
+            else this.filter.filterRatio = type;
         },
         updateFilterColor: function (color) {
-            if (color === this.filterColor) this.filterColor = "";
-            else this.filterColor = color;
+            if (color === this.filterColor) this.filter.filterColor = "";
+            else this.filter.filterColor = color;
         },
         isDarkColor: function (hexcolor) {
             return cmnIsDarkColor(hexcolor);
+        },
+        saveFilters: async function () {
+            if (!store.state.user) return;
+            let filters = {};
+            filters["filterRatio"] = this.filterRatio ? this.filterRatio : null;
+            filters["filterColor"] = this.filterColor ? this.filterColor : null;
+            filters["filterUploadTime"] = this.filterUploadTime ? this.filterUploadTime : 0;
+            await store.state.user.updateFilters(filters);
         }
     },
     watch: {
@@ -337,8 +364,9 @@ let browseC = {
             setTimeout(()=>cmnScrollTop(), 10)
         },
         filterSearchTrigger: async function () {
+            if (store.state.pageId === 3) this.randomSeed = undefined;
             await this.refreshWallpapers();
             this.filterMenu = false;
         }
-    },
+    }
 };
