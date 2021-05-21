@@ -349,12 +349,20 @@ let browseC = {
             return cmnIsDarkColor(hexcolor);
         },
         saveFilters: async function () {
-            if (!store.state.user) return;
+            if (!store.state.user) {
+                setAlert("An error occurred when saving selected filters.");
+                return;
+            }
             let filters = {};
             filters["filterRatio"] = this.filterRatio ? this.filterRatio : null;
             filters["filterColor"] = this.filterColor ? this.filterColor : null;
             filters["filterUploadTime"] = this.filterUploadTime ? this.filterUploadTime : 0;
-            await store.state.user.updateFilters(filters);
+            let error = await store.state.user.updateFilters(filters);
+            if (error) {
+                setAlert("An error occurred when saving selected filters.");
+                return;
+            }
+            setAlert("Successfully saved the selected filters.", "success")
         }
     },
     watch: {

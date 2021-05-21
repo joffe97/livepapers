@@ -15,6 +15,8 @@
     <script src={{url_for("static", filename="scripts/other/alertsC.js")}}></script>
     <script src={{url_for("static", filename="scripts/other/header.js")}}></script>
     <script src={{url_for("static", filename="scripts/other/app.js")}}></script>
+    <script src={{url_for("static", filename="scripts/profile/adminMenus/adminMenuUsers.js")}}></script>
+    <script src={{url_for("static", filename="scripts/profile/adminMenus/adminMenuWallpapers.js")}}></script>
     <script src={{url_for("static", filename="scripts/userManagement/login.js")}}></script>
     <script src={{url_for("static", filename="scripts/userManagement/register.js")}}></script>
     <script src={{url_for("static", filename="scripts/profile/profile.js")}}></script>
@@ -43,6 +45,8 @@
     app.component("my-head", headerC);
     app.component("alert-cross", alertCrossC);
     app.component("alert-tmp", alertTmpC);
+    app.component("admin-menu-users", adminMenuUsersC);
+    app.component("admin-menu-wallpapers", adminMenuWallpapersC);
     app.component("profile-overview", profileOverviewC);
     app.component("profile-collection", profileCollectionC);
     app.component("profile-upload", profileUploadC);
