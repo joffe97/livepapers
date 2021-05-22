@@ -23,5 +23,5 @@ let profileAdminC = {
         admin_menus: function () {
             return ADMIN_MENUS;
         }
-    }
+    },
 }

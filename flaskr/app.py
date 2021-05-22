@@ -5,7 +5,7 @@ import json
 import datetime
 import mimetypes
 
-from flask import g, render_template, request, Flask, jsonify
+from flask import g, render_template, request, Flask, jsonify, abort
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 import db
@@ -188,10 +188,51 @@ def update_filters():
     return get_reply("success")
 
 
+@app.route("/allusers/<string:username>/data", methods=["GET"])
+@login_required
+def get_user_by_username(username: str):
+    if not current_user.type & (db.UserType.ADMIN | db.UserType.MANAGER):
+        return abort(403)
+
+    user = db.get_user(get_db(), username)
+    if not user:
+        return {}
+
+    if (user.get("type", 0) & (db.UserType.MANAGER | db.UserType.ADMIN)
+        and not current_user.type & db.UserType.MANAGER) or \
+            current_user.username == user.get("username"):
+        return abort(403)
+    return user
+
+
+@app.route("/allusers/<string:username>/type", methods=["PUT"])
+def update_user_type(username: str):
+    jsdata = json.loads(request.data)
+    new_type = jsdata.get("type", None)
+    if not isinstance(new_type, int):
+        return get_reply("error")
+
+    if not current_user.type & (db.UserType.ADMIN | db.UserType.MANAGER):
+        return abort(403)
+
+    user = db.get_user(get_db(), username)
+    if not user:
+        return get_reply("error")
+
+    if (user.get("type", 0) & (db.UserType.MANAGER | db.UserType.ADMIN)
+        and not current_user.type & db.UserType.MANAGER) or \
+            current_user.username == user.get("username"):
+        return abort(403)
+
+    error = db.update_type(get_db(), username, new_type)
+    return get_reply("error" if error else "success")
+
+
 # Gets id, username of uploader, width, height, upload date and views for wallpaper
 @app.route("/wallpaperdata/<int:aid>", methods=["GET"])
 def get_wallpaper(aid: int):
-    return db.get_wallpaper(get_db(), aid, json_conv=True)
+    wp = db.get_wallpaper(get_db(), aid, json_conv=True)
+    return wp if wp else {}
 
 
 # Gets list of tags for wallpaper

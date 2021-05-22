@@ -14,7 +14,7 @@ const ALERT_MODES = ["tmp", "cross"];
 
 const USER_TYPES = {
     WP_ADD: 1,
-    WP_REM: 1 << 1,
+    PROFILE_IMG: 1 << 1,
     ADMIN: 1 << 2,
     MANAGER: 1 << 3,
     BLOCKED: 1 << 4
@@ -24,8 +24,8 @@ function getUserTypeDesc(type) {
     switch (type) {
         case USER_TYPES.WP_ADD:
             return "Add wallpapers";
-        case USER_TYPES.WP_REM:
-            return "Remove wallpapers";
+        case USER_TYPES.PROFILE_IMG:
+            return "Profile picture";
         case USER_TYPES.ADMIN:
             return "Admin";
         case USER_TYPES.MANAGER:
@@ -146,9 +146,6 @@ class Wallpapers {
             if (reply.status !== 200) return null;
             let json = await reply.json();
             this.saveWallpaper(json)
-            // let date = new Date();
-            // date.setTime(json.date);
-            // this.dict[id] = new Wallpaper(json.aid, json.username, json.width, json.height, json.views, date);
         }
         return this.dict[id];
     }
@@ -173,7 +170,7 @@ class User {
         this.receivedStars = undefined; // Int:     Number of stars received on uploaded wallpapers
         this.style = getStyleObjFromJson(style);    // Obj: Object containing style for user
         this.img = img;                 // Str      Filename of profile picture
-        this.filters = filters;         // Obj      // Obj: Object containing filters
+        this.filters = filters;         // Obj      Object containing filters
     }
     getImgUrl() {
         return this.img ? `${PROFILE_IMAGE_DIRECTIORY}${this.img}` : DEFAULT_PROFILE_IMAGE;
@@ -234,8 +231,11 @@ class User {
         this.wpStarred.push(wpId);
         return 0;
     }
+    hasType(type) {
+        return !!(this.type & type);
+    }
     isAnyAdmin() {
-        return (this.type & (USER_TYPES.ADMIN | USER_TYPES.MANAGER)) !== 0;
+        return this.hasType(USER_TYPES.ADMIN | USER_TYPES.MANAGER);
     }
     async updateStyle(style) {
         if (!style) return 1;
@@ -402,6 +402,19 @@ class DataStore {
     }
     getStyleStr() {
         return this.getStyle().getStr();
+    }
+    async getOtherUser(username) {
+        if (!this.state.user || !username || this.state.user.username === username.toLowerCase()) return null;
+        let reply = await fetch(`/allusers/${username}/data`);
+        if (reply.status !== 200) return null;
+        let json = await reply.json();
+        let style = json.style ? JSON.parse(json.style) : null;
+        let img = json.img ? json.img : null;
+        let filters = json.filters ? JSON.parse(json.filters) : null;
+        if (json.username !== undefined && json.type !== undefined) {
+            return new User(json.username, json.type, style, img, filters);
+        }
+        return null;
     }
 }
 

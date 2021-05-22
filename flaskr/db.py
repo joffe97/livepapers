@@ -14,7 +14,7 @@ DATABASE = "./database.db"
 # Class containing usertype flags
 class UserType:
     WP_ADD = 1          # Add wallpapers
-    WP_REM = 1 << 1     # Remove wallpapers
+    PROFILE_IMG = 1 << 1     # Remove wallpapers
     ADMIN = 1 << 2      # Manage users and userdata (except of admins and managers)
     MANAGER = 1 << 3    # Manage all users and userdata
     BLOCKED = 1 << 4    # Blocked user
@@ -25,7 +25,7 @@ class UserType:
 CREATE_USERS_TABLE = f"""CREATE TABLE IF NOT EXISTS users (
                           username TEXT,
                           pwhash TEXT NOT NULL,
-                          type INTEGER NOT NULL DEFAULT {UserType.WP_ADD | UserType.WP_REM},
+                          type INTEGER NOT NULL DEFAULT {UserType.WP_ADD | UserType.PROFILE_IMG},
                           style TEXT DEFAULT NULL,
                           img TEXT DEFAULT NULL,
                           filters TEXT DEFAULT NULL,
@@ -177,6 +177,19 @@ def update_filters(conn, username, filters):
         cur: Cursor = conn.cursor()
         query = "UPDATE users SET filters=? WHERE username=?"
         cur.execute(query, (filters, username.lower()))
+        conn.commit()
+        return None
+    except Error as e:
+        print(e)
+        return e
+
+
+# Update type
+def update_type(conn, username, new_type):
+    try:
+        cur: Cursor = conn.cursor()
+        query = "UPDATE users SET type=? WHERE username=?"
+        cur.execute(query, (new_type, username.lower()))
         conn.commit()
         return None
     except Error as e:
