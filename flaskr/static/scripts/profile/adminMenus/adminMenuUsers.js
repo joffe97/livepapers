@@ -1,7 +1,11 @@
 let adminMenuUsersC = {
     template: `
     <div class="d-flex justify-content-between mb-2 flex-wrap">
-        <div class="btn btn-success col-12 col-sm-auto mb-3 mb-sm-0 px-sm-5 py-sm-3" @click="updateUser">Apply</div>
+        <button class="btn btn-success col-12 col-sm-auto mb-3 mb-sm-0 px-sm-5 py-sm-3" 
+        @click="updateUser"
+        :disabled="!modifyUser">
+            Apply
+        </button>
         <form class="input-group w-auto mx-sm-0 mx-auto flex-nowrap col-12 col-sm-auto" @submit.prevent 
         @submit="searchUser">
             <div class="form-floating">

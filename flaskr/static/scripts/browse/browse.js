@@ -104,22 +104,7 @@ let browseC = {
     
     <div class="container-fluid px-0 px-lg-5">
         <div id="browsediv" class="d-flex justify-content-center align-content-start flex-wrap pb-5 position-relative">
-            <div
-            v-if="wallpaperIds"
-            v-for="wpId, i in wallpaperIds"
-            @click="goWallpaper(wpId)"
-            @mouseover="hoverIndex = i"
-            @mouseleave="hoverIndex = -1"
-            class="browse-img-square btn m-2 p-0 position-relative">
-                <video v-if="hoverIndex === i" autoplay loop muted :poster="getImageUrl(wpId)"
-                class="wallpaper-video unclickable position-absolute translate-middle start-50 top-50">
-                    <source :src="getVideoUrl(wpId)" type="video/mp4">
-                </video>
-                <figure class="figure m-0">
-                    <img class="rounded-3 m-0 figure-img img-fluid position-absolute translate-middle start-50 top-50" 
-                    :src="getImageUrl(wpId)">
-                </figure>
-            </div>
+            <wallpaper-square v-for="wpId in wallpaperIds" v-bind:wpId="wpId"></wallpaper-square>
             <h4 v-if="!isLoading && wallpaperIds && !wallpaperIds.length">Cannot find any wallpapers ${EMOJI_SCREAMING}</h4>
         </div>
         <div v-if="isLoading" class="w-75 position-fixed bottom-0 start-50 translate-middle-x">

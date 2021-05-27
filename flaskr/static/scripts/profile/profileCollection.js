@@ -22,11 +22,7 @@ let profileCollectionC = {
                 :class="[isUnfavorited(wpId) ? 'bi-star' : 'bi-star-fill']"
                 role="button" title="Unfavorite" @click="toggleFavoriteWallpaper(wpId)"></i>
             </div>
-            <div class="browse-img-square col-lg-5 m-auto btn p-0" @click="goWallpaper(wpId)">
-                <figure class="figure m-0">
-                    <img class="img-fluid" :src="getImageUrl(wpId)">
-                </figure>
-            </div>
+            <wallpaper-square v-bind:wpId="wpId" class="m-auto"></wallpaper-square>
             <table class="col table my-auto mx-lg-5 my-lg-4 align-middle position-relative" :style="tableStyle">
                 <tbody>
                     <tr v-if="mode === 'favorites'" class="text-capitalize">

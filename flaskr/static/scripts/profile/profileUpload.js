@@ -188,7 +188,7 @@ let profileUploadC = {
             }
             setAlert("Successfully uploaded " + type + ".", "success", "cross");
             let wpId = json.id;
-            if (wpId) store.state.user.wpUploaded.push(wpId);
+            if (wpId && store.state.user.wpUploaded) store.state.user.wpUploaded.push(wpId);
         },
     }
 };
