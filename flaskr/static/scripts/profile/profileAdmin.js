@@ -11,7 +11,7 @@ let profileAdminC = {
                     </div>
                 </h2>
                 <div :id="'collapse' + menu" class="accordion-collapse collapse text-primary bg-dark">
-                    <div class="accordion-body overflow-hidden">
+                    <div class="accordion-body overflow-hidden admin-menu-section">
                         <component :is="'admin-menu-' + menu"></component>
                     </div>
                 </div>

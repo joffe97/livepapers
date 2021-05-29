@@ -11,7 +11,7 @@ let adminMenuUsersC = {
             <div class="form-floating">
                 <input id="username-search" class="form-control col-auto rounded-0 rounded-start" 
                 :class="usernameValidatorClass"
-                type="search" placeholder="Username" v-model="usernameInput">
+                placeholder="Username" v-model="usernameInput">
                 <label for="username-search">Username</label>
             </div>
             <div class="btn btn-secondary col-auto d-flex align-items-center" @click="searchUser">

@@ -4,8 +4,11 @@ let wallpaperC = {
     <div class="container">
         <div class="col">
             <div class="row-12 m-auto">
-                <div class="wallpaper-video mb-lg-4 mb-2">
-                    <video class="unclickable p-0 wallpaper-page-video" autoplay loop muted>
+                <div class="mb-lg-4 mb-2"
+                :class="fullscreenVideo ? 'wallpaper-video-fullscreen' : 'wallpaper-video'"
+                @click="fullscreenVideo = !fullscreenVideo">
+                    <video class="p-0" autoplay loop muted
+                    :class="fullscreenVideo ? 'wallpaper-page-video-fullscreen' : 'wallpaper-page-video'">
                         <source :src="getVideoUrl()">
                     </video>
                 </div>
@@ -51,6 +54,7 @@ let wallpaperC = {
             hoverUpdate: false,
             hoverFavorite: false,
             wpId: parseInt(this.wpIdStr),
+            fullscreenVideo: false
         }
     },
     async created() {
@@ -120,17 +124,17 @@ let wallpaperC = {
             let error = await this.user.addFavorite(this.wpId);
             if (error) {
                 setAlert("Couldn't add to favorites.");
-            } else {
-                setAlert("Added wallpaper to favorites.", "success");
+                return;
             }
+            setAlert("Added wallpaper to favorites.", "success");
         },
         unfavoriteWallpaper: async function () {
             let error = await this.user.removeFavorite(this.wpId);
             if (error) {
                 setAlert("Couldn't remove from favorites.");
-            } else {
-                setAlert("Removed wallpaper from favorites.", "warning");
+                return;
             }
+            setAlert("Removed wallpaper from favorites.", "warning");
         },
         goSearchTag: async function (tag) {
             store.state.filterSearch = tag;

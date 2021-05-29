@@ -20,11 +20,11 @@ async function cmnIsLoggedIn() {
 }
 
 function cmnGetVideoUrl (wpId) {
-	return 'static/wallpapers/videos/' + wpId + '.mp4'
+	return 'static/wallpapers/videos/' + wpId + '.mp4';
 }
 
 function cmnGetImageUrl (wpId) {
-	return 'static/wallpapers/images/' + wpId + '.jpg'
+	return wpId ? 'static/wallpapers/images/' + wpId + '.jpg' : 'static/assets/no_wallpaper.png';
 }
 
 function cmnScrollTop () {

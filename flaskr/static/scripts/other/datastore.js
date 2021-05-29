@@ -131,6 +131,9 @@ class Wallpaper {
         let gcd = cmnGcd(this.width, this.height);
         return {width: this.width / gcd, height: this.height / gcd};
     }
+    getResolution() {
+        return this.width + " x " + this.height;
+    }
 }
 
 class Wallpapers {
@@ -366,7 +369,7 @@ class DataStore {
     }
     getWpResolutionStr (wpId) {
         let wp = this.getWallpaper(wpId);
-        return wp ? (wp.width + " x " + wp.height) : "";
+        return wp ? wp.getResolution() : "";
     }
     getWpAspectRatioStr (wpId) {
         let wp = this.getWallpaper(wpId);
