@@ -173,7 +173,7 @@ def update_profile_img():
     return reply
 
 
-# Update profile picture
+# Update user filters
 @app.route("/userdata/filters", methods=["PUT"])
 @login_required
 def update_filters():

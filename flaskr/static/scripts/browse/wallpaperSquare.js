@@ -8,8 +8,7 @@ let wallpaperSquareC = {
     class="browse-img-square btn m-2 p-0 position-relative rounded rounded-3"
     :class="wpId ? 'browse-img-square-hover' : 'unclickable'">
         <div v-if="isHover && wpId" class="wallpaper-video unclickable position-absolute translate-middle start-50 top-50">
-            <video autoplay loop muted :poster="getImageUrl(wpId)"
-            class="">
+            <video autoplay loop muted :poster="getImageUrl(wpId)">
                 <source :src="getVideoUrl(wpId)" type="video/mp4">
             </video>
             <div v-if="wp" class="browse-img-square-info">

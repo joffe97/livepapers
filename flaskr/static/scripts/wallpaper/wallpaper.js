@@ -4,13 +4,21 @@ let wallpaperC = {
     <div class="container">
         <div class="col">
             <div class="row-12 m-auto">
-                <div class="mb-lg-4 mb-2"
-                :class="fullscreenVideo ? 'wallpaper-video-fullscreen' : 'wallpaper-video'"
-                @click="fullscreenVideo = !fullscreenVideo">
-                    <video class="p-0" autoplay loop muted
-                    :class="fullscreenVideo ? 'wallpaper-page-video-fullscreen' : 'wallpaper-page-video'">
-                        <source :src="getVideoUrl()">
-                    </video>
+                <div class="mb-lg-4 mb-2 wallpaper-video d-flex justify-content-center">
+                    <div class="wallpaper-page-video position-relative">
+                        <video class="p-0 d-block" autoplay loop muted
+                            @click="goFullscreen($event.target)"
+                            @mouseover="hoverWallpaper = true"
+                            @mouseleave="hoverWallpaper = false">
+                            <source :src="getVideoUrl()">
+                        </video>
+                        <div v-if="hoverWallpaper">
+                            <img src="static/assets/arrow_tr.png" class="position-absolute top-0 end-0 diag_arrow">
+                            <img src="static/assets/arrow_tr.png" class="position-absolute top-0 start-0 rot270 diag_arrow">
+                            <img src="static/assets/arrow_tr.png" class="position-absolute bottom-0 end-0 rot90 diag_arrow">
+                            <img src="static/assets/arrow_tr.png" class="position-absolute bottom-0 start-0 rot180 diag_arrow">
+                        </div>
+                    </div>
                 </div>
                 <div class="btn-group m-0 mb-2 col-12" role="group">
                     <div v-if="user" class="me-1 py-lg-2 btn border-warning border-2" 
@@ -53,6 +61,7 @@ let wallpaperC = {
         return {
             hoverUpdate: false,
             hoverFavorite: false,
+            hoverWallpaper: false,
             wpId: parseInt(this.wpIdStr),
             fullscreenVideo: false
         }
@@ -139,6 +148,21 @@ let wallpaperC = {
         goSearchTag: async function (tag) {
             store.state.filterSearch = tag;
             return this.$router.push("/latest/");
+        },
+        goFullscreen: function (el) {
+            if (!this.fullscreenVideo) {
+                if (el.requestFullscreen) el.requestFullscreen();
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                else if (el.msRequestFullscreen) el.msRequestFullscreen();
+                else return;
+                this.fullscreenVideo = true;
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.msExitFullscreen)document.msExitFullscreen();
+                else return;
+                this.fullscreenVideo = false;
+            }
         }
     }
 };
