@@ -430,7 +430,5 @@ function setAlert(message, type = "danger", mode = "tmp") {
 }
 
 function clearAlert() {
-    store.state.alertMessage = "";
-    store.state.alertType = "";
     store.state.alertMode = "";
 }

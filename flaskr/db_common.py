@@ -34,8 +34,18 @@ def append_select_query_filter_search(where_list: list, arg_list: list, search: 
     if not search:
         return
 
-    where_list.append("aid IN (SELECT aid FROM tags WHERE tag LIKE ?)")
-    arg_list.append(search.lower() + "%")
+    search = search.lower()
+    query = f"aid IN (SELECT aid FROM tags WHERE tag LIKE ?)"
+    arg_list.append(search + "%")
+
+    if search.isdecimal():
+        query += " OR aid = ?"
+        arg_list.append(search)
+    else:
+        query += " OR username = ?"
+        arg_list.append(search)
+
+    where_list.append(query)
 
 
 def get_select_query_filter(filters):

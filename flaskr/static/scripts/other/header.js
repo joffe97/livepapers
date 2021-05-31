@@ -41,24 +41,26 @@ let headerC = {
                 @mouseleave="userButtonHover = false"
                 @click="userButtonHover = !userButtonHover">
                     <div class="dropend">
-                      <div class="btn nav-link dropdown-toggle" 
-                      :class="{show: userButtonHover, active: pageId == 4}" type="button" 
-                      id="dropdownMenuButton1" data-bs-toggle="dropdown" v-bind:aria-expanded="userButtonHover">
-                        Profile
-                      </div>
-                      <div class="dropdown-menu p-0 border-0" :class="{show: userButtonHover}">
-                        <button class="btn btn-dark p-2 w-100 rounded-0 rounded-top" @click="goProfileOverview()">Overview</button>
-                        <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileCollection()">Collection</button>
-                        <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileUpload()">Upload</button>
-                        <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileSettings()">Settings</button>
-                        <button class="btn btn-danger p-2 w-100 rounded-0 rounded-bottom" @click="logout()">Log out</button>
-                      </div>
+                        <div class="btn nav-link dropdown-toggle" 
+                        :class="{active: pageId == 4}" type="button" 
+                        id="dropdownMenuButton1" data-bs-toggle="dropdown">
+                          Profile
+                        </div>
+                        <transition name="from-upper-left">
+                            <div v-show="userButtonHover" id="profile-menu-dropdown" class="dropdown-menu p-0 border-0 show">
+                              <button class="btn btn-dark p-2 w-100 rounded-0 rounded-top" @click="goProfileOverview()">Overview</button>
+                              <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileCollection()">Collection</button>
+                              <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileUpload()">Upload</button>
+                              <button class="btn btn-dark p-2 w-100 rounded-0" @click="goProfileSettings()">Settings</button>
+                              <button class="btn btn-danger p-2 w-100 rounded-0 rounded-bottom" @click="logout()">Log out</button>
+                            </div>
+                        </transition>
                     </div>
                 </div>
               </ul>
               <form class="nav-item d-flex p-lg-0 py-2 btn-group" @submit.prevent @submit="triggerAndGoSearch">
                 <input v-model="state.filterSearch" class="form-control rounded-0 rounded-start" 
-                type="search" placeholder="Enter tag">
+                type="search" placeholder="Search wallpaper...">
                 <button class="btn btn-outline-success position-relative" type="submit">Search</button>
               </form>
           </div>
@@ -139,7 +141,7 @@ let headerC = {
             store.state.user = null;
             this.triggerRefresh();
             setAlert("You have been logged out.", "warning");
-            return 1;
+            return this.triggerAndGoSearch();
         }
     },
 };

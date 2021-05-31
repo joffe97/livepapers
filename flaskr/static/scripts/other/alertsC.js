@@ -26,11 +26,13 @@ let alertCrossC = {
 
 let alertTmpC = {
     template: `
-    <div v-if="alertMessage !== '' && alertMode === 'tmp' && alertType" id="alerttmp" 
-    class="alert alert-dismissible fade border-0 position-fixed shadow-lg translate-middle-x start-50" 
-    :class="[ 'alert-' + alertType ]">
-        {{ alertMessage }}
-    </div>
+    <transition name="showing">
+        <div v-show="alertMessage !== '' && alertMode === 'tmp' && alertType" id="alerttmp" 
+        class="alert alert-dismissible border-0 position-fixed shadow-lg translate-middle-x start-50" 
+        :class="[ 'alert-' + alertType ]">
+            {{ alertMessage }}
+        </div>
+    </transition>
     `,
     data() {
         return {

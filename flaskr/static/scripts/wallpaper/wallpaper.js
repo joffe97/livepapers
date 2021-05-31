@@ -12,12 +12,14 @@ let wallpaperC = {
                             @mouseleave="hoverWallpaper = false">
                             <source :src="getVideoUrl()">
                         </video>
-                        <div v-if="hoverWallpaper">
-                            <img src="static/assets/arrow_tr.png" class="position-absolute top-0 end-0 diag_arrow">
-                            <img src="static/assets/arrow_tr.png" class="position-absolute top-0 start-0 rot270 diag_arrow">
-                            <img src="static/assets/arrow_tr.png" class="position-absolute bottom-0 end-0 rot90 diag_arrow">
-                            <img src="static/assets/arrow_tr.png" class="position-absolute bottom-0 start-0 rot180 diag_arrow">
-                        </div>
+                        <transition name="showing">
+                            <div v-show="hoverWallpaper" class="overflow-hidden">
+                                <img src="static/assets/arrow_tr.png" class="position-absolute top-0 end-0 diag_arrow">
+                                <img src="static/assets/arrow_tr.png" class="position-absolute bottom-0 end-0 rot90 diag_arrow">
+                                <img src="static/assets/arrow_tr.png" class="position-absolute bottom-0 start-0 rot180 diag_arrow">
+                                <img src="static/assets/arrow_tr.png" class="position-absolute top-0 start-0 rot270 diag_arrow">
+                            </div>
+                        </transition>
                     </div>
                 </div>
                 <div class="btn-group m-0 mb-2 col-12" role="group">

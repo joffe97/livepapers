@@ -36,6 +36,7 @@ main {
     overflow: hidden;
     width: 300px;
     height: 200px;
+    background-color: rgba(174, 174, 174, 0.4);
 }
 
 .browse-img-square figure, .browse-img-square video {
@@ -75,6 +76,7 @@ main {
 
 .wallpaper-page-video video {
     max-height: 50vh;
+    max-width: 100%;
 }
 
 .wallpaper-video {
@@ -125,17 +127,6 @@ main {
 .bg-show {
     width: 6em;
     height: 3.5em;
-}
-
-.tag-list-item-enter-from, .tag-list-item-leave-to {
-    line-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    transition: all 0.3s ease-out;
-}
-
-.tag-list-item-enter-to, .tag-list-item-leave-from {
-    transition: all 0.3s ease-out;
 }
 
 .outline-thick {
@@ -211,13 +202,50 @@ main {
 }
 
 .diag_arrow {
-    padding: 5px;
-    max-width: 20%;
-    max-height: 20%;
+    margin: 5px;
+    max-width: 10%;
+    max-height: 10%;
+    user-select: none;
+    pointer-events: none;
+    object-fit: fill;
+    opacity: .7;
+}
+
+.tag-list-item-enter-from, .tag-list-item-leave-to {
+    line-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: all 0.3s ease-out;
+}
+
+.tag-list-item-enter-to, .tag-list-item-leave-from {
+    transition: all 0.3s ease-out;
+}
+
+.showing-leave-active {
+    opacity: 0 !important;
+    transition: opacity 0.15s ease-out;
+}
+
+.from-upper-left-enter-active, .from-upper-left-leave-active {
+    overflow: hidden;
+}
+
+.from-upper-left-enter-from, .from-upper-left-leave-to {
+    max-height: 0 !important;
+    transition: max-height .2s ease-out;
+}
+
+.from-upper-left-enter-to, .from-upper-left-leave-from {
+    max-height: 50vh !important;
+    transition: max-height .5s ease-out;
+}
+
+#profile-menu-dropdown {
+    max-height: 50vh;
 }
 
 #alerttmp {
-    position: absolute;
     top: 130px;
     opacity: 0.96;
     margin: auto;
@@ -244,6 +272,19 @@ main {
 }
 
 @media (min-width: 992px) {
+    .from-upper-left-enter-from, .from-upper-left-leave-to {
+        width: 0 !important;
+        max-height: 100% !important;
+        min-width: 0;
+        transition: max-height .1s ease-in, width .1s ease-in, min-width .1s ease-in;
+    }
+
+    .from-upper-left-enter-to, .from-upper-left-leave-from {
+        width: 100% !important;
+        max-height: 500%;
+        min-width: 10rem;
+        transition: max-height .2s ease-out, width .1s ease-out, min-width .1s ease-out;
+    }
     #alerttmp {
         min-width: 30vw;
     }
