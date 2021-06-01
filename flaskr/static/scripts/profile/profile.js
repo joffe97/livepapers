@@ -1,7 +1,7 @@
 let profileC = {
     props: ["pid", "cid"],
     template: `
-    <div class="container" v-if="user">
+    <div class="container profile-page" v-if="user" @touchstart="startTouch" @touchmove="moveTouch">
         <div class="btn-group col-12 mb-lg-5 mb-4 bg-dark rounded overflow-auto row-auto">
             <div class="btn btn-outline-primary col-2" 
             :class="{ active: profilePageId == 1 }" @click="goProfileOverview">
@@ -24,44 +24,56 @@ let profileC = {
                 <i class="bi bi-command d-sm-none"></i><span class="d-sm-inline d-none">Admin</span>
             </div>
         </div>
-        <profile-overview v-if="profilePageId == 1"></profile-overview>
-        <profile-collection v-bind:cid="cid" v-if="profilePageId == 2"></profile-collection>
-        <profile-upload v-if="profilePageId == 3"></profile-upload>
-        <profile-settings v-if="profilePageId == 4"></profile-settings>
-        <profile-admin v-if="profilePageId == 5 && isAnyAdmin"></profile-admin>
+        <transition :name="componentSlideName">
+            <profile-overview v-if="profilePageId == 1"></profile-overview>
+            <profile-collection v-bind:cid="cid" v-else-if="profilePageId == 2"></profile-collection>
+            <profile-upload v-else-if="profilePageId == 3"></profile-upload>
+            <profile-settings v-else-if="profilePageId == 4"></profile-settings>
+            <profile-admin v-else-if="profilePageId == 5 && isAnyAdmin"></profile-admin>
+        </transition>
     </div>
     `,
     data() {
         return {
-            profilePageId: 1
+            profilePageId: undefined,
+            componentSlideName: "NA",
+            startTouchPos: null,
+            lockSwipe: false
         };
     },
     async created() {
         store.state.pageId = 4;
-        this.updateProfilePageId();
-        await store.getUser();
+        if (!await store.getUser()) this.goBack();
+        else this.updateProfilePageId();
     },
     beforeUnmount() {
         store.state.pageId = 0;
     },
     methods: {
         updateProfilePageId: function () {
+            let pageId;
             switch (this.pid) {
                 case "collection":
-                    this.profilePageId = 2;
+                    pageId = 2;
                     break;
                 case "upload":
-                    this.profilePageId = 3;
+                    pageId = 3;
                     break;
                 case "settings":
-                    this.profilePageId = 4;
+                    pageId = 4;
                     break;
                 case "admin":
-                    this.profilePageId = 5;
-                    break;
+                    if (this.user.isAnyAdmin()) {
+                        pageId = 5;
+                        break;
+                    }
                 default:
-                    this.profilePageId = 1;
+                    pageId = 1;
             }
+            if (this.profilePageId !== undefined && this.profilePageId !== pageId) {
+                this.componentSlideName = pageId > this.profilePageId ? "component-slide-left" : "component-slide-right";
+            }
+            this.profilePageId = pageId;
         },
         goBack: function () {
             return this.$router.go(-1);
@@ -81,6 +93,51 @@ let profileC = {
         goProfileAdmin: function () {
             return this.$router.push("/profile/admin");
         },
+        startTouch: function (event) {
+            this.startTouchPos = event.touches[0];
+        },
+        moveTouch: function (event) {
+            if (this.lockSwipe || !this.startTouchPos) return;
+            this.lockSwipe = true
+            let touch = event.touches[0];
+            let diffX = touch.clientX - this.startTouchPos.clientX;
+            let diffY = touch.clientY - this.startTouchPos.clientY;
+            if (Math.abs(diffX) < Math.abs(diffY)) {  // Vertical swipe
+                this.lockSwipe = false;
+                return;
+            }
+            let swipeDirection = (diffX < 0) * 2 - 1;
+            let newPageId = this.profilePageId + swipeDirection;
+            let goFunc = null;
+            switch (newPageId) {
+                case 1:
+                    goFunc = this.goProfileOverview;
+                    break;
+                case 2:
+                    goFunc = this.goProfileCollection;
+                    break;
+                case 3:
+                    goFunc = this.goProfileUpload;
+                    break;
+                case 4:
+                    goFunc = this.goProfileSettings;
+                    break;
+                case 5:
+                    if (this.user.isAnyAdmin()) {
+                        goFunc = this.goProfileAdmin;
+                        break;
+                    }
+            }
+            console.log(swipeDirection)
+            if (goFunc) {
+                setTimeout(()=>this.lockSwipe=false, 100);
+                this.startTouchPos = null;
+                return goFunc();
+            } else {
+                this.lockSwipe = false;
+                return;
+            }
+        }
     },
     computed: {
         user: function () {

@@ -1,6 +1,6 @@
 let profileUploadC = {
     template: `
-    <div class="mx-lg-3 row align-content-center flex-column">
+    <div class="mx-lg-3 row">
         <alert-cross class="col-auto"></alert-cross>
         <div id="upload-wp" class="col-10 m-auto col-lg-8 bg-dark border border-2 border-primary p-0">
             <video v-if="userVideo" class="unclickable p-2 wallpaper-video m-0 mx-auto" 
@@ -9,24 +9,18 @@ let profileUploadC = {
             </video>
             <img v-else :src="getUploadImg" class="img-fluid w-100 p-2" :class="{'light-img': !userImg}" alt="Upload">
         </div>
-        <div class="col-10 ms-lg-4 m-auto p-lg-3 mt-2">
+        <div class="col-10 mx-auto p-0 p-lg-3 mt-2">
             <div class="input-group row m-auto shadow-sm">
                 <input @change="onUploadChange" class="form-control form-control-lg col-auto" accept="video/mp4" type="file"/>
                 <button @click="uploadFile" class="btn btn-success col-lg-2 col-auto" type="button">Upload</button>
             </div>
-            <div class="row mt-3 mx-lg-3">
-                <div class=" rounded col-lg-8 p-0 h-auto">
+            <div class="row mt-3 mx-auto col-12">
+                <div class="rounded col-lg-8 p-0 h-auto">
                     <div class="bg-light rounded">
-                        <div>
-                            <div class="input-group">
-                                <span class="input-group-text w-25">Name</span>
-                                <input v-model="customName" type="text" class="form-control" placeholder="Example">
-                            </div>
-                            <div class="input-group">
-                                <span class="input-group-text w-25">Type</span>
-                                <input v-bind:value="type" type="text" class="form-control" disabled>
-                            </div>
-                        </div>            
+                        <div class="input-group">
+                            <span class="input-group-text w-25">Type</span>
+                            <input v-bind:value="type" type="text" class="form-control" disabled>
+                        </div>
                         <div class="input-group rounded-0">
                             <span class="input-group-text w-25">
                                 Resolution
@@ -37,7 +31,7 @@ let profileUploadC = {
                         </div>
                     </div>
                 </div>
-                <div class="col-lg p-0 mx-lg-3 mt-lg-0 mt-3">
+                <div class="col-lg p-0 ms-lg-3 mt-lg-0 mt-3">
                     <form class="input-group" @submit.prevent @submit="addTag">
                         <input v-model="tagInput" class="form-control" type="text" placeholder="Tagname"/>
                         <button class="btn btn-success" type="submit">Add tag</button>

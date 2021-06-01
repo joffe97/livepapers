@@ -18,7 +18,7 @@ let profileCollectionC = {
             <div class="position-absolute end-0 top-0 me-1 p-2 d-none d-lg-block col-auto">
                 <div v-if="mode === 'uploaded'" class="btn-close btn-close-white"
                 role="button" title="Delete wallpaper" @click="removeWallpaper(wpId)"></div>
-                <i v-if="mode === 'favorites'" class="bi text-warning" 
+                <i v-else-if="mode === 'favorites'" class="bi text-warning" 
                 :class="[isUnfavorited(wpId) ? 'bi-star' : 'bi-star-fill']"
                 role="button" title="Unfavorite" @click="toggleFavoriteWallpaper(wpId)"></i>
             </div>

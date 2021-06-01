@@ -1,36 +1,38 @@
 let profileSettingsC = {
     template: `
-    <div class="col col-lg-11 mx-lg-auto pb-5">
-        <div class="justify-content-between position-relative mx-lg-2">
-            <div class="display-5 d-inline-block">Settings</div>
-        </div>
-        <hr>
-        <div class="mx-lg-3">
-            <div class="mx-lg-2">
-                <h3 class="mb-4">Background</h3>
-                <div class="d-flex justify-content-center flex-wrap mb-5">
-                    <div 
-                    v-for="s, i in custom_styles"
-                    :style="s.getStr() + outline_style"
-                    class="bg-show btn btn-info mx-3 my-2"
-                    :class="{'outline-thick': i === selected_style}"
-                    @click="selected_style = i"></div>
-                </div>
-                <button class="btn px-5 mx-auto translate-middle-x position-relative start-50" :style="button_style" 
-                @click="changeStyle()">
-                    Apply
-                </button>
+    <div>
+        <div class="col col-lg-11 mx-lg-auto pb-5">
+            <div class="justify-content-between position-relative mx-lg-2">
+                <div class="display-5 d-inline-block">Settings</div>
             </div>
             <hr>
-            <div class="mx-lg-2">
-                <h3 class="mb-4">Profile picture</h3>
-                <div class="row mx-auto border border-primary rounded profile-img-upload col-lg-4 col-sm-8 col-11 p-0">
-                    <div class="profile-img rounded-0 rounded-top">
-                        <img :src="imgurl" alt="Profile picture">
+            <div class="mx-lg-3">
+                <div class="mx-lg-2">
+                    <h3 class="mb-4">Background</h3>
+                    <div class="d-flex justify-content-center flex-wrap mb-5">
+                        <div 
+                        v-for="s, i in custom_styles"
+                        :style="s.getStr() + outline_style"
+                        class="bg-show btn btn-info mx-3 my-2"
+                        :class="{'outline-thick': i === selected_style}"
+                        @click="selected_style = i"></div>
                     </div>
-                    <div class="col-12 input-group p-0 border-top border-primary">
-                        <input @change="onUploadChange" class="form-control rounded-bottom-left" accept="image/jpeg" type="file"/>
-                        <div @click="uploadProfileImg" class="btn btn-success rounded-bottom-right" type="button">Change</div>
+                    <button class="btn px-5 mx-auto translate-middle-x position-relative start-50" :style="button_style" 
+                    @click="changeStyle()">
+                        Apply
+                    </button>
+                </div>
+                <hr>
+                <div class="mx-lg-2">
+                    <h3 class="mb-4">Profile picture</h3>
+                    <div class="row mx-auto border border-primary rounded profile-img-upload col-lg-4 col-sm-8 col-11 p-0">
+                        <div class="profile-img rounded-0 rounded-top">
+                            <img :src="imgurl" alt="Profile picture">
+                        </div>
+                        <div class="col-12 input-group p-0 border-top border-primary">
+                            <input @change="onUploadChange" class="form-control rounded-bottom-left" accept="image/jpeg" type="file"/>
+                            <div @click="uploadProfileImg" class="btn btn-success rounded-bottom-right" type="button">Change</div>
+                        </div>
                     </div>
                 </div>
             </div>
