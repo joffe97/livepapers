@@ -1,7 +1,8 @@
 let registerC = {
     template: `
     <div class="container">
-        <form class="okform" @submit.prevent @submit="onRegister()">
+        <form class="okform d-flex flex-column justify-content-center" @submit.prevent @submit="onRegister()">
+            <div class="display-3 mb-4 text-center">Register now!</div>
             <alert-cross></alert-cross>
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
@@ -15,7 +16,7 @@ let registerC = {
                 <label for="pw_verify" class="form-label">Verify password</label>
                 <input v-model="pwVerify" type="password" class="form-control" id="pw_verify">
             </div>
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="submit" class="btn btn-primary col-10 col-lg-6 mx-auto">Register</button>
         </form>    
     </div>
     `,
@@ -37,6 +38,9 @@ let registerC = {
         if (this.succRegister) setAlert("Successfully registered!", "success");
     },
     methods: {
+        goProfileOverview: function () {
+            return this.$router.push("/profile/overview");
+        },
         onRegister: async function () {
             let reply = await fetch("/doregister", {
                 method: "POST",
@@ -53,14 +57,14 @@ let registerC = {
                 setAlert("An unknown error occured.", "danger", "cross");
                 return 0;
             }
-            let message = await reply.json();
-            if (message.status === "error") {
-                setAlert(message.msg, "danger", "cross");
+            let json = await reply.json();
+            if (json.status === "error" || !json.loggedIn) {
+                setAlert(json.msg ? json.msg : "An unknown error occured.", "danger", "cross");
                 return 0;
             }
-            store.state.isLoggedIn = message.loggedIn;
+            store.state.isLoggedIn = true;
             this.succRegister = true;
-            return this.$router.go(-1);
+            return this.goProfileOverview();
         }
     }
 }

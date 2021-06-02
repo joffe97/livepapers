@@ -1,4 +1,4 @@
-const WALLPAPER_LOAD_COUNT = 5;
+const WALLPAPER_LOAD_COUNT = 12;
 
 const UPLOADED_TIMES = {
     ALL_TIME: 0,
@@ -347,7 +347,8 @@ let browseC = {
                 setAlert("An error occurred when saving selected filters.");
                 return;
             }
-            setAlert("Successfully saved the selected filters.", "success")
+            setAlert("Successfully saved the selected filters.", "success");
+            await this.refreshWallpapers();
         }
     },
     watch: {

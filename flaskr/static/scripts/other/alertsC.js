@@ -2,7 +2,7 @@ let alertCrossC = {
     template: `
     <transition name="fade-up">
         <div v-if="alertMessage !== '' && alertMode === 'cross' && alertType" 
-        class="alert alert-dismissible col-lg-12 mx-auto text-truncate" :class="[ 'alert-' + alertType ]">
+        class="alert alert-dismissible col-lg-12 mx-auto text-truncate user-select-none" :class="[ 'alert-' + alertType ]">
             {{ alertMessage }}
             <button type="button" class="btn-close" @click="clearAlert()"></button>
         </div>
@@ -30,7 +30,7 @@ let alertTmpC = {
     template: `
     <transition name="showing">
         <div v-show="alertMessage !== '' && alertMode === 'tmp' && alertType" id="alerttmp" type="button"
-        class="alert alert-dismissible border-0 position-fixed shadow-lg translate-middle-x start-50" 
+        class="alert alert-dismissible border-0 position-fixed shadow-lg translate-middle-x start-50 user-select-none" 
         :class="[ 'alert-' + alertType ]"
         @click="clearAlert">
             {{ alertMessage }}

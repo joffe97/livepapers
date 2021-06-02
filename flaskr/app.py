@@ -52,8 +52,8 @@ def load_user(username: str) -> User:
 
 
 def verify_and_load_user(username: str, password: str):
-    db_user = db.verify_and_get_user(get_db(), username, password)
-    return User(db_user) if db_user else None
+    db_user, error = db.verify_and_get_user(get_db(), username, password)
+    return (User(db_user) if db_user else None), error
 
 
 # Renders index template, which initialize the vue application
@@ -71,7 +71,7 @@ def register():
     pw_verify: str = credentials.get("pw_verify", None)
 
     reply_dict = register_if_valid(get_db(), username, password, pw_verify)
-    user = verify_and_load_user(username, password) if reply_dict.get("status") == "success" else None
+    user, _ = verify_and_load_user(username, password) if reply_dict.get("status") == "success" else (None, "")
     if user:
         login_user(user)
         reply_dict["loggedIn"] = True
@@ -87,12 +87,13 @@ def login():
     credentials = json.loads(request.data)
     username: str = credentials.get("username", None)
     password: str = credentials.get("password", None)
-    user = verify_and_load_user(username, password)
-    if user:
-        login_user(user)
-        reply_dict = user.get_dict()
+    user, error = verify_and_load_user(username, password)
+    if error or not user:
+        reply_dict = get_reply("error", error)
     else:
-        reply_dict = {}
+        login_user(user)
+        reply_dict = user.get_dict() | get_reply("success")
+        print(reply_dict)
 
     return reply_dict
 

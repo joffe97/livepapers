@@ -102,7 +102,8 @@ let profileC = {
             let touch = event.touches[0];
             let diffX = touch.clientX - this.startTouchPos.clientX;
             let diffY = touch.clientY - this.startTouchPos.clientY;
-            if (Math.abs(diffX) < Math.abs(diffY)) {  // Vertical swipe
+            let clientMinLen = Math.min(document.documentElement.clientWidth, document.documentElement.clientHeight);
+            if (Math.abs(diffX) < Math.abs(diffY) || Math.abs(diffX) < clientMinLen / 5) {  // Vertical swipe
                 this.lockSwipe = false;
                 return;
             }
@@ -128,7 +129,6 @@ let profileC = {
                         break;
                     }
             }
-            console.log(swipeDirection)
             if (goFunc) {
                 setTimeout(()=>this.lockSwipe=false, 100);
                 this.startTouchPos = null;

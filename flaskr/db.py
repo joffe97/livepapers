@@ -2,7 +2,7 @@ import sqlite3
 import datetime
 from sqlite3 import Error, Cursor, Connection
 from werkzeug.security import generate_password_hash, check_password_hash
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 from math import gcd
 
 from db_common import get_select_query_filter
@@ -130,19 +130,20 @@ def user_exist(conn, username: str):
 
 
 # Verify user and returns user
-def verify_and_get_user(conn, username: str, password: str) -> Union[Dict[str, Union[str, int]], None]:
+def verify_and_get_user(conn, username: str, password: str) -> Tuple[Union[Dict[str, Union[str, int]], None], str]:
     user = get_user(conn, username)
     if user is None:
-        return None
+        return None, "User doesn't exist."
     pwhash = user.get("pwhash", None)
     if pwhash is None or check_password_hash(pwhash, password) is False:
-        return None
-    return user
+        return None, "Wrong password."
+    return user, ""
 
 
 # Verify user
 def verify_user(conn, username: str, password: str) -> bool:
-    return bool(verify_and_get_user(conn, username, password))
+    user, _ = verify_and_get_user(conn, username, password)
+    return bool(user)
 
 
 # Update style

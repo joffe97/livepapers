@@ -2,12 +2,14 @@ let headerC = {
     template: `   
     <nav class="position-fixed w-100 navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-3 p-0 navbar">
       <div class="container-fluid">
-        <div class="navbar-brand"><img @click="goLatest()" id="logo" role="button" class="img-fluid w-50 unselectable" 
-        src="static/assets/logo_l.png" width="100" height="65"></div>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="d-flex flex-nowrap justify-content-between col-12 col-lg-auto">
+            <div class="navbar-brand"><img @click="goLatest()" id="logo" role="button" class="img-fluid w-50 unselectable" 
+            src="static/assets/logo_l.png" width="100" height="65"></div>
+            <button class="navbar-toggler my-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
         <div class="collapse navbar-collapse" id="navbarNav">
           <div class="d-flex justify-content-between flex-column-reverse flex-lg-row w-100 pb-2 pb-lg-0">
               <ul class="navbar-nav">

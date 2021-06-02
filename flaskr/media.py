@@ -279,9 +279,7 @@ def delete_wallpaper_media(aid):
             continue
         for file_ending in WP_MEDIA_TYPES[media_type]:
             filename = f"{folder_path}{aid}.{file_ending}"
-            if os.path.exists(filename):
-                os.remove(filename)
+            delete_file_if_exists(filename)
 
     lowresname = f"{WP_LOWRESIMG_PATH}{aid}.jpg"
-    if os.path.exists(lowresname):
-        os.remove(lowresname)
+    delete_file_if_exists(lowresname)

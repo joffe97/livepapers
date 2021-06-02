@@ -4,8 +4,8 @@
 
 nav {
     z-index: 10000;
-    min-width: 300px;
-    min-height: 75px;
+    min-height: 4.5rem;
+    max-height: 100vh;
 }
 
 main {
@@ -14,18 +14,18 @@ main {
 
 .nav-space {
     z-index: 9500;
-    height: 100px;
+    height: 6rem;
 }
 
 .nav-dropdown {
     z-index: 9600;
-    margin-top: calc(-27em + 75px);
+    margin-top: calc(-27em + 4.5rem);
     height: 27em;
     transition: margin-top 0.4s ease-out;
 }
 
 .nav-dropdown-view {
-    margin-top: 75px;
+    margin-top: 4.5rem;
 }
 
 .in-front {
@@ -33,19 +33,20 @@ main {
 }
 
 .profile-page {
-    min-height: calc(100vh - 100px);
+    min-height: calc(100vh - 6rem);
 }
 
 .browse-img-square {
     overflow: hidden;
-    width: 300px;
-    height: 200px;
+    width: 100vw;
+    height: calc(200vw/3);
+    background-color: rgba(174, 174, 174, 0.4);
+    border: 0;
 }
 
 .browse-img-square figure, .browse-img-square video {
     height: 100%;
     width: 100%;
-    background-color: rgba(174, 174, 174, 0.4);
 }
 
 .browse-img-square figure img, .browse-img-square video {
@@ -68,7 +69,7 @@ main {
     bottom: 0;
     z-index: 600;
     background: linear-gradient(180deg, rgba(52, 58, 64, 0), rgba(52, 58, 64, .6) 15%);
-    padding: 5px 0;
+    padding: 0.5em 0;
     color: #efefef;
 }
 
@@ -105,7 +106,7 @@ main {
 
 .vl {
     border-left: 1px solid #555555;
-    margin: 0 10px;
+    margin: 0 0.6em;
     height: 100%
 }
 
@@ -206,7 +207,7 @@ main {
 }
 
 .diag_arrow {
-    margin: 5px;
+    margin: 0.3rem;
     max-width: 10%;
     max-height: 10%;
     user-select: none;
@@ -256,7 +257,7 @@ main {
 .component-slide-right-enter-from {
     position: relative;
     height: 0;
-    left: -100vw;
+    left: -100%;
     opacity: 0;
     transition: all .8s ease-in-out;
 }
@@ -264,7 +265,7 @@ main {
 .component-slide-right-leave-to {
     position: relative;
     height: 0;
-    left: 100vw;
+    left: 100%;
     opacity: 0;
     transition: all .8s ease-in-out;
 }
@@ -280,7 +281,7 @@ main {
 .component-slide-left-enter-from {
     position: relative;
     height: 0;
-    right: -100vw;
+    right: -100%;
     opacity: 0;
     transition: all .8s ease-in-out;
 }
@@ -288,7 +289,7 @@ main {
 .component-slide-left-leave-to {
     position: relative;
     height: 0;
-    right: 100vw;
+    right: 100%;
     opacity: 0;
     transition: all .8s ease-in-out;
 }
@@ -306,12 +307,22 @@ main {
     transition: all .15s ease-out;
 }
 
+.wp-enter-from {
+    opacity: 0;
+    transition: all 0.5s;
+}
+
+.wp-enter-to {
+    opacity: 1;
+    transition: all 0.5s;
+}
+
 #profile-menu-dropdown {
     max-height: 50vh;
 }
 
 #alerttmp {
-    top: 130px;
+    top: 7.8rem;
     opacity: 0.96;
     margin: auto;
     min-width: 90vw;
@@ -352,13 +363,13 @@ main {
         max-height: 100vh !important;
         transition: height .2s ease-out, width .1s ease-out, min-width .1s ease-out;
     }
-    #alerttmp {
-        min-width: 30vw;
-    }
-
     .portrait-h {
         max-height: 16em;
         overflow-y: auto;
+    }
+
+    #alerttmp {
+        min-width: 30vw;
     }
 
     #upload-wp * {
@@ -377,5 +388,9 @@ main {
         padding: 0.375rem 0.75rem;
         font-size: 1rem;
         border-radius: 0.25rem;
+    }
+    .browse-img-square {
+        width: 300px;
+        height: 200px;
     }
 }

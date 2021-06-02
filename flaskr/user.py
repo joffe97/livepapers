@@ -35,6 +35,8 @@ class User:
 def register_if_valid(conn, username: str, password: str, pw_verify: str):
     if len(username) < 3:
         return get_reply("error", "Username is too short.")
+    if len(username) > 20:
+        return get_reply("error", "Username is too long.")
     if not only_chars_and_nums(username):
         return get_reply("error", "Username contains prohibited characters.")
     if not only_chars_and_nums([char for char in password if char not in LEGAL_PW_CHARS]):
