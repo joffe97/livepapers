@@ -1,5 +1,7 @@
+// Types of collections
 const COLLECTION_TYPES = ["uploaded", "favorites"];
 
+// Component for displaying collections
 let profileCollectionC = {
     props: ["cid"],
     template: `
@@ -17,7 +19,8 @@ let profileCollectionC = {
         <div v-for="wpId in wpIds" class="row mx-0 justify-content-between flex-lg-row flex-column position-relative">
             <div class="position-absolute end-0 top-0 me-1 p-2 d-none d-lg-block col-auto">
                 <div v-if="mode === 'uploaded'" class="btn-close btn-close-white"
-                role="button" title="Delete wallpaper" @click="removeWallpaper(wpId)"></div>
+                role="button" title="Delete wallpaper" @click="removeWallpaper(wpId)"
+                :style="crossStyle"></div>
                 <i v-else-if="mode === 'favorites'" class="bi text-warning" 
                 :class="[isUnfavorited(wpId) ? 'bi-star' : 'bi-star-fill']"
                 role="button" title="Unfavorite" @click="toggleFavoriteWallpaper(wpId)"></i>
@@ -82,20 +85,20 @@ let profileCollectionC = {
     `,
     data() {
         return {
-            mode: "",
+            mode: "",           // Current collection type
             store: store,
-            selectedTags: {},
-            addTagInputs: {},
-            favoritesStart: []
+            selectedTags: {},   // Tags that's currently selected for each wallpaper (uploaded only)
+            addTagInputs: {},   // Input that's added to the input in the add tag field for each wallpaper (uploaded only)
+            favoritesStart: []  // List of favorites in collection at load time (favorites only)
         }
     },
     async created() {
-        if (COLLECTION_TYPES.includes(this.cid)) this.mode = this.cid;
+        if (COLLECTION_TYPES.includes(this.cid)) this.mode = this.cid;  // Checks if collection type is specified in url
         else this.mode = "uploaded";
 
         let user = await store.getUser();
         if (user) {
-            await this.loadWallpapers();
+            await this.loadWallpapers();    // Loads wallpapers for the given collection type
         }
     },
     watch: {
@@ -107,6 +110,8 @@ let profileCollectionC = {
         user: function () {
             return store.state.user;
         },
+
+        // Wallpaper ids for the current collection type
         wpIds: function () {
             switch (this.mode) {
                 case "uploaded":
@@ -117,14 +122,23 @@ let profileCollectionC = {
                     return [];
             }
         },
+
+        // Css for table
         tableStyle: function () {
             return store.getStyle().getTextBorderColorStr();
         },
+
+        // Css for buttons
         buttonStyle: function () {
             return store.getStyle().getButtonStr();
+        },
+
+        crossStyle: function () {
+            return store.getStyle().getCrossStr();
         }
     },
     methods: {
+        // Loads wallpapers for the given collection type, including tags and favorites
         loadWallpapers: async function() {
             let wpIds = [];
             switch (this.mode) {
@@ -143,13 +157,18 @@ let profileCollectionC = {
                 this.selectedTags[wpIds[i]] = "";
             }
         },
+
+        // Returns true if wallpaper has been unfavorited
         isUnfavorited: function (wpId) {
             return !this.user.wpStarred.includes(wpId);
         },
+
+        // Returns default value for tag lists
         getTagSelectDefault: function (wpId) {
             let tags = store.getWpTags(wpId);
-            if (!tags || tags.length === 0) return "No tags";
-            if (this.mode === 'uploaded') {
+            if (!tags || tags.length === 0) {
+                return "No tags";
+            } else if (this.mode === 'uploaded') {
                 return "Select tag";
             } else {
                 return "View tags";
@@ -164,6 +183,8 @@ let profileCollectionC = {
         getWp: function (wpId) {
             return store.getWallpaper(wpId);
         },
+
+        // Removes tag from wallpaper
         removeTag: async function (wpId) {
             let wp = this.getWp(wpId);
             let tag = this.selectedTags[wpId];
@@ -180,6 +201,8 @@ let profileCollectionC = {
             }
 
         },
+
+        // Adds tag to wallpaper
         addTag: async function (wpId) {
             let wp = this.getWp(wpId);
             if (!wp) {
@@ -195,6 +218,8 @@ let profileCollectionC = {
                 this.addTagInputs[wpId] = "";
             }
         },
+
+        // Removes wallpaper
         removeWallpaper: async function (wpId) {
             if (!confirm("Delete wallpaper?")) {
                 return;
@@ -208,6 +233,8 @@ let profileCollectionC = {
             delete this.addTagInputs[wpId];
             setAlert("Successfully deleted wallpaper.", "success");
         },
+
+        // Toggle favorite wallpaper
         toggleFavoriteWallpaper: async function (wpId) {
             if (this.isUnfavorited(wpId)) {
                 await this.favoriteWallpaper(wpId);
@@ -215,6 +242,8 @@ let profileCollectionC = {
                 await this.unfavoriteWallpaper(wpId);
             }
         },
+
+        // Add wallpaper to favorites
         favoriteWallpaper: async function (wpId) {
             let error = await this.user.addFavorite(wpId);
             if (error) {
@@ -223,6 +252,8 @@ let profileCollectionC = {
             }
             clearAlert();
         },
+
+        // Remove wallpaper from favorites
         unfavoriteWallpaper: async function (wpId) {
             let error = await this.user.removeFavorite(wpId);
             if (error) {

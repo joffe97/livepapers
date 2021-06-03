@@ -1,8 +1,11 @@
+// Class used for styles
 class Style {
     constructor(background, color) {
-        this.background = background;
-        this.color = color;
+        this.background = background;   // Background of application
+        this.color = color;             // Content color
     }
+
+    // Returns css for application
     getStr() {
         let styleStr = "";
 
@@ -11,30 +14,45 @@ class Style {
 
         return styleStr;
     }
+
+    // Returns css for borders
     getTextBorderColorStr() {
         let styleStr = "";
         if (this.color) styleStr += `color: ${this.color}; border-color: ${this.color};`
         return styleStr;
     }
+
+    // Returns css for buttons
     getButtonStr() {
         if (!this.color) return "";
         let textcolor = !cmnIsDarkColor(this.color) ? "#212529" : "#f8f9fa";
         return `color: ${textcolor}; background-color: ${this.color};`
     }
+
+    // Returns css for outlines
     getOutlineColor() {
         if (!this.color) return "";
         let textcolor = !cmnIsDarkColor(this.color) ? "#dee2e6" : "#212529";
         return `outline-color: ${textcolor};`
     }
+
+    // Returns css for crosses
+    getCrossStr() {
+        if (!this.color) return "";
+        return `filter: invert(${cmnIsDarkColor(this.color) ? 0 : 1}) grayscale(100%) brightness(200%);`
+    }
 }
 
+// Creates style object from json object
 function getStyleObjFromJson (dict) {
     if (!dict || !dict.background || !dict.color) return null;
     return new Style(dict.background, dict.color);
 }
 
+// Default style
 const DEFAULT_STYLE = new Style("#343a40", "#f8f9fa");
 
+// Styles to choose from
 CUSTOM_STYLES = [
     DEFAULT_STYLE,
     new Style("#c6c6c6", "#212529"),

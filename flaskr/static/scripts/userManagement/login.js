@@ -1,3 +1,4 @@
+// Component for logging in
 let loginC = {
     template: `
     <div class="container">
@@ -17,24 +18,29 @@ let loginC = {
     </div>`,
     data() {
         return {
-            username: "",
-            password: "",
-            succLogin: false
+            username: "",       // Username input
+            password: "",       // Password input
+            succLogin: false    // True if successful login
         }
     },
     created() {
-        store.state.pageId = 5;
+        store.state.pageId = 5;     // Set pageId to login
     },
     beforeUnmount() {
         store.state.pageId = 0;
     },
     unmounted() {
+        // Adds alert if successfully logged in when leaving page
         if (this.succLogin) setAlert("Successfully logged in!", "success");
     },
     methods: {
         goProfileOverview: function () {
             return this.$router.push("/profile/overview");
         },
+
+        /* Tries to log in with the given username and password.
+           Creates user object and goes to profile overview if successful.
+         */
         onLogin: async function () {
             let reply = await fetch("/dologin", {
                 method: "POST",

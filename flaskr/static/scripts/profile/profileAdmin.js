@@ -1,5 +1,7 @@
+// List of admin menu component name endings
 const ADMIN_MENUS = ['users', 'wallpapers'];
 
+// Component for admin profile menu. Displays the components in ADMIN_MENUS in accordions.
 let profileAdminC = {
     template: `
     <div class="col col-lg-11 mx-lg-auto">

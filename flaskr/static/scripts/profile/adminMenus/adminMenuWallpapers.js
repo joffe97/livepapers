@@ -1,3 +1,4 @@
+// Component of the user setting menu for admins
 let adminMenuWallpapersC = {
     template: `
     <div class="d-flex justify-content-between mb-2 flex-wrap">
@@ -32,15 +33,17 @@ let adminMenuWallpapersC = {
     `,
     data() {
         return {
-            wallpaperInput: "",
-            validWallpaperInput: undefined,
-            wp: undefined
+            wallpaperInput: "",             // The current wallpaper id input
+            validWallpaperInput: undefined, // True if valid wallpaper id
+            wp: undefined                   // The selected wallpaper
         }
     },
     computed: {
         wpId: function () {
             return this.wp ? this.wp.id : null;
         },
+
+        // Class showing if wallpaper is valid
         wallpaperValidatorClass: function () {
             switch (this.validWallpaperInput) {
                 case true:
@@ -51,11 +54,14 @@ let adminMenuWallpapersC = {
                     return "";
             }
         },
+
+        // The selected wallpapers tags
         tags: function () {
             return this.wp && this.wp.tags ? this.wp.tags : [];
         }
     },
     methods: {
+        // Search for a wallpaper with the selected wallpaper id
         searchWallpaper: async function () {
             let wp = await store.loadWallpaper(this.wallpaperInput);
             if (!wp) {
@@ -66,10 +72,14 @@ let adminMenuWallpapersC = {
             let tags = await this.wp.getTags();
             this.validWallpaperInput = true;
         },
+
+        // Remove tag from wallpaper
         removeTag: async function (tag) {
             if (!this.wp || !confirm(`Remove the tag "${tag}" from the selected wallpaper?`)) return;
             let error = await this.wp.removeTag(tag);
         },
+
+        // Delete current wallpaper
         deleteWallpaper: async function () {
             if (!confirm("Delete selected wallpaper?")) return;
             let error = await store.removeWallpaper(this.wpId);
@@ -82,6 +92,7 @@ let adminMenuWallpapersC = {
         }
     },
     watch: {
+        // Remove wallpaper when typing
         wallpaperInput: function () {
             this.validWallpaperInput = undefined;
             this.wp = undefined;

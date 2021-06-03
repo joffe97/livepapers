@@ -1,25 +1,29 @@
-const DEFAULT_UPLOAD_IMAGE = "static/assets/upload_default_img.png";
+const DEFAULT_UPLOAD_IMAGE = "static/assets/upload_default_img.png";    // Path to upload image placeholder
 
-const DEFAULT_PROFILE_IMAGE = "static/assets/user_default_img.jpg";
+const DEFAULT_PROFILE_IMAGE = "static/assets/user_default_img.jpg";     // Path to default profile picture
 
-const PROFILE_IMAGE_DIRECTIORY = "static/profileimages/";
+const PROFILE_IMAGE_DIRECTORY = "static/profileimages/";   // Path to profile picture
 
+// Accepted wallpaper media
 const MEDIA_TYPES = {
     "video": ["mp4"]
 };
 
-const ALERT_TYPES = ["danger", "success", "warning"];
+const ALERT_TYPES = ["danger", "success", "warning"];   // Types of alerts
 
-const ALERT_MODES = ["tmp", "cross"];
+const ALERT_MODES = ["tmp", "cross"];   // Names of alert modes
 
+// Class containing user type flags
 const USER_TYPES = {
-    WP_ADD: 1,
-    PROFILE_IMG: 1 << 1,
-    ADMIN: 1 << 2,
-    MANAGER: 1 << 3,
-    BLOCKED: 1 << 4
+    WP_ADD: 1,              // Add wallpapers
+    PROFILE_IMG: 1 << 1,    // Have profile image
+    ADMIN: 1 << 2,          // Manage users and userdata (except of admins and managers)
+    MANAGER: 1 << 3,        // Manage all users and userdata
+    BLOCKED: 1 << 4         // Blocked user
 };
 
+
+// Returns description of user type
 function getUserTypeDesc(type) {
     switch (type) {
         case USER_TYPES.WP_ADD:
@@ -35,6 +39,7 @@ function getUserTypeDesc(type) {
     }
 }
 
+// Class used for wallpaper data
 class Wallpaper {
     constructor(id, username, width, height, views, date) {
         this.id = id;           // Int      Id
@@ -46,6 +51,8 @@ class Wallpaper {
         this.tags = undefined;  // [str]:   List of tags
         this.likes = undefined; // Int:     Number of likes
     }
+
+    // Return tags. Fetch from server if it is not yet defined.
     async getTags() {
         if (this.tags === undefined) {
             let reply = await fetch("/wallpaperdata/" + this.id + "/tags");
@@ -55,6 +62,8 @@ class Wallpaper {
         }
         return this.tags;
     }
+
+    // Adds tag to wallpaper
     async addTag(tag) {
         if (!tag || this.tags === undefined) return 1;
         tag = tag.toLowerCase();
@@ -74,6 +83,8 @@ class Wallpaper {
         this.tags.push(tag);
         return 0;
     }
+
+    // Removes tag from wallpaper
     async removeTag(tag) {
         if (!tag) return;
         tag = tag.toLowerCase();
@@ -88,6 +99,8 @@ class Wallpaper {
         this.tags.splice(index, 1);
         return 0;
     }
+
+    // Return likes. Fetch from server if it is not yet defined.
     async getLikes() {
         if (this.likes === undefined) {
             let reply = await fetch("/wallpaperdata/" + this.id + "/likes");
@@ -97,6 +110,8 @@ class Wallpaper {
         }
         return this.likes;
     }
+
+    // Increment number of views on wallpaper
     async incrementViews () {
         let reply = await fetch("/wallpaperdata/" + this.id + "/views", {
             method: "PUT"
@@ -107,9 +122,15 @@ class Wallpaper {
         this.views += 1;
         return 0;
     }
+
+    // Returns upload date of wallpaper
     getDateString() {
         return this.date.toLocaleString();
     }
+
+    /* Returns a string that displays how long ago it is since the wallpaper got updated.
+       Ex: "5 years", "1 month", "53 seconds"
+     */
     getTimeSinceString() {
         if (!this.date) return "";
         let seconds = Math.floor((new Date() - this.date) / 1000);
@@ -127,22 +148,31 @@ class Wallpaper {
         if (interval !== 1) unit += "s";
         return interval.toString() + " " + unit;
     }
+
+    // Calculates and returns the acpect ratio of the wallpaper
     getAspectRatio() {
         let gcd = cmnGcd(this.width, this.height);
         return {width: this.width / gcd, height: this.height / gcd};
     }
+
+    // Returns the resolution of the wallpaper
     getResolution() {
         return this.width + " x " + this.height;
     }
 }
 
+// A class used for multiple wallpapers
 class Wallpapers {
     constructor() {
         this.dict = {};  // wpId[wp]: Object containing loaded wallpapers
     }
+
+    // Returns the wallpaper with the given id, if the wallpaper is loaded
     getWallpaper(id) {
         return this.dict[id];
     }
+
+    // Gets the wallpaper with the given id from the server, stores it, and then returns it
     async loadWallpaper(id) {
         if (!this.dict[id]) {
             let reply = await fetch("/wallpaperdata/" + id);
@@ -152,6 +182,8 @@ class Wallpapers {
         }
         return this.dict[id];
     }
+
+    // Stores the given wallpaper object
     saveWallpaper(wpObject) {
         if (this.dict[wpObject.aid]) return;
         let date = new Date();
@@ -163,6 +195,7 @@ class Wallpapers {
     }
 }
 
+// Class used for user data
 class User {
     constructor(username, type, style, img, filters) {
         if (filters && !filters.filterUploadTime) filters.filterUploadTime = 0;
@@ -175,9 +208,13 @@ class User {
         this.img = img;                 // Str      Filename of profile picture
         this.filters = filters;         // Obj      Object containing filters
     }
+
+    // Returns url for profile picture
     getImgUrl() {
-        return this.img ? `${PROFILE_IMAGE_DIRECTIORY}${this.img}` : DEFAULT_PROFILE_IMAGE;
+        return this.img ? `${PROFILE_IMAGE_DIRECTORY}${this.img}` : DEFAULT_PROFILE_IMAGE;
     }
+
+    // Return ids of uploaded wallpapers. Fetch from server if it is not yet defined.
     async getUploaded() {
         if (this.wpUploaded === undefined) {
             let reply = await fetch("/userdata/uploaded");
@@ -187,6 +224,8 @@ class User {
         }
         return this.wpUploaded;
     }
+
+    // Return ids of starred wallpapers. Fetch from server if it is not yet defined.
     async getStarred() {
         if (this.wpStarred === undefined) {
             let reply = await fetch("/userdata/favorites");
@@ -196,6 +235,8 @@ class User {
         }
         return this.wpStarred;
     }
+
+    // Return number of stars gotten on uploaded wallpapers. Fetch from server if it is not yet defined.
     async getReceivedStars() {
         if (this.receivedStars === undefined) {
             let reply = await fetch("/userdata/receivedstars");
@@ -205,6 +246,8 @@ class User {
         }
         return this.receivedStars;
     }
+
+    // Remove a wallpaper from favorites
     async removeFavorite(wpId) {
         let index = this.wpStarred.indexOf(wpId);
         if (index === -1) return 1;
@@ -217,6 +260,8 @@ class User {
         this.wpStarred.splice(index, 1);
         return 0;
     }
+
+    // Adds a wallpaper to favorites
     async addFavorite(wpId) {
         if (!wpId) return 1;
         let reply = await fetch("/userdata/favorites", {
@@ -234,12 +279,18 @@ class User {
         this.wpStarred.push(wpId);
         return 0;
     }
+
+    // Returns true if user is of the given type
     hasType(type) {
         return !!(this.type & type);
     }
+
+    // Returns true if user is admin or manager
     isAnyAdmin() {
         return this.hasType(USER_TYPES.ADMIN | USER_TYPES.MANAGER);
     }
+
+    // Updates the users style
     async updateStyle(style) {
         if (!style) return 1;
         let reply = await fetch("/userdata/style", {
@@ -257,6 +308,8 @@ class User {
         this.style = style;
         return 0;
     }
+
+    // Updates the users browsing filters
     async updateFilters(filters) {
         if (!filters) return 1;
         let reply = await fetch("/userdata/filters", {
@@ -274,6 +327,8 @@ class User {
         this.filters = filters;
         return 0;
     }
+
+    // Updates the users profile picture
     async updateImg(imgdata) {
         if (!imgdata) return 1;
         let reply = await fetch("/userdata/img", {
@@ -293,24 +348,27 @@ class User {
     }
 }
 
+// Class used to store application data
 class DataStore {
     constructor() {
         this.state = Vue.reactive({
-            isInited: false,
-            isLoggedIn: false,
-            pageId: 0,
-            alertMessage: "",
-            alertType: "",
-            alertMode: "",
-            user: null,
+            isInited: false,    // True if application is initialized
+            isLoggedIn: false,  // True if user is logged in
+            pageId: 0,          // Id of the current page. 0 if not important
+            alertMessage: "",   // Message in the current alert
+            alertType: "",      // Type of the current alert. Ex: "error", "success"
+            alertMode: "",      // Mode of the current alert type. Ex: "tmp", "cross"
+            user: null,         // Current logged in user
             wallpapers: new Wallpapers(),  // Wps: Object containing loaded wallpapers
-            filterRatio: "",
-            filterColor: "",
-            filterUploadTime: 0,
-            filterSearch: "",
-            filterSearchTrigger: 0
+            filterRatio: "",    // The selected ratio filter for the browse pages
+            filterColor: "",    // The selected color filter for the browse pages
+            filterUploadTime: 0,    // The selected "uploaded after" filter for the browse pages
+            filterSearch: "",   // The current search query in the the browse pages
+            filterSearchTrigger: 0  // A trigger that empties the filterSearch every time it changes
         });
     }
+
+    // Returns the logged in user. Fetches from server if it doesn't exist
     async getUser () {
         if (!this.state.isLoggedIn) this.state.isLoggedIn = await cmnIsLoggedIn();
         if (!this.state.user) {
@@ -326,61 +384,87 @@ class DataStore {
         }
         return this.state.user;
     }
+
+    // Fetches a given wallpaper from the server
     async loadWallpaper (wpId) {
         return await this.state.wallpapers.loadWallpaper(wpId);
     }
+
+    // Fetches a list of wallpapers from the server
     async loadManyWallpapers (wpIds) {
         for (let i = 0; i < wpIds.length; i++) {
             await this.loadWallpaper(wpIds[i]);
         }
     }
+
+    // Fetches tags for a list of wallpapers
     async loadManyWallpaperTags (wpIds) {
         for (let i = 0; i < wpIds.length; i++) {
             let wp = await this.loadWallpaper(wpIds[i]);
             wp.tags = await wp.getTags();
         }
     }
+
+    // Fetches favorite count for a list of wallpapers
     async loadManyWallpaperFavorites (wpIds) {
         for (let i = 0; i < wpIds.length; i++) {
             let wp = await this.loadWallpaper(wpIds[i]);
             wp.likes = await wp.getLikes();
         }
     }
+
+    // Returns the wallpaper with the given id, if it is loaded
     getWallpaper (wpId) {
         return this.state.wallpapers.getWallpaper(wpId);
     }
+
+    // Returns a string of the given wallpapers upload time
     getWpDateStr (wpId) {
         let wp = this.getWallpaper(wpId);
         return wp ? wp.getDateString() : "";
     }
+
+    // Returns the username of the given wallpapers uploader
     getWpUploaderStr (wpId) {
         let wp = this.getWallpaper(wpId);
         return wp ? wp.username : "";
     }
+
+    // Returns the number of views a given wallpaper has
     getWpViewsStr (wpId) {
         let wp = this.getWallpaper(wpId);
         if (!wp) return 0;
         return wp.views ? wp.views : 0;
     }
+
+    // Returns the number of stars a given wallpaper has
     getWpStarsStr (wpId) {
         let wp = this.getWallpaper(wpId);
         if (!wp) return 0;
         return wp.likes ? wp.likes : 0;
     }
+
+    // Returns a string of the given wallpapers resolution
     getWpResolutionStr (wpId) {
         let wp = this.getWallpaper(wpId);
         return wp ? wp.getResolution() : "";
     }
+
+    // Returns a string of the given wallpapers aspect ratio
     getWpAspectRatioStr (wpId) {
         let wp = this.getWallpaper(wpId);
         if (!wp) return "";
         let ratio = wp.getAspectRatio();
         return ratio.width + ":" + ratio.height;
     }
+
+    // Returns a list of the given wallpapers tags
     getWpTags (wpId) {
         let wp = this.getWallpaper(wpId);
         return wp ? wp.tags : [];
     }
+
+    // Removes the given wallpaper and values associated with it
     async removeWallpaper(wpId) {
         if (!this.state.wallpapers.dict[wpId]) return 1;
         let reply = await fetch("/wallpaperdata/" + wpId, {
@@ -396,6 +480,8 @@ class DataStore {
 
         return 0;
     }
+
+    // Returns the current users style
     getStyle() {
         if (this.state.user) {
             let style = this.state.user.style;
@@ -403,9 +489,13 @@ class DataStore {
         }
         return DEFAULT_STYLE;
     }
+
+    // Returns a css string of the current users style
     getStyleStr() {
         return this.getStyle().getStr();
     }
+
+    // Returns a user object of another user with a given username
     async getOtherUser(username) {
         if (!this.state.user || !username || this.state.user.username === username.toLowerCase()) return null;
         let reply = await fetch(`/allusers/${username}/data`);
@@ -421,14 +511,18 @@ class DataStore {
     }
 }
 
+// Creates the data storage
 let store = new DataStore();
 
+// Set an alert of a given type
 function setAlert(message, type = "danger", mode = "tmp") {
     store.state.alertMessage = message;
     store.state.alertType = ALERT_TYPES.includes(type.toLowerCase()) ? type : "danger";
     store.state.alertMode = ALERT_MODES.includes(mode.toLowerCase()) ? mode : "tmp";
 }
 
+// Clear any alert
 function clearAlert() {
     store.state.alertMode = "";
+    this.timeout = setTimeout(() => store.state.alertMessage = "", 800);
 }

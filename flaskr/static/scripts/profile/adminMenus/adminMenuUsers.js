@@ -1,3 +1,4 @@
+// Component of the user setting menu for admins
 let adminMenuUsersC = {
     template: `
     <div class="d-flex justify-content-between mb-2 flex-wrap">
@@ -32,19 +33,24 @@ let adminMenuUsersC = {
     `,
     data() {
         return {
-            usernameInput: "",
-            validUsernameInput: undefined,
-            modifyUser: undefined,
-            modifyUserTypes: this.getEmptyUserTypesDict()
+            usernameInput: "",              // Typed in username
+            validUsernameInput: undefined,  // True if valid username, False if not valid, undefined if no users is selected
+            modifyUser: undefined,          // The selected user
+            modifyUserTypes: this.getEmptyUserTypesDict()   // User type checkbox inputs
         }
     },
     computed: {
+        // Current user
         adminuser: function () {
             return store.state.user;
         },
+
+        // True if user is manager
         isManager: function () {
             return this.adminuser.type & USER_TYPES.MANAGER
         },
+
+        // Class for showing if selected username input is valid
         usernameValidatorClass: function () {
             switch (this.validUsernameInput) {
                 case true:
@@ -55,6 +61,8 @@ let adminMenuUsersC = {
                     return "";
             }
         },
+
+        // Return user types this user is allowed to control
         adminUserTypesControl: function () {
             let userTypes = {...USER_TYPES};
             if (!this.isManager) {
@@ -65,6 +73,7 @@ let adminMenuUsersC = {
         }
     },
     methods: {
+        // Return dictionary with user types with no values
         getEmptyUserTypesDict: function () {
             let dict = {};
             for (let type in USER_TYPES) {
@@ -72,9 +81,13 @@ let adminMenuUsersC = {
             }
             return dict;
         },
+
+        // Returns description of given user type
         getTypeDesc: function (type) {
             return getUserTypeDesc(type)
         },
+
+        // Search for the selected user in the server
         searchUser: async function () {
             let user = await store.getOtherUser(this.usernameInput);
             if (!user) {
@@ -85,6 +98,8 @@ let adminMenuUsersC = {
             this.validUsernameInput = true;
             this.modifyUserTypes = this.getEmptyUserTypesDict();
         },
+
+        // Update the selected user with the new selected values
         updateUser: async function () {
             let typeflag = 0;
             for (let typenum in this.modifyUserTypes) {
@@ -123,6 +138,7 @@ let adminMenuUsersC = {
         },
     },
     watch: {
+        // Remove user when typing
         usernameInput: function () {
             this.validUsernameInput = undefined;
             this.modifyUser = undefined;

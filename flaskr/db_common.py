@@ -1,6 +1,8 @@
 import datetime
 
 
+# Adds a string with arguments containing a condition for a select query, that checks if the wallpaper is
+# the given ratio.
 def append_select_query_filter_ratio(where_list: list, arg_list: list, ratio: tuple):
     if not ratio or len(ratio) != 2 or ratio[0] == ratio[1] == 0:
         return
@@ -14,6 +16,8 @@ def append_select_query_filter_ratio(where_list: list, arg_list: list, ratio: tu
         arg_list.extend((ratio[0], ratio[1]))
 
 
+# Adds a string with arguments containing a condition for a select query, that checks if the wallpaper contains
+# the given color.
 def append_select_query_filter_color(where_list: list, arg_list: list, color: str):
     if not color or len(color) != 7:
         return
@@ -22,6 +26,8 @@ def append_select_query_filter_color(where_list: list, arg_list: list, color: st
     arg_list.append(color)
 
 
+# Adds a string with arguments containing a condition for a select query, that checks if the wallpaper is
+# newer than the "uploadtime" parameter.
 def append_select_query_filter_updatetime(where_list: list, arg_list: list, uploadtime: datetime.datetime):
     if not uploadtime:
         return
@@ -30,6 +36,8 @@ def append_select_query_filter_updatetime(where_list: list, arg_list: list, uplo
     arg_list.append(uploadtime)
 
 
+# Adds a string with arguments containing a condition for a select query, that checks if the aid, username or any tag
+# for a wallpaper matches the search.
 def append_select_query_filter_search(where_list: list, arg_list: list, search: str):
     if not search:
         return
@@ -48,10 +56,10 @@ def append_select_query_filter_search(where_list: list, arg_list: list, search: 
     where_list.append(query)
 
 
+# Returns a select query for the given filters
 def get_select_query_filter(filters):
     where_list = []
     arg_list = []
-    print(filters)
 
     if "ratio" in filters:
         append_select_query_filter_ratio(where_list, arg_list, filters["ratio"])

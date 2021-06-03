@@ -2,7 +2,7 @@ import sqlite3
 import datetime
 from sqlite3 import Error, Cursor, Connection
 from werkzeug.security import generate_password_hash, check_password_hash
-from typing import Dict, List, Union, Tuple
+from typing import Dict, Union, Tuple
 from math import gcd
 
 from db_common import get_select_query_filter
@@ -14,7 +14,7 @@ DATABASE = "./database.db"
 # Class containing usertype flags
 class UserType:
     WP_ADD = 1          # Add wallpapers
-    PROFILE_IMG = 1 << 1     # Remove wallpapers
+    PROFILE_IMG = 1 << 1     # Have profile image
     ADMIN = 1 << 2      # Manage users and userdata (except of admins and managers)
     MANAGER = 1 << 3    # Manage all users and userdata
     BLOCKED = 1 << 4    # Blocked user
@@ -22,6 +22,7 @@ class UserType:
 
 # --------------- Queries ---------------
 
+# Sql query for creating users table
 CREATE_USERS_TABLE = f"""CREATE TABLE IF NOT EXISTS users (
                           username TEXT,
                           pwhash TEXT NOT NULL,
@@ -33,6 +34,7 @@ CREATE_USERS_TABLE = f"""CREATE TABLE IF NOT EXISTS users (
                           CONSTRAINT uc_img UNIQUE (img)
                         );"""
 
+# Sql query for creating wallpapers table
 CREATE_WALLPAPERS_TABLE = """CREATE TABLE IF NOT EXISTS wallpapers (
                                aid INTEGER,
                                username TEXT,
@@ -44,6 +46,7 @@ CREATE_WALLPAPERS_TABLE = """CREATE TABLE IF NOT EXISTS wallpapers (
                                FOREIGN KEY (username) REFERENCES users (username)
                              );"""
 
+# Sql query for creating likes table
 CREATE_LIKES_TABLE = """CREATE TABLE IF NOT EXISTS likes (
                           lid INTEGER,
                           aid INTEGER NOT NULL,
@@ -54,6 +57,7 @@ CREATE_LIKES_TABLE = """CREATE TABLE IF NOT EXISTS likes (
                           CONSTRAINT uc_like UNIQUE (aid, username)
                         );"""
 
+# Sql query for creating tags table
 CREATE_TAGS_TABLE = """CREATE TABLE IF NOT EXISTS tags (
                           tag TEXT NOT NULL,
                           aid INTEGER NOT NULL,
@@ -61,6 +65,7 @@ CREATE_TAGS_TABLE = """CREATE TABLE IF NOT EXISTS tags (
                           FOREIGN KEY (aid) REFERENCES wallpapers (aid)
                         );"""
 
+# Sql query for creating colors table
 CREATE_COLORS_TABLE = """CREATE TABLE IF NOT EXISTS colors (
                             aid INTEGER,
                             color TEXT,
@@ -89,8 +94,8 @@ def create_table(conn: Connection, query: str) -> int:
         cursor = conn.cursor()
         cursor.execute(query)
         return 1
-    except Error:
-        print(Error)
+    except Error as e:
+        print(e)
     return 0
 
 
@@ -159,7 +164,7 @@ def update_style(conn, username, style):
         return e
 
 
-# Update style
+# Update image
 def update_img(conn, username, img):
     try:
         cur: Cursor = conn.cursor()
@@ -298,7 +303,6 @@ def get_latest_wallpapers(conn, fromdate: datetime.datetime = None, count=24, fi
 
     cur = conn.cursor()
     query = f"SELECT * FROM (SELECT * FROM ({query}) ORDER BY date DESC) WHERE date < ? LIMIT ?"
-    print(query)
     cur.execute(query, tuple(args))
 
     returnlist = []
@@ -487,23 +491,12 @@ def delete_tags_for_wallpaper(conn, aid: int):
 
 # --------------- Colors ---------------
 
+# Adds color to wallpaper
 def add_color(conn, aid: int, color: str):
     try:
         cur = conn.cursor()
         query = "INSERT INTO colors VALUES (?,?)"
         cur.execute(query, (aid, color))
-        conn.commit()
-        return 0
-    except Error as e:
-        print(e)
-        return 1
-
-
-def delete_color_for_wallpaper(conn, aid: int):
-    try:
-        cur = conn.cursor()
-        query = "DELETE FROM colors WHERE aid=?"
-        cur.execute(query, (aid,))
         conn.commit()
         return 0
     except Error as e:
@@ -543,7 +536,7 @@ def delete_wallpaper_likes_tags_colors(conn, aid):
 
 # --------------- Functions ---------------
 
-# Create a function that compares ratios
+# Creates an sql function that compares ratios
 def create_ratiocmp_function(conn):
     def ratiocmp(x1, y1, x2, y2):
         gcd1 = gcd(x1, y1)
@@ -600,6 +593,7 @@ def init_tags(conn):
         add_tag(conn, tag[0], tag[1])
 
 
+# Initalize colors
 def init_colors(conn):
     colors = (
         (1, "#0000ff"),

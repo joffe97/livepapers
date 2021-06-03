@@ -1,3 +1,4 @@
+// Component for displaying an overview of the current user profile
 let profileOverviewC = {
     template: `
     <div>
@@ -18,10 +19,7 @@ let profileOverviewC = {
         </div>
     </div>
     `,
-    data() {
-        return {
-        }
-    },
+    // Loads userdata
     async created() {
         let user = await store.getUser();
         if (user) {
@@ -40,17 +38,25 @@ let profileOverviewC = {
         imgurl: function () {
             return this.user.getImgUrl();
         },
+
+        // Returns number of uploaded wallpapers
         countUploaded: function () {
             let uploaded = this.user.wpUploaded;
             return uploaded ? uploaded.length : 0;
         },
+
+        // Returns number of favorite wallpapers
         countStarred: function () {
             let starred = this.user.wpStarred;
             return starred ? starred.length : 0;
         },
+
+        // Returns number of favorites on uploaded wallpapers
         countReceivedStars: function () {
             return this.user.receivedStars;
         },
+
+        // Returns css for table
         tableStyle: function () {
             return store.getStyle().getTextBorderColorStr();
         },

@@ -1,3 +1,4 @@
+// Component for displaying wallpapers
 let wallpaperSquareC = {
     props: ["wpId"],
     template: `

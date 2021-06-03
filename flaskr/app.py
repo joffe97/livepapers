@@ -11,7 +11,7 @@ from flask_login import LoginManager, current_user, login_user, login_required, 
 import db
 from user import User, register_if_valid
 from common import get_reply, validate_and_add_tags, get_filter_vars
-from media import handle_media_uri_wallpaper, delete_wallpaper_media, handle_media_uri_profileimg
+from media import handle_media_uri_wallpaper, handle_media_uri_profileimg, delete_wallpaper_media, delete_profile_picture
 
 mimetypes.add_type("application/javascript", ".js")
 
@@ -33,7 +33,7 @@ def get_db():
     database = getattr(g, '_database', None)
     if database is None:
         database = g._database = sqlite3.connect(DATABASE, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
-        db.init_functions(database)
+        db.init_functions(database)  # Initialize database functions
     return database
 
 
@@ -44,13 +44,14 @@ def close_db():
         database.close()
 
 
-# Log in user
+# Loads user
 @login_manager.user_loader
 def load_user(username: str) -> User:
     db_user = db.get_user(get_db(), username)
     return User(db_user) if db_user else None
 
 
+# Verifies and load user if successfully verified
 def verify_and_load_user(username: str, password: str):
     db_user, error = db.verify_and_get_user(get_db(), username, password)
     return (User(db_user) if db_user else None), error
@@ -81,7 +82,7 @@ def register():
     return reply_dict
 
 
-# Log in the user if right credentials
+# Log in the user if right credentials and user is not blocked
 @app.route("/dologin", methods=["POST"])
 def login():
     credentials = json.loads(request.data)
@@ -90,11 +91,11 @@ def login():
     user, error = verify_and_load_user(username, password)
     if error or not user:
         reply_dict = get_reply("error", error)
+    elif user.type & db.UserType.BLOCKED:
+        reply_dict = get_reply("error", "Cannot log into a blocked account.")
     else:
         login_user(user)
         reply_dict = user.get_dict() | get_reply("success")
-        print(reply_dict)
-
     return reply_dict
 
 
@@ -112,7 +113,7 @@ def validate_user():
     return {"loggedIn": current_user.is_authenticated}
 
 
-# Gets username, type and settings
+# Gets username, type, style, profile image filename and filters
 @app.route("/userdata/user", methods=["GET"])
 def get_user():
     if not current_user or not current_user.is_authenticated:
@@ -160,6 +161,8 @@ def update_style():
 @app.route("/userdata/img", methods=["PUT"])
 @login_required
 def update_profile_img():
+    if not (current_user.type & db.UserType.PROFILE_IMG):
+        return get_reply("error", "You are not allowed to update your profile picture.")
     jsdata = json.loads(request.data)
     img = jsdata.get("img")
     if img is None:
@@ -189,6 +192,7 @@ def update_filters():
     return get_reply("success")
 
 
+# Gets username, type, style, profile image filename and filters for given user, if current user is admin or manager
 @app.route("/allusers/<string:username>/data", methods=["GET"])
 @login_required
 def get_user_by_username(username: str):
@@ -206,6 +210,7 @@ def get_user_by_username(username: str):
     return user
 
 
+# Updates user type for the given user, if current user is admin or manager
 @app.route("/allusers/<string:username>/type", methods=["PUT"])
 def update_user_type(username: str):
     jsdata = json.loads(request.data)
@@ -226,6 +231,11 @@ def update_user_type(username: str):
         return abort(403)
 
     error = db.update_type(get_db(), username, new_type)
+
+    if not error and user["img"] and not (new_type & db.UserType.PROFILE_IMG):
+        db.update_img(get_db(), username, None)
+        delete_profile_picture(user["img"])
+
     return get_reply("error" if error else "success")
 
 
@@ -252,6 +262,8 @@ def get_wallpaper_likes(aid: int):
 @app.route("/wallpaperdata", methods=["POST"])
 @login_required
 def ajax_add_wallpaper():
+    if not (current_user.type & db.UserType.WP_ADD):
+        return get_reply("error", "Adding wallpapers is blocked.")
     jsdata = json.loads(request.data)
     data = jsdata.get("data")
     tags = jsdata.get("tags")
@@ -326,7 +338,9 @@ def ajax_add_favorite():
     return get_reply("success") if not error else get_reply("error")
 
 
-# Returns wallpapers when the infinite_scroll parameter is set
+# Returns wallpapers when the infinite_scroll parameter is set.
+# Infinite scroll will only add the first "count" wallpapers every time it's called. This is used to simulate a never
+# ending scroll on the browse pages.
 def infinite_scroll_func(func, count, filters):
     return_list = []
     while len(return_list) < count:
@@ -424,7 +438,7 @@ def get_random_wallpapers():
 
 if __name__ == '__main__':
     for arg in sys.argv:
-        if arg == "-infinite_scroll":
+        if arg == "-infinite_scroll":  # Turns on infinite scroll if it's added as a system argument
             INFINITE_SCROLL = True
 
     app.run(debug=True, host="0.0.0.0")

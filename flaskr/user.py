@@ -6,6 +6,7 @@ from db import user_exist, add_user
 LEGAL_PW_CHARS = '"' + r" !#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
 
 
+# User object used by flask_login
 class User:
     def __init__(self, db_user):
         self.username = db_user["username"]
@@ -31,7 +32,7 @@ class User:
         return {"username": self.username, "type": self.type, "style": self.style, "img": self.img, "filters": self.filters}
 
 
-# Verifies the registration
+# Verifies the registration and returns any errors that would occur
 def register_if_valid(conn, username: str, password: str, pw_verify: str):
     if len(username) < 3:
         return get_reply("error", "Username is too short.")

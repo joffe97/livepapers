@@ -1,5 +1,15 @@
-const WALLPAPER_LOAD_COUNT = 12;
+const WALLPAPER_LOAD_COUNT = 12;    // Number of wallpapers loaded at each request
 
+// Contains ratios to filter by
+const RATIOS = [{name: "general", types: ["portrait", "landscape"]},
+                {name: "ultrawide", types: ["21x9", "32x9"]},
+                {name: "wide", types: ["16x9", "16x10"]},
+                {name: "portrait", types: ["9x16", "18x37"]}];
+
+// Contains colors to filter by
+const COLORS = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffffff", "#808080", "#000000"];
+
+// Contains flags for upload times
 const UPLOADED_TIMES = {
     ALL_TIME: 0,
     LAST_SIX_HOURS: 1,
@@ -11,13 +21,7 @@ const UPLOADED_TIMES = {
     LAST_YEAR: 7,
 };
 
-const RATIOS = [{name: "general", types: ["portrait", "landscape"]},
-                {name: "ultrawide", types: ["21x9", "32x9"]},
-                {name: "wide", types: ["16x9", "16x10"]},
-                {name: "portrait", types: ["9x16", "18x37"]}];
-
-const COLORS = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffffff", "#808080", "#000000"];
-
+// Returns description of upload times
 function getUploadedTimesDesc(type) {
     switch (type) {
         case UPLOADED_TIMES.ALL_TIME:
@@ -39,6 +43,7 @@ function getUploadedTimesDesc(type) {
     }
 }
 
+// Component for browse pages
 let browseC = {
     props: ["browseId"],
     template: `
@@ -119,20 +124,20 @@ let browseC = {
     `,
     data() {
         return {
-            wallpaperIds: [],
-            isLoading: false,
-            reachedEnd: false,
-            hoverIndex: -1,
-            randomSeed: undefined,
-            filterMenu: false
+            wallpaperIds: [],       // Ids that is beeing displayed
+            isLoading: false,       // True if page is loading
+            reachedEnd: false,      // True if there is no more wallpapers to get
+            randomSeed: undefined,  // Seed for random generated wallpaper sequences
+            filterMenu: false       // True if filter menu is shown
         }
     },
     async created() {
         await this.updatePageId();
-        if (!store.state.user) await store.getUser();
+        if (!store.state.user) await store.getUser();   // Loads user if it is not yet loaded
+
         window.onscroll = async () => {
-            this.filterMenu = false;
-            await this.onBottomScroll();
+            this.filterMenu = false;        // Filter menu closes when scrolling
+            await this.onBottomScroll();    // More wallpapers is loading if scrolled to bottom
         }
     },
     beforeUnmount() {
@@ -146,9 +151,13 @@ let browseC = {
         user: function () {
             return store.state.user;
         },
+
+        // Returns where the filters are
         filter: function () {
             return this.user && this.user.filters ? this.user.filters : this.state;
         },
+
+        // Returns last wallpaper
         lastWallpaper: function () {
             if (!this.wallpaperIds || !this.wallpaperIds.length) return undefined;
             let wpId = this.wallpaperIds[this.wallpaperIds.length - 1];
@@ -193,6 +202,11 @@ let browseC = {
         getVideoUrl: function (wpId) {
             return cmnGetVideoUrl(wpId);
         },
+
+        /* Updates page id, based on prop passed in as url.
+           Initializes values for changing browse page.
+           Loads more wallpapers until the view is filled.
+         */
         updatePageId: async function () {
             let oldPageId = store.state.pageId;
             switch (this.browseId) {
@@ -215,6 +229,8 @@ let browseC = {
             }
             await this.loadIfNotFullPage()
         },
+
+        // Loads more wallpapers in a chosen way, if the page is not loading and there is more wallpapers to get
         loadMoreWallpapers: async function () {
             if (this.isLoading || this.reachedEnd) {
                 return
@@ -235,6 +251,8 @@ let browseC = {
             }
             this.isLoading = false;
         },
+
+        // Returns a specified number of wallpapers sorted by last uploaded
         getLatest: async function () {
             let count = WALLPAPER_LOAD_COUNT;
             let lastWp = this.lastWallpaper;
@@ -246,6 +264,8 @@ let browseC = {
             this.addWallpapers(wps);
             this.verifyWpReplyCount(wps, count);
         },
+
+        // Returns a specified number of wallpapers sorted by most liked
         getMostliked: async function () {
             let count = WALLPAPER_LOAD_COUNT;
             let lastWp = this.lastWallpaper;
@@ -263,6 +283,8 @@ let browseC = {
             this.addWallpapers(wps);
             this.verifyWpReplyCount(wps, count);
         },
+
+        // Returns a specified number of wallpapers sorted by a random seed. Generates seed if it doesn't exist.
         getRandom: async function () {
             let count = WALLPAPER_LOAD_COUNT;
             if (this.randomSeed === undefined) this.randomSeed = Math.floor(Math.random() * 10000) + 1;
@@ -274,12 +296,16 @@ let browseC = {
             this.addWallpapers(wps);
             this.verifyWpReplyCount(wps, count);
         },
+
+        // Removes all loaded wallpapers and loads new
         refreshWallpapers: async function () {
             this.wallpaperIds = [];
             this.reachedEnd = this.isLoading = false;
             await this.loadIfNotFullPage();
             setTimeout(()=>cmnScrollTop(), 10)
         },
+
+        // Returns query containing chosen filters
         getFilterQuery: function () {
             let query = "";
             if (this.filterUploadTime) query += `&uploadtime=${this.filterUploadTime}`;
@@ -293,21 +319,29 @@ let browseC = {
             if (this.filterColor) query += `&color=${this.filterColor.replace('#', '%23')}`;
             return query
         },
+
+        // Checks if the number of fetched wallpapers is the same as expected. No more wallpapers is loaded if not.
         verifyWpReplyCount: function (wps, count) {
             if (!wps || wps.length === count) return;
             this.reachedEnd = true;
         },
+
+        // Add wallpapers to browse page
         addWallpapers: function (wps) {
             for (let i = 0; i < wps.length; i++) {
                 this.wallpaperIds.push(wps[i].aid);
                 store.state.wallpapers.saveWallpaper(wps[i])
             }
         },
+
+        // Loads more wallpapers if scrolled to bottom
         onBottomScroll: async function () {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) {
                 await this.loadMoreWallpapers();
             }
         },
+
+        // Load more wallpapers if the view is not filled
         loadIfNotFullPage: async function (i) {
             if (i === undefined) i = 12;
             if (!i) return;
@@ -330,9 +364,13 @@ let browseC = {
             if (color === this.filterColor) this.filter.filterColor = "";
             else this.filter.filterColor = color;
         },
+
+        // Returns true if the given color is more dark than light
         isDarkColor: function (hexcolor) {
             return cmnIsDarkColor(hexcolor);
         },
+
+        // Saves the current filters to the current user
         saveFilters: async function () {
             if (!store.state.user) {
                 setAlert("An error occurred when saving selected filters.");
@@ -352,11 +390,14 @@ let browseC = {
         }
     },
     watch: {
+        // When browse page is changed: Updates page id, closes filter menu and scroll to top
         browseId: async function () {
             await this.updatePageId();
             this.filterMenu = false;
             setTimeout(()=>cmnScrollTop(), 10)
         },
+
+        // On search: Reset the random seed, refresh wallpapers, and close the filter menu
         filterSearchTrigger: async function () {
             if (store.state.pageId === 3) this.randomSeed = undefined;
             await this.refreshWallpapers();

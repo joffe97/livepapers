@@ -1,3 +1,4 @@
+// Component for user settings
 let profileSettingsC = {
     template: `
     <div>
@@ -41,23 +42,30 @@ let profileSettingsC = {
     `,
     data() {
         return {
-            selected_style: this.getCurrentStyleIndex(),
-            profileImg: null
+            selected_style: this.getCurrentStyleIndex(),    // Index of selected style
+            profileImg: null                                // Uploaded profile picture
         }
     },
     computed: {
+        // List of available style to select from
         custom_styles: function () {
             return CUSTOM_STYLES;
         },
+
+        // Css button style
         button_style: function () {
             return store.getStyle().getButtonStr();
         },
+
+        // Css outline style
         outline_style: function () {
             return store.getStyle().getOutlineColor();
         },
         user: function () {
             return store.state.user;
         },
+
+        // Returns current profile picture, or uploaded.
         imgurl: function () {
             if (this.profileImg) return this.profileImg;
             else if (!this.user) return DEFAULT_PROFILE_IMAGE;
@@ -65,11 +73,14 @@ let profileSettingsC = {
         }
     },
     methods: {
+        // Returns index of the applied style
         getCurrentStyleIndex: function () {
             for (let i = 0; i < CUSTOM_STYLES.length; i++) {
                 if (CUSTOM_STYLES[i].getStr() === store.getStyleStr()) return i;
             }
         },
+
+        // Change style applied to user
         changeStyle: async function () {
             if (!this.user || this.selected_style < 0 || this.selected_style >= this.custom_styles.length) {
                 setAlert("Cannot change to the selected style.");
@@ -84,6 +95,8 @@ let profileSettingsC = {
             if (error) setAlert("An internal server error occurred.");
             else clearAlert();
         },
+
+        // Change image in the image upload preview
         onUploadChange: function (e) {
             let files = e.target.files;
             if (!files.length) return;
@@ -97,6 +110,8 @@ let profileSettingsC = {
             }
             setAlert("The current file format is not supported.", "danger");
         },
+
+        // Create image from file
         createImage: function (file) {
             let reader = new FileReader();
             reader.onload = (e) => {
@@ -104,6 +119,8 @@ let profileSettingsC = {
             };
             reader.readAsDataURL(file);
         },
+
+        // Upload and change profile picture to server
         uploadProfileImg: async function () {
             if (!this.user || !this.profileImg) {
                 setAlert("Cannot change profile picture.");

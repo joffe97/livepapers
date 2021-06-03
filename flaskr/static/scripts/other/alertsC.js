@@ -1,3 +1,4 @@
+// Component for a static alert that can be crossed out. Displays if alert is set and alertmode is set to cross.
 let alertCrossC = {
     template: `
     <transition name="fade-up">
@@ -26,6 +27,7 @@ let alertCrossC = {
     }
 }
 
+// Component for a temporary alert that hovers over other content. Displays if alert is set and alertmode is set to tmp.
 let alertTmpC = {
     template: `
     <transition name="showing">
@@ -57,7 +59,7 @@ let alertTmpC = {
         this.setAlertTimeout();
     },
     beforeUnmount() {
-        this.clearAlert();
+        clearAlert();
         this.clearAlertTimeout();
     },
     methods: {
@@ -67,7 +69,7 @@ let alertTmpC = {
         setAlertTimeout: function () {
             if (this.alertMode !== "tmp") return;
             this.clearAlertTimeout();
-            this.timeout = setTimeout(() => this.clearAlert(), 3000);
+            this.timeout = setTimeout(() => clearAlert(), 3000);
         },
         clearAlertTimeout: function () {
             if (this.timeout) clearTimeout(this.timeout);

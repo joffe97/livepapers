@@ -1,3 +1,4 @@
+// Component for uploading wallpapers
 let profileUploadC = {
     template: `
     <div class="mx-lg-3 row">
@@ -52,32 +53,38 @@ let profileUploadC = {
     `,
     data() {
         return {
-            userImg: null,
-            userVideo: null,
-            video: null,
-            type: "",
-            width: null,
-            height: null,
-            customName: "",
-            tags: [],
-            tagInput: ""
+            userImg: null,      // Added image
+            userVideo: null,    // Added video
+            type: "",           // Filetype
+            width: null,        // Wallpaper width
+            height: null,       // Wallpaper height
+            tags: [],           // Tags added to wallpaper
+            tagInput: ""        // Current tag input
         }
     },
     computed: {
+        // Displaying image
         getUploadImg: function () {
             return this.userImg ? this.userImg : DEFAULT_UPLOAD_IMAGE;
         },
+
+        // Displaying width
         displayWidth: function () {
             return this.displayData(this.width);
         },
+
+        // Displaying height
         displayHeight: function () {
             return this.displayData(this.height);
         }
     },
     methods: {
+        // Get display data
         displayData: function (data) {
             return (this.userImg || this.userVideo) && data ? data : "";
         },
+
+        // Add tag to wallpaper
         addTag: function () {
             if (!this.tagInput) {
                 setAlert("Cannot add an empty tag.", "danger", "cross");
@@ -95,6 +102,8 @@ let profileUploadC = {
             this.tags.push(lowerStr);
             this.tagInput = "";
         },
+
+        // Remove tag from wallpaper
         removeTag: function (tag) {
             if (!tag || cmnPopValue(this.tags, tag)) {
                 setAlert("Cannot remove tag.", "danger", "cross");
@@ -102,6 +111,8 @@ let profileUploadC = {
             }
             clearAlert();
         },
+
+        // Change media in the wallpaper upload preview
         onUploadChange: function (e) {
             let files = e.target.files;
             if (!files.length) return;
@@ -116,6 +127,8 @@ let profileUploadC = {
             }
             setAlert("The current file format is not supported.", "danger");
         },
+
+        // Creates image from file
         createImage: function (file) {
             let reader = new FileReader();
             this.width = this.height = null;
@@ -126,6 +139,8 @@ let profileUploadC = {
             };
             reader.readAsDataURL(file);
         },
+
+        // Creates video from file
         createVideo: function (file) {
             let reader = new FileReader();
             reader.onload = (e) => {
@@ -137,6 +152,8 @@ let profileUploadC = {
             this.userVideo = null;
             reader.readAsDataURL(file);
         },
+
+        // Get dimentions from video
         vidUpdateRes: function (src) {
             let comp = this;
             let video = document.createElement("video");
@@ -146,6 +163,8 @@ let profileUploadC = {
                  comp.height = this.videoHeight;
             });
         },
+
+        // Upload wallpaper to server
         uploadFile: async function () {
             let mediatype = null;
             let type;

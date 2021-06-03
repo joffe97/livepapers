@@ -1,3 +1,4 @@
+// Component of profile page. Only visible if logged in.
 let profileC = {
     props: ["pid", "cid"],
     template: `
@@ -35,21 +36,22 @@ let profileC = {
     `,
     data() {
         return {
-            profilePageId: undefined,
-            componentSlideName: "NA",
-            startTouchPos: null,
-            lockSwipe: false
+            profilePageId: undefined,   // Id of the current profile sub page
+            componentSlideName: "NA",   // Name of component transition
+            startTouchPos: null,        // Starting position of mobile touch    (for touch screens)
+            lockSwipe: false            // True if swiping is locked            (for touch screens)
         };
     },
     async created() {
         store.state.pageId = 4;
-        if (!await store.getUser()) this.goBack();
+        if (!await store.getUser()) this.goBack();  // Goes back to previous if there is no user
         else this.updateProfilePageId();
     },
     beforeUnmount() {
         store.state.pageId = 0;
     },
     methods: {
+        // Updates profile page id, based on the pid prop / url
         updateProfilePageId: function () {
             let pageId;
             switch (this.pid) {
@@ -93,22 +95,31 @@ let profileC = {
         goProfileAdmin: function () {
             return this.$router.push("/profile/admin");
         },
+
+        // Store the position of the starting touch position (for touch screens)
         startTouch: function (event) {
             this.startTouchPos = event.touches[0];
         },
+
+        // Handles any moving touch (for touch screens). Changes sub profile page in the direction of the swipe.
         moveTouch: function (event) {
             if (this.lockSwipe || !this.startTouchPos) return;
             this.lockSwipe = true
             let touch = event.touches[0];
-            let diffX = touch.clientX - this.startTouchPos.clientX;
-            let diffY = touch.clientY - this.startTouchPos.clientY;
+            let diffX = touch.clientX - this.startTouchPos.clientX;     // Distance swiped in x direction
+            let diffY = touch.clientY - this.startTouchPos.clientY;     // Distance swiped in y direction
+
+            // The shortest of device height and width
             let clientMinLen = Math.min(document.documentElement.clientWidth, document.documentElement.clientHeight);
-            if (Math.abs(diffX) < Math.abs(diffY) || Math.abs(diffX) < clientMinLen / 5) {  // Vertical swipe
+
+            if (Math.abs(diffX) < Math.abs(diffY) || Math.abs(diffX) < clientMinLen / 5) {  // Returns if vertical swipe
                 this.lockSwipe = false;
                 return;
             }
-            let swipeDirection = (diffX < 0) * 2 - 1;
-            let newPageId = this.profilePageId + swipeDirection;
+            let swipeDirection = (diffX < 0) * 2 - 1;   // Left (1) or right (-1) direction
+            let newPageId = this.profilePageId + swipeDirection;    // Id of new calculated page id
+
+            // Finds function for going to new sub profile page
             let goFunc = null;
             switch (newPageId) {
                 case 1:
@@ -129,8 +140,10 @@ let profileC = {
                         break;
                     }
             }
+
+            // Go to new sub profile page, if available
             if (goFunc) {
-                setTimeout(()=>this.lockSwipe=false, 100);
+                setTimeout(()=>this.lockSwipe=false, 100);  // Unlocks swiping after 100ms
                 this.startTouchPos = null;
                 return goFunc();
             } else {

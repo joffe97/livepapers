@@ -1,3 +1,4 @@
+// Component for registration for new users
 let registerC = {
     template: `
     <div class="container">
@@ -29,18 +30,23 @@ let registerC = {
         }
     },
     created() {
-        store.state.pageId = 6;
+        store.state.pageId = 6;     // Set pageId to login
     },
     beforeUnmount() {
         store.state.pageId = 0;
     },
     unmounted() {
+        // Adds alert if successfully registered in when leaving page
         if (this.succRegister) setAlert("Successfully registered!", "success");
     },
     methods: {
         goProfileOverview: function () {
             return this.$router.push("/profile/overview");
         },
+
+        /* Tries to log in with the given username, password and verified password.
+           Goes to profile overview if successful.
+         */
         onRegister: async function () {
             let reply = await fetch("/doregister", {
                 method: "POST",

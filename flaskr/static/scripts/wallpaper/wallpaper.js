@@ -1,3 +1,4 @@
+// Component for displaying and downloading a wallpaper
 let wallpaperC = {
     props: ["wpIdStr"],
     template: `
@@ -61,11 +62,11 @@ let wallpaperC = {
     `,
     data() {
         return {
-            hoverUpdate: false,
-            hoverFavorite: false,
-            hoverWallpaper: false,
-            wpId: parseInt(this.wpIdStr),
-            fullscreenVideo: false
+            hoverUpdate: false,             // True if hovering update button
+            hoverFavorite: false,           // True if hovering favorite button
+            hoverWallpaper: false,          // True if hovering wallpaper
+            wpId: parseInt(this.wpIdStr),   // Id of wallpaper
+            fullscreenVideo: false          // True if wallpaper is in fullscreen
         }
     },
     async created() {
@@ -116,6 +117,8 @@ let wallpaperC = {
         tags: function () {
             return store.getWpTags(this.wpId);
         },
+
+        // Css for tables
         tableStyle: function () {
             return store.getStyle().getTextBorderColorStr();
         },
@@ -124,6 +127,8 @@ let wallpaperC = {
         getVideoUrl: function () {
             return cmnGetVideoUrl(this.wpId)
         },
+
+        // Toggle favorite wallpaper
         toggleFavoriteWallpaper: async function () {
             if (this.isFavorited) {
                 await this.unfavoriteWallpaper();
@@ -131,6 +136,8 @@ let wallpaperC = {
                 await this.favoriteWallpaper();
             }
         },
+
+        // Add wallpaper to favorites
         favoriteWallpaper: async function () {
             let error = await this.user.addFavorite(this.wpId);
             if (error) {
@@ -139,6 +146,8 @@ let wallpaperC = {
             }
             setAlert("Added wallpaper to favorites.", "success");
         },
+
+        // Remove wallpaper from favorites
         unfavoriteWallpaper: async function () {
             let error = await this.user.removeFavorite(this.wpId);
             if (error) {
@@ -147,10 +156,14 @@ let wallpaperC = {
             }
             setAlert("Removed wallpaper from favorites.", "warning");
         },
+
+        // Go to browse page and search for the given tag
         goSearchTag: async function (tag) {
             store.state.filterSearch = tag;
             return this.$router.push("/latest/");
         },
+
+        // Put clicked element into fullscreen
         goFullscreen: function (el) {
             if (!this.fullscreenVideo) {
                 if (el.requestFullscreen) el.requestFullscreen();

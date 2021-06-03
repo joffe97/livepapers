@@ -1,13 +1,13 @@
 from typing import List
 import datetime
 from enum import Flag
-from flask_login import current_user
 from db import add_tag
 
 
 DAYS_IN_MONTH = 365 / 12
 
 
+# Contains flags for upload times
 class UploadedTimes(Flag):
     last_six_hours = 1
     last_day = 2
@@ -42,12 +42,14 @@ class UploadedTimes(Flag):
             return None
 
 
+# Creates a dictionary that can be sent to client containing status and an optional message
 def get_reply(status: str, msg: str = ""):
     if status not in ["error", "success", "info", "warning"]:
         raise ValueError(f"{status} is not a valid status")
     return {"status": status, "msg": msg}
 
 
+# Returns true if all chars in string is big og small letter from A to Z
 def only_chars(text: str):
     for i in text:
         if not ("a" <= i <= "z" or "A" <= i <= "Z"):
@@ -55,13 +57,15 @@ def only_chars(text: str):
     return True
 
 
+# Returns true if all chars in string is a letter or a number
 def only_chars_and_nums(text: str):
     for i in text:
-        if not ("a" <= i <= "z" or "A" <= i <= "Z" or i.isnumeric()):
+        if not ("a" <= i <= "z" or "A" <= i <= "Z" or i.isdecimal()):
             return False
     return True
 
 
+# Add list of tags to wallpaper if they are valid
 def validate_and_add_tags(conn, tags: List[str], aid):
     if not isinstance(tags, list) or not isinstance(aid, int):
         return True

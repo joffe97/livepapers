@@ -136,6 +136,26 @@ def change_profile_image_resolution_ratio(imgname):
     return not cv2.imwrite(imgname, image_resize)
 
 
+# Removes media associated with wallpaper id
+def delete_wallpaper_media(aid):
+    for media_type in WP_MEDIA_TYPES:
+        folder_path = get_media_folder_path(media_type)
+        if not folder_path:
+            continue
+        for file_ending in WP_MEDIA_TYPES[media_type]:
+            filename = f"{folder_path}{aid}.{file_ending}"
+            delete_file_if_exists(filename)
+
+    lowresname = f"{WP_LOWRESIMG_PATH}{aid}.jpg"
+    delete_file_if_exists(lowresname)
+
+
+# Delete profile picture
+def delete_profile_picture(imgname):
+    if imgname:
+        delete_file_if_exists(f"{PROFILE_IMAGE_PATH}{imgname}")
+
+
 # Finds the most similar color in the COLORS list
 def find_most_similar_color(color: tuple):
     lowest_diff = 0
@@ -262,24 +282,9 @@ def handle_media_uri_profileimg(conn, datauri):
         return None, "servererror"
 
     # Delete old image
-    if current_user.img:
-        delete_file_if_exists(f"{PROFILE_IMAGE_PATH}{current_user.img}")
+    delete_profile_picture(current_user.img)
 
     # Update profile picture name in database
     update_img(conn, current_user.username, filename)
     current_user.img = filename
     return filename, None
-
-
-# Removes media associated with wallpaper id
-def delete_wallpaper_media(aid):
-    for media_type in WP_MEDIA_TYPES:
-        folder_path = get_media_folder_path(media_type)
-        if not folder_path:
-            continue
-        for file_ending in WP_MEDIA_TYPES[media_type]:
-            filename = f"{folder_path}{aid}.{file_ending}"
-            delete_file_if_exists(filename)
-
-    lowresname = f"{WP_LOWRESIMG_PATH}{aid}.jpg"
-    delete_file_if_exists(lowresname)
