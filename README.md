@@ -21,7 +21,7 @@
      * **Note!** This is only for displaying/testing purposes, and is not intended for the production state of the app.
    * If the venv is not working, delete the old venv and create a new:
      1. `python3.9.exe -m venv venv`
-     2. `./venv/Scripts/pip.exe -r ./requirements.txt`
+     2. `./venv/Scripts/pip.exe install -r ./requirements.txt`
 
 
 
