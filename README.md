@@ -33,7 +33,6 @@
     </thead>
 	<tbody>
         <tr><td>Joachim</td><td>sjoko123</td><td>All permissions</td></tr>
-        <tr><td>Tina</td><td>pokemon</td><td>Log in and have profile picture</td></tr>
         <tr><td>Nassenoff</td><td>sjoko123</td><td>Blocked</td></tr>
     </tbody>
 </table>
